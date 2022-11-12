@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Исходные файлы">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Исходные файлы\Библиотеки">
+      <UniqueIdentifier>{c5814647-5653-4da8-88a7-7689d07ca747}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Библиотеки\JIO">
+      <UniqueIdentifier>{a4a84a9d-aab2-42cb-9f16-51490ebd9069}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Библиотеки\OpenGL">
+      <UniqueIdentifier>{bcf9a52a-4f60-418a-b208-a01665fe1417}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Шейдеры">
+      <UniqueIdentifier>{2f0ddf48-75d3-4a14-aa4d-a6024cde1479}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Игра">
+      <UniqueIdentifier>{51beb6ad-6715-46d9-beed-c1d9de49c5e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Библиотеки\OSL">
+      <UniqueIdentifier>{ef39ec40-7972-488e-b9d9-aed7e707a63f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Шейдеры\cells">
+      <UniqueIdentifier>{d1f4234f-cbe0-42e6-ad07-433a502824d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Шейдеры\petri">
+      <UniqueIdentifier>{eed09186-5511-4df5-b3d2-8d9d288775f6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGL\glad.c">
+      <Filter>Исходные файлы\Библиотеки\OpenGL</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Vector.hpp">
+      <Filter>Исходные файлы\Библиотеки\JIO</Filter>
+    </ClInclude>
+    <ClInclude Include="include.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="world.h">
+      <Filter>Исходные файлы\Игра</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGL\gl_func.h">
+      <Filter>Исходные файлы\Библиотеки\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGL\stb_image.h">
+      <Filter>Исходные файлы\Библиотеки\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="OSL\include.h">
+      <Filter>Исходные файлы\Библиотеки\OSL</Filter>
+    </ClInclude>
+    <ClInclude Include="OSL\Randomizer.h">
+      <Filter>Исходные файлы\Библиотеки\OSL</Filter>
+    </ClInclude>
+    <ClInclude Include="OSL\Vector234.h">
+      <Filter>Исходные файлы\Библиотеки\OSL</Filter>
+    </ClInclude>
+    <ClInclude Include="OSL\typedef.h">
+      <Filter>Исходные файлы\Библиотеки\OSL</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGL\shad_primitive.h">
+      <Filter>Исходные файлы\Библиотеки\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="OSL\miniMath.h">
+      <Filter>Исходные файлы\Библиотеки\OSL</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\cells.vert">
+      <Filter>Шейдеры\cells</Filter>
+    </None>
+    <None Include="Shaders\cells.frag">
+      <Filter>Шейдеры\cells</Filter>
+    </None>
+    <None Include="Shaders\cells.geom">
+      <Filter>Шейдеры\cells</Filter>
+    </None>
+    <None Include="Shaders\petri.vert">
+      <Filter>Шейдеры\petri</Filter>
+    </None>
+    <None Include="Shaders\petri.frag">
+      <Filter>Шейдеры\petri</Filter>
+    </None>
+  </ItemGroup>
+</Project>
