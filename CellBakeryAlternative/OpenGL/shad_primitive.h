@@ -3,7 +3,8 @@
 namespace shad {
 	const bool using_external_code_of_shaders = 0;
 
-	class Shader;
+	class Shader; 
+	class ComputeShader;
 	class SimpleMesh;
 	class EBOMesh;
 
@@ -160,6 +161,68 @@ private:
 	}
 };
 
+class shad::ComputeShader {
+public:
+	std::string name;
+
+	ComputeShader() {
+		glID = NULL;
+	}
+	ComputeShader(const char *sourseComp) {
+		compile(sourseComp);
+	}
+
+	bool compile(const char *sourseComp) {
+		int success;
+		bool err = 0;
+		char infoLog[512];
+
+		// вычислительный шейдер
+		int computeShader = glCreateShader(GL_COMPUTE_SHADER);
+		err |= interimСomp(computeShader, sourseComp, "ERROR::SHADER::COMPUTE::COMPILATION_FAILED\n");
+
+
+		// связывание шейдеров
+		glID = glCreateProgram();
+		glAttachShader(glID, computeShader);
+		err |= interimLink();
+		glDeleteShader(computeShader);
+		return err;
+	}
+
+
+	uint32_t glID;
+private:
+	inline bool interimСomp(int Shader, const char *sourse, const char *errlog) {
+		int success;
+		bool err = 0;
+		char infoLog[512];
+		glShaderSource(Shader, 1, &sourse, NULL);
+		glCompileShader(Shader);
+		glGetShaderiv(Shader, GL_COMPILE_STATUS, &success); // проверка на наличие ошибок компилирования шейдера
+		if (!success) {
+			err = 1;
+			glGetShaderInfoLog(Shader, 512, NULL, infoLog);
+			std::cout << name.c_str() << ":\n";
+			std::cout << errlog << infoLog << std::endl;
+		}
+		return err;
+	}
+	inline bool interimLink() {
+		int success;
+		bool err = 0;
+		char infoLog[512];
+		glLinkProgram(glID);
+		glGetProgramiv(glID, GL_LINK_STATUS, &success); // проверка на наличие ошибок связывания шейдеров
+		if (!success) {
+			err = 1;
+			glGetProgramInfoLog(glID, 512, NULL, infoLog);
+			std::cout << name.c_str() << ":\n";
+			std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+		}
+		return err;
+	}
+};
 
 class shad::VoidMesh {
 public:

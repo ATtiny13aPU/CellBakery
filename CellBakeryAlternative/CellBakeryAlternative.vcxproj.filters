@@ -29,6 +29,12 @@
     <Filter Include="Шейдеры\petri">
       <UniqueIdentifier>{eed09186-5511-4df5-b3d2-8d9d288775f6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Шейдеры\sim">
+      <UniqueIdentifier>{57baf64a-1802-46b9-b2fb-2b874ce7b9fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Шейдеры\sim\light">
+      <UniqueIdentifier>{f529e4ea-6556-44ff-afa3-f039e472dd84}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -88,6 +94,9 @@
     </None>
     <None Include="Shaders\petri.frag">
       <Filter>Шейдеры\petri</Filter>
+    </None>
+    <None Include="Shaders\sim\light.comp">
+      <Filter>Шейдеры\sim\light</Filter>
     </None>
   </ItemGroup>
 </Project>
