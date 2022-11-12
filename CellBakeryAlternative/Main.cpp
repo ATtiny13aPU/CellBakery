@@ -27,7 +27,7 @@ private:
 	Randomaizer RAND;
 	int Xd = 800, Yd = 600;
 
-	int Vsync = 0, VsyncNow = Vsync;
+	int Vsync = 1, VsyncNow = Vsync;
 
 	GLFWwindow *window;
 	shad::VoidMesh voidMesh;
@@ -39,8 +39,8 @@ private:
 	shad::ComputeShader lightComputeShader;
 
 	uint32_t count_of_frames = -1;
-	std::ostringstream buff; // òåêñò áóôôåð
-	ch_tp frame_time_point[2]; // äâå ïåðåìåííûå âðåìåíè
+	std::ostringstream buff; // Ñ‚ÐµÐºÑÑ‚ Ð±ÑƒÑ„Ñ„ÐµÑ€
+	ch_tp frame_time_point[2]; // Ð´Ð²Ðµ Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ñ‹Ðµ Ð²Ñ€ÐµÐ¼ÐµÐ½Ð¸
 	fastLinearFilter frameTime;
 
 	vec2 mPos, dmPos1, dmPos2;
@@ -107,7 +107,7 @@ int Context::run() {
 		lightComputeShader.compile(sourseC.c_str());
 	}
 
-	// Ñîçäàíèå ìèðà
+	// Ð¡Ð¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð¼Ð¸Ñ€Ð°
 	///==============================
 	WorldCS world;
 	world.setup.Dp = 5.;
@@ -119,51 +119,53 @@ int Context::run() {
 	while (!world.control.out_ready) std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 
-	GLuint light_map = 0; // òåêñòóðà êàðòû ìèðà äëÿ ÿðêîñòè ñâåòà
+	GLuint light_map = 0; // Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ð° ÐºÐ°Ñ€Ñ‚Ñ‹ Ð¼Ð¸Ñ€Ð° Ð´Ð»Ñ ÑÑ€ÐºÐ¾ÑÑ‚Ð¸ ÑÐ²ÐµÑ‚Ð°
 	{
 		glGenTextures(1, &light_map);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, light_map);
 
 		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // áåç èíòåðïîëÿöèè
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // Ð±ÐµÐ· Ð¸Ð½Ñ‚ÐµÑ€Ð¿Ð¾Ð»ÑÑ†Ð¸Ð¸
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // âûäà¸ò öâåò áëèæàéøåãî ïèêñåëÿ â ïðåäåëàõ òåêñòóðû ïðè âûëåòå çà ãðàíèöû
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Ð²Ñ‹Ð´Ð°Ñ‘Ñ‚ Ñ†Ð²ÐµÑ‚ Ð±Ð»Ð¸Ð¶Ð°Ð¹ÑˆÐµÐ³Ð¾ Ð¿Ð¸ÐºÑÐµÐ»Ñ Ð² Ð¿Ñ€ÐµÐ´ÐµÐ»Ð°Ñ… Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ñ‹ Ð¿Ñ€Ð¸ Ð²Ñ‹Ð»ÐµÑ‚Ðµ Ð·Ð° Ð³Ñ€Ð°Ð½Ð¸Ñ†Ñ‹
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, world.setup.out_mapSize, world.setup.out_mapSize, 0, GL_RED, GL_UNSIGNED_BYTE, world.light_map);
+
+		glBindImageTexture(0, light_map, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R8);
 	}
-	GLuint collision_map = 0; // òåêñòóðà êàðòû èíäåêñîâ êîëëèçèîííûõ îáëàñòåé ìèðà
+	GLuint collision_map = 0; // Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ð° ÐºÐ°Ñ€Ñ‚Ñ‹ Ð¸Ð½Ð´ÐµÐºÑÐ¾Ð² ÐºÐ¾Ð»Ð»Ð¸Ð·Ð¸Ð¾Ð½Ð½Ñ‹Ñ… Ð¾Ð±Ð»Ð°ÑÑ‚ÐµÐ¹ Ð¼Ð¸Ñ€Ð°
 	{
 		glGenTextures(1, &collision_map);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, collision_map);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // áåç èíòåðïîëÿöèè
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // Ð±ÐµÐ· Ð¸Ð½Ñ‚ÐµÑ€Ð¿Ð¾Ð»ÑÑ†Ð¸Ð¸
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // âûäà¸ò öâåò áëèæàéøåãî ïèêñåëÿ â ïðåäåëàõ òåêñòóðû ïðè âûëåòå çà ãðàíèöû
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Ð²Ñ‹Ð´Ð°Ñ‘Ñ‚ Ñ†Ð²ÐµÑ‚ Ð±Ð»Ð¸Ð¶Ð°Ð¹ÑˆÐµÐ³Ð¾ Ð¿Ð¸ÐºÑÐµÐ»Ñ Ð² Ð¿Ñ€ÐµÐ´ÐµÐ»Ð°Ñ… Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ñ‹ Ð¿Ñ€Ð¸ Ð²Ñ‹Ð»ÐµÑ‚Ðµ Ð·Ð° Ð³Ñ€Ð°Ð½Ð¸Ñ†Ñ‹
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32I, world.setup.out_mapSize, world.setup.out_mapSize, 0, GL_RED_INTEGER, GL_INT, world.collision_map);
 	}
-	GLuint collision_data = 0; // èíôîðìàöèÿ î êîëëèçèÿõ
+	GLuint collision_data = 0; // Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾ ÐºÐ¾Ð»Ð»Ð¸Ð·Ð¸ÑÑ…
 	{
 		glGenTextures(1, &collision_data);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, collision_data);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // áåç èíòåðïîëÿöèè
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // Ð±ÐµÐ· Ð¸Ð½Ñ‚ÐµÑ€Ð¿Ð¾Ð»ÑÑ†Ð¸Ð¸
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // âûäà¸ò öâåò áëèæàéøåãî ïèêñåëÿ â ïðåäåëàõ òåêñòóðû ïðè âûëåòå çà ãðàíèöû
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // Ð²Ñ‹Ð´Ð°Ñ‘Ñ‚ Ñ†Ð²ÐµÑ‚ Ð±Ð»Ð¸Ð¶Ð°Ð¹ÑˆÐµÐ³Ð¾ Ð¿Ð¸ÐºÑÐµÐ»Ñ Ð² Ð¿Ñ€ÐµÐ´ÐµÐ»Ð°Ñ… Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ñ‹ Ð¿Ñ€Ð¸ Ð²Ñ‹Ð»ÐµÑ‚Ðµ Ð·Ð° Ð³Ñ€Ð°Ð½Ð¸Ñ†Ñ‹
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32I, 4096, world.setup.out_maxÑollisionData / 4096, 0, GL_RED_INTEGER, GL_INT, &world.collision_data[0]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32I, 4096, world.setup.out_maxÐ¡ollisionData / 4096, 0, GL_RED_INTEGER, GL_INT, &world.collision_data[0]);
 	}
-	GLuint cells_pos = 0; // ïîçèöèè êëåòîê
+	GLuint cells_pos = 0; // Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ ÐºÐ»ÐµÑ‚Ð¾Ðº
 	{
 		glGenTextures(1, &cells_pos);
 		glActiveTexture(GL_TEXTURE3);
@@ -173,11 +175,11 @@ int Context::run() {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		float clr[4] = {0, 0, 0, 0};
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, clr); // ñâîéñòâî òåêñòóðû çà ïðåäåëàìè âûäàâàòü ÷¸ðíûé ïðîçðà÷íûé öâåò
+		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, clr); // ÑÐ²Ð¾Ð¹ÑÑ‚Ð²Ð¾ Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ñ‹ Ð·Ð° Ð¿Ñ€ÐµÐ´ÐµÐ»Ð°Ð¼Ð¸ Ð²Ñ‹Ð´Ð°Ð²Ð°Ñ‚ÑŒ Ñ‡Ñ‘Ñ€Ð½Ñ‹Ð¹ Ð¿Ñ€Ð¾Ð·Ñ€Ð°Ñ‡Ð½Ñ‹Ð¹ Ñ†Ð²ÐµÑ‚
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 4096, world.setup.set_max_ec / 4096, 0, GL_RGBA, GL_FLOAT, world.buffFloatPosCells);
 	}
-	GLuint cells_meta = 0; // ìåòàäàòà êëåòîê
+	GLuint cells_meta = 0; // Ð¼ÐµÑ‚Ð°Ð´Ð°Ñ‚Ð° ÐºÐ»ÐµÑ‚Ð¾Ðº
 	{
 		glGenTextures(1, &cells_meta);
 		glActiveTexture(GL_TEXTURE3);
@@ -188,35 +190,30 @@ int Context::run() {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		float clr[4] = {0, 0, 0, 0};
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, clr); // ñâîéñòâî òåêñòóðû çà ïðåäåëàìè âûäàâàòü ÷¸ðíûé ïðîçðà÷íûé öâåò
+		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, clr); // ÑÐ²Ð¾Ð¹ÑÑ‚Ð²Ð¾ Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ñ‹ Ð·Ð° Ð¿Ñ€ÐµÐ´ÐµÐ»Ð°Ð¼Ð¸ Ð²Ñ‹Ð´Ð°Ð²Ð°Ñ‚ÑŒ Ñ‡Ñ‘Ñ€Ð½Ñ‹Ð¹ Ð¿Ñ€Ð¾Ð·Ñ€Ð°Ñ‡Ð½Ñ‹Ð¹ Ñ†Ð²ÐµÑ‚
 
-		glBindTexture(GL_TEXTURE_2D, cells_meta); // òàêæå çàïîëíÿåì ñòàðòîâûìè äàííûìè äëÿ öèêëà
+		glBindTexture(GL_TEXTURE_2D, cells_meta); // Ñ‚Ð°ÐºÐ¶Ðµ Ð·Ð°Ð¿Ð¾Ð»Ð½ÑÐµÐ¼ ÑÑ‚Ð°Ñ€Ñ‚Ð¾Ð²Ñ‹Ð¼Ð¸ Ð´Ð°Ð½Ð½Ñ‹Ð¼Ð¸ Ð´Ð»Ñ Ñ†Ð¸ÐºÐ»Ð°
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, world.setup.set_max_ec / 4096, 0, GL_RGBA, GL_UNSIGNED_BYTE, world.buffByteMetaCells);
 	}
 
 
-	
-	glBindImageTexture(0, light_map, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R8);
-
-
-	
 	glEnable(GL_MULTISAMPLE);
 
-	// Öèêë ãðàôèêè
+	// Ð¦Ð¸ÐºÐ» Ð³Ñ€Ð°Ñ„Ð¸ÐºÐ¸
 	///\/\/\/\/\/\/\/\///
 	glfwSwapInterval(Vsync);
 	while (!glfwWindowShouldClose(window)) {
-		// Ðàáîòà ñ glfw3
+		// Ð Ð°Ð±Ð¾Ñ‚Ð° Ñ glfw3
 		{	///============================================================///
 			if (VsyncNow != Vsync) {
 				glfwSwapInterval(Vsync);
 				VsyncNow = Vsync;
 			}
 
-			// Ïîëó÷àåì ýâåíòû
+			// ÐŸÐ¾Ð»ÑƒÑ‡Ð°ÐµÐ¼ ÑÐ²ÐµÐ½Ñ‚Ñ‹
 			glfwPollEvents();
 
-			// Íàñòðàèâàåì êàìåðó ïîä ðàçðåøåíèå îêíà
+			// ÐÐ°ÑÑ‚Ñ€Ð°Ð¸Ð²Ð°ÐµÐ¼ ÐºÐ°Ð¼ÐµÑ€Ñƒ Ð¿Ð¾Ð´ Ñ€Ð°Ð·Ñ€ÐµÑˆÐµÐ½Ð¸Ðµ Ð¾ÐºÐ½Ð°
 			glfwGetFramebufferSize(window, &Xd, &Yd);
 			glViewport(0, 0, Xd, Yd);
 		}	///============================================================///
@@ -231,11 +228,13 @@ int Context::run() {
 		int gmesh = (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS);
 
 
-		// Âû÷èñëåíèÿ
+		// Ð’Ñ‹Ñ‡Ð¸ÑÐ»ÐµÐ½Ð¸Ñ
 		if (test) {
-			// ñâåò
+			// ÑÐ²ÐµÑ‚
 			if (1) {
 				glUseProgram(lightComputeShader.glID);
+				glUniform1f(glGetUniformLocation(lightComputeShader.glID, "mapSize"), float(world.setup.out_mapSize));
+
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, light_map);
 
@@ -246,11 +245,11 @@ int Context::run() {
 			
 		}
 
-		// Ãðàôèêà
+		// Ð“Ñ€Ð°Ñ„Ð¸ÐºÐ°
 		{
-			// óïðàâëåíèå êàìåðîé
+			// ÑƒÐ¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ ÐºÐ°Ð¼ÐµÑ€Ð¾Ð¹
 			{	///==============================
-				// äâèæåíèå êëàâèàòóðîé
+				// Ð´Ð²Ð¸Ð¶ÐµÐ½Ð¸Ðµ ÐºÐ»Ð°Ð²Ð¸Ð°Ñ‚ÑƒÑ€Ð¾Ð¹
 				{	///==============================
 					if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 						world.view.Pos[0] -= (frameTime.get() / 1000.) * world.view.mst;
@@ -263,26 +262,26 @@ int Context::run() {
 				}	///==============================
 
 				
-				// ìàñøòàáèðîâàíèå â óêàçàòåëü è äâèæåíèå
+				// Ð¼Ð°ÑÑˆÑ‚Ð°Ð±Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð² ÑƒÐºÐ°Ð·Ð°Ñ‚ÐµÐ»ÑŒ Ð¸ Ð´Ð²Ð¸Ð¶ÐµÐ½Ð¸Ðµ
 				{	///==============================
-					// ïîëó÷åíèå ýâåíòà êîë¸ñèêà ìûøè
+					// Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ðµ ÑÐ²ÐµÐ½Ñ‚Ð° ÐºÐ¾Ð»Ñ‘ÑÐ¸ÐºÐ° Ð¼Ñ‹ÑˆÐ¸
 					//float scroll = ImGui::GetIO().MouseWheel;
 					if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 						scroll -= 0.05;
 					if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 						scroll += 0.03;
 
-					dmPos2 = dmPos1; // äâèæåíèå
+					dmPos2 = dmPos1; // Ð´Ð²Ð¸Ð¶ÐµÐ½Ð¸Ðµ
 					glfwGetCursorPos(window, &dmPos1[0], &dmPos1[1]); dmPos1[0] = -dmPos1[0];
 					if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
 						world.view.Pos -= mVec_to_wVec(dmPos2 - dmPos1, world.view.mst);
 					}
 					mPos = mPos_to_wPos(vec2(-dmPos1[0], dmPos1[1]), world.view.mst, world.view.Pos);
 
-					/// êîìïåíñàöèÿ äâèæåíèÿ
+					/// ÐºÐ¾Ð¼Ð¿ÐµÐ½ÑÐ°Ñ†Ð¸Ñ Ð´Ð²Ð¸Ð¶ÐµÐ½Ð¸Ñ
 					// dmPos3 *= vec2(std::min(vec2(dmPos2.x - dmPos1.x).length() * 0.05, 2.), std::min(vec2(dmPos2.y - dmPos1.y).length() * 0.05, 2.)) * 0.3;
 
-					while (scroll > 0.01) { // ïðèáëèæåíèå
+					while (scroll > 0.01) { // Ð¿Ñ€Ð¸Ð±Ð»Ð¸Ð¶ÐµÐ½Ð¸Ðµ
 						scroll -= 0.1;
 						if (scroll < 0.) scroll = 0.;
 						vec2 mnPos = mPos_to_wPos(vec2(0, 0), world.view.mst, world.view.Pos);
@@ -294,7 +293,7 @@ int Context::run() {
 
 						world.view.mst = std::max(world.view.mst, 0.00001 * world.setup.Dp);
 					}
-					while (scroll < -0.01) { // îòäàëåíèå 
+					while (scroll < -0.01) { // Ð¾Ñ‚Ð´Ð°Ð»ÐµÐ½Ð¸Ðµ 
 						scroll += 0.1;
 						vec2 mnPos = mPos_to_wPos(vec2(0, 0), world.view.mst, world.view.Pos);
 						vec2 mxPos = mPos_to_wPos(vec2(Xd, Yd), world.view.mst, world.view.Pos);
@@ -312,7 +311,7 @@ int Context::run() {
 			vec2 mnPos = mPos_to_wPos(vec2(0, 0), world.view.mst, world.view.Pos);
 			vec2 mxPos = mPos_to_wPos(vec2(Xd, Yd), world.view.mst, world.view.Pos);
 
-			// ÷àøêà ïåòðè
+			// Ñ‡Ð°ÑˆÐºÐ° Ð¿ÐµÑ‚Ñ€Ð¸
 			if (1) {
 				glUseProgram(petriShader.glID);
 				glUniform4f(glGetUniformLocation(petriShader.glID, "ViewWorld"), mnPos[0], mxPos[1], mxPos[0], mnPos[1]);
@@ -325,7 +324,7 @@ int Context::run() {
 				glUniform1f(glGetUniformLocation(petriShader.glID, "Ac"), world.setup.Ac);
 				//glUniform1i(glGetUniformLocation(petriShader.glID, "MSAA"), MSAAuniform[MSAA]);
 
-				// glBindTexture(GL_TEXTURE_2D, light_map); // îáíîâëåíèå äàííûõ êàðòà ñâåòà
+				// glBindTexture(GL_TEXTURE_2D, light_map); // Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð´Ð°Ð½Ð½Ñ‹Ñ… ÐºÐ°Ñ€Ñ‚Ð° ÑÐ²ÐµÑ‚Ð°
 				// glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, world.setup.out_mapSize, world.setup.out_mapSize, GL_RED, GL_UNSIGNED_BYTE, world.light_map);
 
 				glActiveTexture(GL_TEXTURE0);
@@ -337,7 +336,7 @@ int Context::run() {
 					glDrawArrays(GL_TRIANGLE_STRIP, 0, fullScreenMesh.size);
 				}
 			}
-			// êëåòêè
+			// ÐºÐ»ÐµÑ‚ÐºÐ¸
 			if (1) {
 				
 				glUseProgram(cellsShader.glID);

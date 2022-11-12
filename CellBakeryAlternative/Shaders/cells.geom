@@ -19,7 +19,7 @@ out vec2 Pos;
 out vec4 c_meta;
 out vec4 c_pos;
 
-mat2 rot(float a) { //матрица поворота по заданному углу
+mat2 rot(float a) { //РјР°С‚СЂРёС†Р° РїРѕРІРѕСЂРѕС‚Р° РїРѕ Р·Р°РґР°РЅРЅРѕРјСѓ СѓРіР»Сѓ
 	float s = sin(a);
 	float c = cos(a);
 	return mat2(c, -s, s, c);
@@ -32,24 +32,24 @@ float lengthRect(vec2 tl, vec2 br, vec2 uv) {
 
 struct CellType {
 int
-	Phago,		// Фагоцит 0
-	Flagello,	// Жгутоцит 1
-	Photo,		// Фотоцит 2
-	Devoro,		// Девороцит 3
-	Lipo,		// Липоцит 4
-	Keratino,	// Кератиноцит 5
-	Buoyo,		// Буецит 6
-	Glueo,		// Клейкоцит 7
-	Viro,		// Вироцит 8
-	Nitro,		// Нитроцит 9
-	Stereo,		// Стереоцит 10
-	Senseo,		// Сенсеоцит 11
-	Myo,		// Миоцит 12
-	Neuro,		// Нейроцит 13
-	Secro,		// Секроцит 14
-	Stemo,		// Стволоцит 15
-	Gamete,		// Гамета 16
-	Cilio;		// Цилиоцит 17
+	Phago,		// Р¤Р°РіРѕС†РёС‚ 0
+	Flagello,	// Р–РіСѓС‚РѕС†РёС‚ 1
+	Photo,		// Р¤РѕС‚РѕС†РёС‚ 2
+	Devoro,		// Р”РµРІРѕСЂРѕС†РёС‚ 3
+	Lipo,		// Р›РёРїРѕС†РёС‚ 4
+	Keratino,	// РљРµСЂР°С‚РёРЅРѕС†РёС‚ 5
+	Buoyo,		// Р‘СѓРµС†РёС‚ 6
+	Glueo,		// РљР»РµР№РєРѕС†РёС‚ 7
+	Viro,		// Р’РёСЂРѕС†РёС‚ 8
+	Nitro,		// РќРёС‚СЂРѕС†РёС‚ 9
+	Stereo,		// РЎС‚РµСЂРµРѕС†РёС‚ 10
+	Senseo,		// РЎРµРЅСЃРµРѕС†РёС‚ 11
+	Myo,		// РњРёРѕС†РёС‚ 12
+	Neuro,		// РќРµР№СЂРѕС†РёС‚ 13
+	Secro,		// РЎРµРєСЂРѕС†РёС‚ 14
+	Stemo,		// РЎС‚РІРѕР»РѕС†РёС‚ 15
+	Gamete,		// Р“Р°РјРµС‚Р° 16
+	Cilio;		// Р¦РёР»РёРѕС†РёС‚ 17
 };
 
 const float t2kr[18] = float[](1., 1., 1., 1.3, 1., 1., 1., 1.3, 1.2, 1.15, 1.15, 1.15, 1., 1., 1., 1., 1., 1.1);
@@ -58,7 +58,7 @@ void main() {
 	int cid = id[0];
 	vec4 cell_pos_data = texelFetch(CellsPos, ivec2(cid & 0xFFF, cid / 0x1000), 0);
 
-	// отсекаем вне экрана
+	// РѕС‚СЃРµРєР°РµРј РІРЅРµ СЌРєСЂР°РЅР°
 	if (lengthRect(ViewWorld.xy, ViewWorld.zw, cell_pos_data.xy) < cell_pos_data.z) {
 		vec2 WinK = (cell_pos_data.xy - ViewWorld.xy) / (ViewWorld.zw - ViewWorld.xy) * 2. - 1.;
 		vec2 WinR = cell_pos_data.z / (ViewWorld.zw - ViewWorld.xy);
@@ -73,7 +73,7 @@ void main() {
 		float r = cell_pos_data.z * t2kr[t];
 		WinR *= t2kr[t];
 
-		// 4-угольник
+		// 4-СѓРіРѕР»СЊРЅРёРє
 		if (GM == 0) {
 			if(t != 1) {
 				vec2 p1 = WinK - WinR, p2 = WinK + WinR;
@@ -119,7 +119,7 @@ void main() {
 				EmitVertex();
 			}
 		}
-		// 3-угольник
+		// 3-СѓРіРѕР»СЊРЅРёРє
 		else {
 			// 1:bottom-left
 			Pos = vec2(cell_pos_data.x - r * 1.7320508, cell_pos_data.y - r);

@@ -3,10 +3,13 @@
 layout(local_size_x = 1, local_size_y = 1) in;
 layout(r8, binding = 0) uniform image2D light_map;
 
-void main() {
-	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
-	
-	float brightness = 0.5;
+uniform float mapSize;
 
-	imageStore(light_map, pixel_coords, vec4(brightness, vec3(0.0)));
+void main() {
+	vec2 pixel_coords = gl_GlobalInvocationID.xy / mapSize;
+	
+	float brightness = length(1. - pixel_coords * 2.);
+	brightness *= pixel_coords.y;
+
+	imageStore(light_map, ivec2(gl_GlobalInvocationID.xy), vec4(brightness, vec3(0.0)));
 }

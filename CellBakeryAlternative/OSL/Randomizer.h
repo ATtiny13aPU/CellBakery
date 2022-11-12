@@ -90,7 +90,7 @@ namespace osl {
 			delete[] seedu64;
 		}
 
-		void ini(uint64_t seed) { // инициализация по заданному сиду
+		void ini(uint64_t seed) { // РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРѕ Р·Р°РґР°РЅРЅРѕРјСѓ СЃРёРґСѓ
 			mseed = seed;
 			for (uint64_t i = 0u; i < NSEED * 4; i++)
 				seedu16[i] = uint16_t((i * 35u) ^ mseed);
@@ -101,7 +101,7 @@ namespace osl {
 
 		}
 
-		uint64_t ini() { // инициализация без сида, генерация сида
+		uint64_t ini() { // РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р±РµР· СЃРёРґР°, РіРµРЅРµСЂР°С†РёСЏ СЃРёРґР°
 			uint64_t ps = uint64_t(&seedu64);
 			uint8_t *u1 = new (uint8_t);
 			ps ^= uint64_t(u1) << 32;
