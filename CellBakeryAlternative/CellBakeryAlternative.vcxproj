@@ -299,6 +299,7 @@
     <None Include="Shaders\cells.vert" />
     <None Include="Shaders\petri.frag" />
     <None Include="Shaders\petri.vert" />
+    <None Include="Shaders\sim\light.comp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

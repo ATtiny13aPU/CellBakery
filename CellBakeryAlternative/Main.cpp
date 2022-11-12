@@ -36,6 +36,8 @@ private:
 	shad::SimpleMesh fullScreenMesh;
 	shad::Shader petriShader;
 
+	shad::ComputeShader lightComputeShader;
+
 	uint32_t count_of_frames = -1;
 	std::ostringstream buff; // текст буффер
 	ch_tp frame_time_point[2]; // две переменные времени
@@ -94,6 +96,15 @@ int Context::run() {
 		std::string sourseG {std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>()};
 		inpf.close();
 		cellsShader.compile(sourseV.c_str(), sourseF.c_str(), sourseG.c_str());
+	}
+
+	{
+		lightComputeShader.name = std::string("lightComputeShader");
+		std::ifstream inpf;
+		inpf.open("Shaders/sim/light.comp");
+		std::string sourseC{ std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>() };
+		inpf.close();
+		lightComputeShader.compile(sourseC.c_str());
 	}
 
 	// Создание мира
@@ -183,6 +194,11 @@ int Context::run() {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, world.setup.set_max_ec / 4096, 0, GL_RGBA, GL_UNSIGNED_BYTE, world.buffByteMetaCells);
 	}
 
+
+	
+	glBindImageTexture(0, light_map, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R8);
+
+
 	
 	glEnable(GL_MULTISAMPLE);
 
@@ -213,6 +229,24 @@ int Context::run() {
 		int boost = (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS);
 		int test = (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS);
 		int gmesh = (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS);
+
+
+		// Вычисления
+		if (test) {
+			// свет
+			if (1) {
+				glUseProgram(lightComputeShader.glID);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, light_map);
+
+				glDispatchCompute(world.setup.out_mapSize, world.setup.out_mapSize, 1);
+
+				glMemoryBarrier(GL_ALL_BARRIER_BITS);
+			}
+			
+		}
+
+		// Графика
 		{
 			// управление камерой
 			{	///==============================
@@ -291,8 +325,8 @@ int Context::run() {
 				glUniform1f(glGetUniformLocation(petriShader.glID, "Ac"), world.setup.Ac);
 				//glUniform1i(glGetUniformLocation(petriShader.glID, "MSAA"), MSAAuniform[MSAA]);
 
-				glBindTexture(GL_TEXTURE_2D, light_map); // обновление данных карта света
-				glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, world.setup.out_mapSize, world.setup.out_mapSize, GL_RED, GL_UNSIGNED_BYTE, world.light_map);
+				// glBindTexture(GL_TEXTURE_2D, light_map); // обновление данных карта света
+				// glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, world.setup.out_mapSize, world.setup.out_mapSize, GL_RED, GL_UNSIGNED_BYTE, world.light_map);
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, light_map);
@@ -372,7 +406,7 @@ int Context::run() {
 
 int main() {
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
