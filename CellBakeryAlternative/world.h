@@ -3,24 +3,24 @@
 using namespace osl;
 
 enum CellType {
-	Phago,		// Фагоцит
-	Flagello,	// Жгутоцит
-	Photo,		// Фотоцит
-	Devoro,		// Девороцит
-	Lipo,		// Липоцит
-	Keratino,	// Кекатиноцит
-	Buoyo,		// Буецит
-	Glueo,		// Клейкоцит
-	Viro,		// Вироцит
-	Nitro,		// Нитроцит
-	Stereo,		// Стереоцит
-	Senseo,		// Сенсеоцит
-	Myo,		// Миоцит
-	Neuro,		// Нейроцит
-	Secro,		// Секроцит
-	Stemo,		// Стволоцит
-	Gamete,		// Гамета
-	Cilio		// Цилиоцит
+	Phago,		// Р¤Р°РіРѕС†РёС‚
+	Flagello,	// Р–РіСѓС‚РѕС†РёС‚
+	Photo,		// Р¤РѕС‚РѕС†РёС‚
+	Devoro,		// Р”РµРІРѕСЂРѕС†РёС‚
+	Lipo,		// Р›РёРїРѕС†РёС‚
+	Keratino,	// РљРµРєР°С‚РёРЅРѕС†РёС‚
+	Buoyo,		// Р‘СѓРµС†РёС‚
+	Glueo,		// РљР»РµР№РєРѕС†РёС‚
+	Viro,		// Р’РёСЂРѕС†РёС‚
+	Nitro,		// РќРёС‚СЂРѕС†РёС‚
+	Stereo,		// РЎС‚РµСЂРµРѕС†РёС‚
+	Senseo,		// РЎРµРЅСЃРµРѕС†РёС‚
+	Myo,		// РњРёРѕС†РёС‚
+	Neuro,		// РќРµР№СЂРѕС†РёС‚
+	Secro,		// РЎРµРєСЂРѕС†РёС‚
+	Stemo,		// РЎС‚РІРѕР»РѕС†РёС‚
+	Gamete,		// Р“Р°РјРµС‚Р°
+	Cilio		// Р¦РёР»РёРѕС†РёС‚
 };
 
 class CellCS {
@@ -46,17 +46,17 @@ private:
 class WorldCS {
 public:
 	struct View {
-		vec2 Pos = vec2(0, 0); // Позиция центра камеры (0 - центр субстрата)
-		frac mst = 1.; // Масштаб зрения (чем больше, тем меньше выглядит субстрат)
+		vec2 Pos = vec2(0, 0); // РџРѕР·РёС†РёСЏ С†РµРЅС‚СЂР° РєР°РјРµСЂС‹ (0 - С†РµРЅС‚СЂ СЃСѓР±СЃС‚СЂР°С‚Р°)
+		frac mst = 1.; // РњР°СЃС€С‚Р°Р± Р·СЂРµРЅРёСЏ (С‡РµРј Р±РѕР»СЊС€Рµ, С‚РµРј РјРµРЅСЊС€Рµ РІС‹РіР»СЏРґРёС‚ СЃСѓР±СЃС‚СЂР°С‚)
 	};
 	View view;
 	class Setup {
 	public:
 		std::string name = "Unnamed";
-		frac Dp; // Диаметр чаши в мм при создании
-		frac Ac = 0.03; // Размер сетки мира (не трогать внешними методами, только для чтения)
+		frac Dp; // Р”РёР°РјРµС‚СЂ С‡Р°С€Рё РІ РјРј РїСЂРё СЃРѕР·РґР°РЅРёРё
+		frac Ac = 0.03; // Р Р°Р·РјРµСЂ СЃРµС‚РєРё РјРёСЂР° (РЅРµ С‚СЂРѕРіР°С‚СЊ РІРЅРµС€РЅРёРјРё РјРµС‚РѕРґР°РјРё, С‚РѕР»СЊРєРѕ РґР»СЏ С‡С‚РµРЅРёСЏ)
 		int out_mapSize = 1;
-		int out_maxСollisionData = 1;
+		int out_maxРЎollisionData = 1;
 		int set_max_ec = 1000;
 		int set_max_efp = 10000;
 		uint64_t main_seed = 0x12067B01A37EE0E2;
@@ -64,27 +64,27 @@ public:
 	Setup setup;
 	class Control {
 	public:
-		int out_ready = 0; // готовность данных мира к использованию внешним кодом
-		int out_safe_shutdown = 0; // готовность к выключению потока мира
-		int out_run_step = 0; // колво запрошенных шагов в очереди
-		bool in_auto_run_mode = 0; // после первого вызова world.run_step(1); мир будет обрабатываться автономно не дожидаясь ответа
-		uint64_t out_counter_of_step = 0; // колво шагов с момента старта симуляции
+		int out_ready = 0; // РіРѕС‚РѕРІРЅРѕСЃС‚СЊ РґР°РЅРЅС‹С… РјРёСЂР° Рє РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЋ РІРЅРµС€РЅРёРј РєРѕРґРѕРј
+		int out_safe_shutdown = 0; // РіРѕС‚РѕРІРЅРѕСЃС‚СЊ Рє РІС‹РєР»СЋС‡РµРЅРёСЋ РїРѕС‚РѕРєР° РјРёСЂР°
+		int out_run_step = 0; // РєРѕР»РІРѕ Р·Р°РїСЂРѕС€РµРЅРЅС‹С… С€Р°РіРѕРІ РІ РѕС‡РµСЂРµРґРё
+		bool in_auto_run_mode = 0; // РїРѕСЃР»Рµ РїРµСЂРІРѕРіРѕ РІС‹Р·РѕРІР° world.run_step(1); РјРёСЂ Р±СѓРґРµС‚ РѕР±СЂР°Р±Р°С‚С‹РІР°С‚СЊСЃСЏ Р°РІС‚РѕРЅРѕРјРЅРѕ РЅРµ РґРѕР¶РёРґР°СЏСЃСЊ РѕС‚РІРµС‚Р°
+		uint64_t out_counter_of_step = 0; // РєРѕР»РІРѕ С€Р°РіРѕРІ СЃ РјРѕРјРµРЅС‚Р° СЃС‚Р°СЂС‚Р° СЃРёРјСѓР»СЏС†РёРё
 
-		void shutdown() { p_shutdown = 1; } // указать завершение работы
+		void shutdown() { p_shutdown = 1; } // СѓРєР°Р·Р°С‚СЊ Р·Р°РІРµСЂС€РµРЅРёРµ СЂР°Р±РѕС‚С‹
 
-		int out_debug1 = 0; // буфферная переменная для дебага
+		int out_debug1 = 0; // Р±СѓС„С„РµСЂРЅР°СЏ РїРµСЂРµРјРµРЅРЅР°СЏ РґР»СЏ РґРµР±Р°РіР°
 
 		int p_start = 0;
 		int p_shutdown = 0;
 	};
 	Control control;
-	int run_step(int n); // запустить симуляцию на определённое колличество шагов
+	int run_step(int n); // Р·Р°РїСѓСЃС‚РёС‚СЊ СЃРёРјСѓР»СЏС†РёСЋ РЅР° РѕРїСЂРµРґРµР»С‘РЅРЅРѕРµ РєРѕР»Р»РёС‡РµСЃС‚РІРѕ С€Р°РіРѕРІ
 	void RenderWorld();
 	void RunWorld();
 	void newCell(int);
 	bool newCell(vec2, frac);
 	void newCell();
-	const int max_collision = 30; // максимально допустимое значение коллизий на клетку
+	const int max_collision = 30; // РјР°РєСЃРёРјР°Р»СЊРЅРѕ РґРѕРїСѓСЃС‚РёРјРѕРµ Р·РЅР°С‡РµРЅРёРµ РєРѕР»Р»РёР·РёР№ РЅР° РєР»РµС‚РєСѓ
 	std::vector<int32_t> collision_data;
 	int32_t* collision_map;
 	uint8_t* light_map;
@@ -106,11 +106,11 @@ private:
 int WorldCS::run_step(int n) {
 
 	if (control.out_run_step > 9)
-		return(1); // переполнено
+		return(1); // РїРµСЂРµРїРѕР»РЅРµРЅРѕ
 	else
 		control.out_run_step += n;
 
-	return(0); // всё хорошо
+	return(0); // РІСЃС‘ С…РѕСЂРѕС€Рѕ
 }
 
 void WorldCS::RunWorld() {
@@ -127,11 +127,11 @@ inline void compute_lightMap(uint8_t* light_map, int Dm, frac Dp, uint64_t time)
 	}
 }
 
-inline void WorldCS::newCell(int c1) { // наследственное создание клетки
+inline void WorldCS::newCell(int c1) { // РЅР°СЃР»РµРґСЃС‚РІРµРЅРЅРѕРµ СЃРѕР·РґР°РЅРёРµ РєР»РµС‚РєРё
 
 }
 
-inline bool WorldCS::newCell(vec2 pos, frac r) { // создание нового прототипа клетки в конец массива клеток
+inline bool WorldCS::newCell(vec2 pos, frac r) { // СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ РїСЂРѕС‚РѕС‚РёРїР° РєР»РµС‚РєРё РІ РєРѕРЅРµС† РјР°СЃСЃРёРІР° РєР»РµС‚РѕРє
 	if (ec < mec) {
 		cells[ec].pos = pos;
 		cells[ec].r = r;
@@ -144,7 +144,7 @@ inline bool WorldCS::newCell(vec2 pos, frac r) { // создание нового прототипа кл
 	return false;
 }
 
-inline void WorldCS::newCell() { // создание случайной клетки
+inline void WorldCS::newCell() { // СЃРѕР·РґР°РЅРёРµ СЃР»СѓС‡Р°Р№РЅРѕР№ РєР»РµС‚РєРё
 	if (ec < mec) {
 		vec2 pos = -vec2(Dp);
 		while (!compareDistanse(pos - Rp, Rp))
@@ -158,8 +158,8 @@ void WorldCS::RenderWorld() {
 	RAND.ini(setup.main_seed);
 	std::ostringstream buff;
 
-	Rp = setup.Dp / 2.; // Радиус чаши в мм
-	Dp = Rp * 2; // Диаметр чаши в мм
+	Rp = setup.Dp / 2.; // Р Р°РґРёСѓСЃ С‡Р°С€Рё РІ РјРј
+	Dp = Rp * 2; // Р”РёР°РјРµС‚СЂ С‡Р°С€Рё РІ РјРј
 	view.mst *= Dp;
 	view.Pos = vec2(Dp / 2.);
 
@@ -182,23 +182,23 @@ void WorldCS::RenderWorld() {
 	mec = setup.set_max_ec;
 	setup.set_max_ec = ceil(mec / 4096.) * 4096;
 	mec = setup.set_max_ec;
-	setup.out_maxСollisionData = ceil(mec * 20. / 4096.) * 4096;
-	int mecl = setup.out_maxСollisionData;
+	setup.out_maxРЎollisionData = ceil(mec * 20. / 4096.) * 4096;
+	int mecl = setup.out_maxРЎollisionData;
 	collision_data.resize(mecl);
 	for (int c = 0; c < mecl; c++)
 		collision_data[c] = nullID;
-	/* формат записи коллизии
-	кол-во клеток снаружи ячейки
-	кол-во клеток внутри ячейки
-	на процессоре только внешние ячейки взаимодействуют с внутренними. А также внутренние с самими собой
-	на видеокарте берёться полный список id внутри и снаружи клетки и проверяется только он на коллизию с пикселем
+	/* С„РѕСЂРјР°С‚ Р·Р°РїРёСЃРё РєРѕР»Р»РёР·РёРё
+	РєРѕР»-РІРѕ РєР»РµС‚РѕРє СЃРЅР°СЂСѓР¶Рё СЏС‡РµР№РєРё
+	РєРѕР»-РІРѕ РєР»РµС‚РѕРє РІРЅСѓС‚СЂРё СЏС‡РµР№РєРё
+	РЅР° РїСЂРѕС†РµСЃСЃРѕСЂРµ С‚РѕР»СЊРєРѕ РІРЅРµС€РЅРёРµ СЏС‡РµР№РєРё РІР·Р°РёРјРѕРґРµР№СЃС‚РІСѓСЋС‚ СЃ РІРЅСѓС‚СЂРµРЅРЅРёРјРё. Рђ С‚Р°РєР¶Рµ РІРЅСѓС‚СЂРµРЅРЅРёРµ СЃ СЃР°РјРёРјРё СЃРѕР±РѕР№
+	РЅР° РІРёРґРµРѕРєР°СЂС‚Рµ Р±РµСЂС‘С‚СЊСЃСЏ РїРѕР»РЅС‹Р№ СЃРїРёСЃРѕРє id РІРЅСѓС‚СЂРё Рё СЃРЅР°СЂСѓР¶Рё РєР»РµС‚РєРё Рё РїСЂРѕРІРµСЂСЏРµС‚СЃСЏ С‚РѕР»СЊРєРѕ РѕРЅ РЅР° РєРѕР»Р»РёР·РёСЋ СЃ РїРёРєСЃРµР»РµРј
 	*/
 	mefp = setup.set_max_efp;
 	cells = new CellCS[mec];
 	int32_t* mainCellID = new int32_t[mec];
 	buffFloatPosCells = new float[mec * 4];
 	buffByteMetaCells = new uint8_t[mec * 4];
-	for (int c = 0; c < mec; c++) { // иницилизируем клетки до фулла
+	for (int c = 0; c < mec; c++) { // РёРЅРёС†РёР»РёР·РёСЂСѓРµРј РєР»РµС‚РєРё РґРѕ С„СѓР»Р»Р°
 		newCell();
 		buffFloatPosCells[c * 4] = cells[c].pos[0];
 		buffFloatPosCells[c * 4 + 1] = cells[c].pos[1];
@@ -226,9 +226,9 @@ void WorldCS::RenderWorld() {
 	std::chrono::time_point<std::chrono::steady_clock> benchPoint[10];
 	benchPoint[0] = std::chrono::steady_clock::now();
 
-	// тестовая обработка
+	// С‚РµСЃС‚РѕРІР°СЏ РѕР±СЂР°Р±РѕС‚РєР°
 	{
-		// клетка ставит свой номер на ячейку мира, или образует связный список
+		// РєР»РµС‚РєР° СЃС‚Р°РІРёС‚ СЃРІРѕР№ РЅРѕРјРµСЂ РЅР° СЏС‡РµР№РєСѓ РјРёСЂР°, РёР»Рё РѕР±СЂР°Р·СѓРµС‚ СЃРІСЏР·РЅС‹Р№ СЃРїРёСЃРѕРє
 		for (int c = 0; c < mec; c++) {
 			CellCS &cell = cells[c];
 			cell.ipos = ivec2(cell.pos * hdAc);
@@ -238,7 +238,7 @@ void WorldCS::RenderWorld() {
 		}
 		benchPoint[1] = std::chrono::steady_clock::now();
 		int emcID = 0;
-		// старшая клетка состовляет список и записывает id на этот список
+		// СЃС‚Р°СЂС€Р°СЏ РєР»РµС‚РєР° СЃРѕСЃС‚РѕРІР»СЏРµС‚ СЃРїРёСЃРѕРє Рё Р·Р°РїРёСЃС‹РІР°РµС‚ id РЅР° СЌС‚РѕС‚ СЃРїРёСЃРѕРє
 		if (1)
 			for (int c = 0; c < mec; c++)
 				if (collision_map[cells[c].mapID] == c) {
@@ -256,21 +256,21 @@ void WorldCS::RenderWorld() {
 		benchPoint[2] = std::chrono::steady_clock::now();
 
 
-		// формирование старшей клеткой данных о коллизиях
+		// С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ СЃС‚Р°СЂС€РµР№ РєР»РµС‚РєРѕР№ РґР°РЅРЅС‹С… Рѕ РєРѕР»Р»РёР·РёСЏС…
 		if (1) {
-			int cID = 0; // временный указатель на начало коллизии
+			int cID = 0; // РІСЂРµРјРµРЅРЅС‹Р№ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РЅР°С‡Р°Р»Рѕ РєРѕР»Р»РёР·РёРё
 			for (int mc = 0; mc < emcID; mc++) {
 				int32_t mcID = mainCellID[mc];
 				CellCS &cell = cells[mcID];
 				int Ni = cell.buffCount, No = 0;
-				int lcID = 2; // локальный указатель текущего местоположения записи
+				int lcID = 2; // Р»РѕРєР°Р»СЊРЅС‹Р№ СѓРєР°Р·Р°С‚РµР»СЊ С‚РµРєСѓС‰РµРіРѕ РјРµСЃС‚РѕРїРѕР»РѕР¶РµРЅРёСЏ Р·Р°РїРёСЃРё
 				for (int v = 0; v < 8; v++) {
 					int32_t mcID1 = collision_map[cell.mapID + vectorID[v]];
 					if (mcID1 != nullID) {
 						if (mcID1 != nullCD) {
 
 							CellCS &cell2 = cells[mcID1];
-							No += cell2.buffCount; // суммируем длинну внешнего списка
+							No += cell2.buffCount; // СЃСѓРјРјРёСЂСѓРµРј РґР»РёРЅРЅСѓ РІРЅРµС€РЅРµРіРѕ СЃРїРёСЃРєР°
 							int32_t c1 = mcID1;
 							do {
 								collision_data[cID + lcID] = c1;
@@ -284,8 +284,8 @@ void WorldCS::RenderWorld() {
 						collision_map[cell.mapID + vectorID[v]] = nullCD;
 					}
 				}
-				collision_data[cID] = No; // записываем в позицию 0 кол-во внешних коллизионных клеток
-				collision_data[cID + 1] = Ni; // записываем в позицию 1 кол-во внутренних клеток
+				collision_data[cID] = No; // Р·Р°РїРёСЃС‹РІР°РµРј РІ РїРѕР·РёС†РёСЋ 0 РєРѕР»-РІРѕ РІРЅРµС€РЅРёС… РєРѕР»Р»РёР·РёРѕРЅРЅС‹С… РєР»РµС‚РѕРє
+				collision_data[cID + 1] = Ni; // Р·Р°РїРёСЃС‹РІР°РµРј РІ РїРѕР·РёС†РёСЋ 1 РєРѕР»-РІРѕ РІРЅСѓС‚СЂРµРЅРЅРёС… РєР»РµС‚РѕРє
 
 
 				int32_t c1 = mcID;
@@ -308,8 +308,8 @@ void WorldCS::RenderWorld() {
 	debugF2 = std::chrono::duration<double, std::milli>(benchPoint[2] - benchPoint[1]).count();
 	debugF3 = std::chrono::duration<double, std::milli>(benchPoint[3] - benchPoint[2]).count();
 
-	control.out_ready = 1; // разрешаем графике идти дальше
-	// главный цикл рендера мира
+	control.out_ready = 1; // СЂР°Р·СЂРµС€Р°РµРј РіСЂР°С„РёРєРµ РёРґС‚Рё РґР°Р»СЊС€Рµ
+	// РіР»Р°РІРЅС‹Р№ С†РёРєР» СЂРµРЅРґРµСЂР° РјРёСЂР°
 	while (control.p_shutdown == 0) {
 
 		if (control.out_run_step == 0)

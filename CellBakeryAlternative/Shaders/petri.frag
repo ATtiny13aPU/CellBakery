@@ -52,8 +52,9 @@ void main() {
 		//				p[x][y] = texelFetch(Light, ivec2(Pos / Ac) + ivec2(x, y) - 1, 0).r;
 		//		ling = bicubicInterpolate(fract(Pos / Ac), p);
 		//	}
-		ling *= ling;
+		ling *= sqrt(ling);
 		pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3);
+		pixel = mix(pixel, vec3(1.), ling * ling * 0.5);
 	} 
 	else if (compareDistanse(Pos - hDp, hDp + 0.01)) { // если это край чаши
 		float ling = texture(Light, Pos / Ac / mapSize).r; 

@@ -21,7 +21,7 @@ public:
 		glDeleteVertexArrays(1, &VAO);
 		glDeleteBuffers(1, &VBO);
 	}
-	// Загружает в VBO данные из data (x и y координаты в формате 0.f - 1.f)
+	// Р—Р°РіСЂСѓР¶Р°РµС‚ РІ VBO РґР°РЅРЅС‹Рµ РёР· data (x Рё y РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ С„РѕСЂРјР°С‚Рµ 0.f - 1.f)
 	virtual void loadFrom(float* data, int sz) {
 		size = sz / 2;
 		glBindVertexArray(VAO);
@@ -47,7 +47,7 @@ public:
 	~EBOMesh() {
 		glDeleteBuffers(1, &EBO);
 	}
-	// Загружает в EBO данные из data (id из будера вершин)
+	// Р—Р°РіСЂСѓР¶Р°РµС‚ РІ EBO РґР°РЅРЅС‹Рµ РёР· data (id РёР· Р±СѓРґРµСЂР° РІРµСЂС€РёРЅ)
 	virtual void loadFrom(uint32_t* data, int sz) {
 		size = sz;
 
@@ -79,20 +79,20 @@ public:
 		bool err = 0;
 		char infoLog[512];
 
-		// вершинный шейдер
+		// РІРµСЂС€РёРЅРЅС‹Р№ С€РµР№РґРµСЂ
 		int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		err |= interimСomp(vertexShader, sourseVert, "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n");
+		err |= interimРЎomp(vertexShader, sourseVert, "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n");
 
 
-		// фрагментный шейдер
+		// С„СЂР°РіРјРµРЅС‚РЅС‹Р№ С€РµР№РґРµСЂ
 		int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		err |= interimСomp(fragmentShader, sourseFrag, "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n");
+		err |= interimРЎomp(fragmentShader, sourseFrag, "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n");
 
-		// геометрический шейдер
+		// РіРµРѕРјРµС‚СЂРёС‡РµСЃРєРёР№ С€РµР№РґРµСЂ
 		int geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-		err |= interimСomp(geometryShader, sourseGeom, "ERROR::SHADER::GEOMETRY::COMPILATION_FAILED\n");
+		err |= interimРЎomp(geometryShader, sourseGeom, "ERROR::SHADER::GEOMETRY::COMPILATION_FAILED\n");
 
-		// связывание шейдеров
+		// СЃРІСЏР·С‹РІР°РЅРёРµ С€РµР№РґРµСЂРѕРІ
 		glID = glCreateProgram();
 		glAttachShader(glID, vertexShader);
 		glAttachShader(glID, fragmentShader);
@@ -109,16 +109,16 @@ public:
 		bool err = 0;
 		char infoLog[512];
 
-		// вершинный шейдер
+		// РІРµСЂС€РёРЅРЅС‹Р№ С€РµР№РґРµСЂ
 		int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		err |= interimСomp(vertexShader, sourseVert, "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n");
+		err |= interimРЎomp(vertexShader, sourseVert, "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n");
 
 
-		// фрагментный шейдер
+		// С„СЂР°РіРјРµРЅС‚РЅС‹Р№ С€РµР№РґРµСЂ
 		int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		err |= interimСomp(fragmentShader, sourseFrag, "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n");
+		err |= interimРЎomp(fragmentShader, sourseFrag, "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n");
 
-		// связывание шейдеров
+		// СЃРІСЏР·С‹РІР°РЅРёРµ С€РµР№РґРµСЂРѕРІ
 		glID = glCreateProgram();
 		glAttachShader(glID, vertexShader);
 		glAttachShader(glID, fragmentShader);
@@ -130,13 +130,13 @@ public:
 
 	uint32_t glID;
 private:
-	inline bool interimСomp(int Shader, const char *sourse, const char *errlog) {
+	inline bool interimРЎomp(int Shader, const char *sourse, const char *errlog) {
 		int success;
 		bool err = 0;
 		char infoLog[512];
 		glShaderSource(Shader, 1, &sourse, NULL);
 		glCompileShader(Shader);
-		glGetShaderiv(Shader, GL_COMPILE_STATUS, &success); // проверка на наличие ошибок компилирования шейдера
+		glGetShaderiv(Shader, GL_COMPILE_STATUS, &success); // РїСЂРѕРІРµСЂРєР° РЅР° РЅР°Р»РёС‡РёРµ РѕС€РёР±РѕРє РєРѕРјРїРёР»РёСЂРѕРІР°РЅРёСЏ С€РµР№РґРµСЂР°
 		if (!success) {
 			err = 1;
 			glGetShaderInfoLog(Shader, 512, NULL, infoLog);
@@ -150,7 +150,7 @@ private:
 		bool err = 0;
 		char infoLog[512];
 		glLinkProgram(glID);
-		glGetProgramiv(glID, GL_LINK_STATUS, &success); // проверка на наличие ошибок связывания шейдеров
+		glGetProgramiv(glID, GL_LINK_STATUS, &success); // РїСЂРѕРІРµСЂРєР° РЅР° РЅР°Р»РёС‡РёРµ РѕС€РёР±РѕРє СЃРІСЏР·С‹РІР°РЅРёСЏ С€РµР№РґРµСЂРѕРІ
 		if (!success) {
 			err = 1;
 			glGetProgramInfoLog(glID, 512, NULL, infoLog);
@@ -177,12 +177,12 @@ public:
 		bool err = 0;
 		char infoLog[512];
 
-		// вычислительный шейдер
+		// РІС‹С‡РёСЃР»РёС‚РµР»СЊРЅС‹Р№ С€РµР№РґРµСЂ
 		int computeShader = glCreateShader(GL_COMPUTE_SHADER);
-		err |= interimСomp(computeShader, sourseComp, "ERROR::SHADER::COMPUTE::COMPILATION_FAILED\n");
+		err |= interimРЎomp(computeShader, sourseComp, "ERROR::SHADER::COMPUTE::COMPILATION_FAILED\n");
 
 
-		// связывание шейдеров
+		// СЃРІСЏР·С‹РІР°РЅРёРµ С€РµР№РґРµСЂРѕРІ
 		glID = glCreateProgram();
 		glAttachShader(glID, computeShader);
 		err |= interimLink();
@@ -193,13 +193,13 @@ public:
 
 	uint32_t glID;
 private:
-	inline bool interimСomp(int Shader, const char *sourse, const char *errlog) {
+	inline bool interimРЎomp(int Shader, const char *sourse, const char *errlog) {
 		int success;
 		bool err = 0;
 		char infoLog[512];
 		glShaderSource(Shader, 1, &sourse, NULL);
 		glCompileShader(Shader);
-		glGetShaderiv(Shader, GL_COMPILE_STATUS, &success); // проверка на наличие ошибок компилирования шейдера
+		glGetShaderiv(Shader, GL_COMPILE_STATUS, &success); // РїСЂРѕРІРµСЂРєР° РЅР° РЅР°Р»РёС‡РёРµ РѕС€РёР±РѕРє РєРѕРјРїРёР»РёСЂРѕРІР°РЅРёСЏ С€РµР№РґРµСЂР°
 		if (!success) {
 			err = 1;
 			glGetShaderInfoLog(Shader, 512, NULL, infoLog);
@@ -213,7 +213,7 @@ private:
 		bool err = 0;
 		char infoLog[512];
 		glLinkProgram(glID);
-		glGetProgramiv(glID, GL_LINK_STATUS, &success); // проверка на наличие ошибок связывания шейдеров
+		glGetProgramiv(glID, GL_LINK_STATUS, &success); // РїСЂРѕРІРµСЂРєР° РЅР° РЅР°Р»РёС‡РёРµ РѕС€РёР±РѕРє СЃРІСЏР·С‹РІР°РЅРёСЏ С€РµР№РґРµСЂРѕРІ
 		if (!success) {
 			err = 1;
 			glGetProgramInfoLog(glID, 512, NULL, infoLog);
