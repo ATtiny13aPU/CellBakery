@@ -6,11 +6,11 @@
 #include <GLFW/glfw3.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "OpenGL\stb_image.h"
+#include "OpenGL/stb_image.h"
 #define NOMINMAX
 
-#include "OpenGL\gl_func.h"
-#include "OpenGL\shad_primitive.h"
+#include "OpenGL/gl_func.h"
+#include "OpenGL/shad_primitive.h"
 
 #include <vector>
 #include <fstream>
@@ -24,6 +24,6 @@
 
 
 #include "Vector.hpp"
-#include "OSL\include.h"
+#include "OSL/include.h"
 
 #include "world.h"
