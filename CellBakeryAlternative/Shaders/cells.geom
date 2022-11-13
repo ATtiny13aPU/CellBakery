@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 
 layout(points) in;
 layout(triangle_strip, max_vertices = 4) out;
@@ -18,6 +18,23 @@ uniform int GM;
 out vec2 Pos;
 out vec4 c_meta;
 out vec4 c_pos;
+
+
+struct Cell {
+	vec2 pos;
+	float radius;
+	float angle;
+	vec3 color_rgb;
+	vec3 color_hsv;
+	int type_id;
+	int linked_list;
+};
+
+
+restrict buffer ssbo_cells {
+    Cell cells[];
+};
+
 
 mat2 rot(float a) { //матрица поворота по заданному углу
 	float s = sin(a);
@@ -56,7 +73,11 @@ const float t2kr[18] = float[](1., 1., 1., 1.3, 1., 1., 1., 1.3, 1.2, 1.15, 1.15
 
 void main() {
 	int cid = id[0];
-	vec4 cell_pos_data = texelFetch(CellsPos, ivec2(cid & 0xFFF, cid / 0x1000), 0);
+	vec4 cell_pos_data;
+	//cell_pos_data = texelFetch(CellsPos, ivec2(cid & 0xFFF, cid / 0x1000), 0);
+	cell_pos_data.xy = cells[cid].pos;
+	cell_pos_data.z = cells[cid].radius;
+	cell_pos_data.w = cells[cid].angle;
 
 	// отсекаем вне экрана
 	if (lengthRect(ViewWorld.xy, ViewWorld.zw, cell_pos_data.xy) < cell_pos_data.z) {

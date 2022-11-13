@@ -37,6 +37,10 @@ private:
 	shad::Shader petriShader;
 
 	shad::ComputeShader lightComputeShader;
+	shad::ComputeShader listComputeShader;
+	shad::ComputeShader iniComputeShader;
+
+	shad::SSBO CellsSSBO;
 
 	uint32_t count_of_frames = -1;
 	std::ostringstream buff; // текст буффер
@@ -56,6 +60,16 @@ private:
 		mPos = (vec2(mPos[0], mPos[1])) / frac(Yd) * mst;
 		return mPos;
 	}
+
+	struct Cell_ssboBlock {
+		fvec2 pos;
+		float radius;
+		float angle;
+		fvec3 color_rgb;
+		fvec3 color_hsv;
+		int type_id;
+		int linked_list;
+	};
 };
 
 int Context::run() {
@@ -71,6 +85,8 @@ int Context::run() {
 		fullScreenMesh.loadFrom(&m[0], m.size());
 	}
 
+
+	// шейдеры графики
 	{
 		petriShader.name = std::string("petriShader");
 		std::ifstream inpf;
@@ -98,6 +114,16 @@ int Context::run() {
 		cellsShader.compile(sourseV.c_str(), sourseF.c_str(), sourseG.c_str());
 	}
 
+	// шейдеры симуляции
+	{
+		iniComputeShader.name = std::string("iniComputeShader");
+		std::ifstream inpf;
+		inpf.open("Shaders/sim/initializer.comp");
+		std::string sourseC{ std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>() };
+		inpf.close();
+		iniComputeShader.compile(sourseC.c_str());
+	}
+
 	{
 		lightComputeShader.name = std::string("lightComputeShader");
 		std::ifstream inpf;
@@ -107,7 +133,16 @@ int Context::run() {
 		lightComputeShader.compile(sourseC.c_str());
 	}
 
-	// Создание мира
+	{
+		listComputeShader.name = std::string("listComputeShader");
+		std::ifstream inpf;
+		inpf.open("Shaders/sim/linked_list.comp");
+		std::string sourseC{ std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>() };
+		inpf.close();
+		listComputeShader.compile(sourseC.c_str());
+	}
+
+	// Создание мира (ВНИМАНИЕ! Данные мира больше не используются, все вычисления переносятся на GPU)
 	///==============================
 	WorldCS world;
 	world.setup.Dp = 5.;
@@ -197,6 +232,23 @@ int Context::run() {
 	}
 
 
+	// Настройка симуляции
+	{
+		CellsSSBO.setSize(world.setup.set_max_ec * sizeof(Cell_ssboBlock));
+		CellsSSBO.bind(iniComputeShader.glID, "ssbo_cells");
+		glUseProgram(iniComputeShader.glID);
+		glUniform1i(glGetUniformLocation(iniComputeShader.glID, "mapSize"), world.setup.out_mapSize);
+		glUniform1f(glGetUniformLocation(iniComputeShader.glID, "mst"), world.view.mst);
+		glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Dp"), world.setup.Dp);
+		glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Ac"), world.setup.Ac);
+
+		glDispatchCompute(world.setup.set_max_ec, 1, 1);
+		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+		CellsSSBO.bind(listComputeShader.glID, "ssbo_cells");
+		CellsSSBO.bind(cellsShader.glID, "ssbo_cells");
+	}
+
 	glEnable(GL_MULTISAMPLE);
 
 	// Цикл графики
@@ -240,7 +292,8 @@ int Context::run() {
 
 				glDispatchCompute(world.setup.out_mapSize, world.setup.out_mapSize, 1);
 
-				glMemoryBarrier(GL_ALL_BARRIER_BITS);
+				//glMemoryBarrier(GL_ALL_BARRIER_BITS);
+				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 			}
 			
 		}

@@ -7,6 +7,7 @@ namespace shad {
 	class ComputeShader;
 	class SimpleMesh;
 	class EBOMesh;
+	class SSBO;
 
 	class VoidMesh;
 };
@@ -222,6 +223,44 @@ private:
 		}
 		return err;
 	}
+};
+
+
+class shad::SSBO {
+public:
+	SSBO() : size(0) {
+		glGenBuffers(1, &glID);
+	}
+	~SSBO() {
+		glDeleteBuffers(1, &glID);
+	}
+	void setSize(int s) {
+		size = s;
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, glID);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, size, NULL, GL_STATIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	}
+
+	void loadFrom(int s, void *data) {
+		size = s;
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, glID);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_STATIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	}
+
+	void loadFrom() {
+		
+	}
+
+	void bind(uint32_t pid, const char* name) {
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, glID);
+		glShaderStorageBlockBinding(pid, glGetProgramResourceIndex(pid, GL_SHADER_STORAGE_BLOCK, name), 1);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, glID);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	}
+	uint32_t glID;
+	int size;
+private:
 };
 
 class shad::VoidMesh {

@@ -102,8 +102,8 @@ void main() {
 				pixel = vec4(c_meta.rgb * 0.5, 1.);
 				break;
 			default: // пустота
-				pixel = vec4(c_meta.rgb * 0.5, 0.2);
-				//discard;
+				//pixel = vec4(c_meta.rgb * 0.5, 0.2);
+				discard;
 		}
 	} else discard;
 }
