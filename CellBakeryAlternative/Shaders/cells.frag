@@ -3,8 +3,9 @@
 uniform float fTime;
 
 in vec2 Pos;
-in vec4 c_meta;
+in vec3 c_meta;
 in vec4 c_pos;
+flat in int type_id;
 
 out vec4 pixel;
 
@@ -21,7 +22,7 @@ void main() {
 	vec2 dp = Pos - c_pos.xy; // дельта позиции
 	float qd = dot(dp, dp); // вкадрат расстояния до целевой клетки
 	float qr = c_pos.z * c_pos.z; // вкадрат радиуса целевой клетки
-	int t = int(c_meta.a * 256.);
+	int t = type_id;
 
 
 	if (qd < qr) {
