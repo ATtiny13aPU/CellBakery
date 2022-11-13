@@ -1,0 +1,63 @@
+#version 430
+
+layout(local_size_x = 1, local_size_y = 1) in;
+layout(r8, binding = 0) uniform image2D light_map;
+
+
+uniform int mapSize;
+uniform float Dp;
+uniform float Ac;
+
+struct Cell {
+	vec2 pos;
+	float radius;
+	float angle;
+	vec3 color_rgb;
+	vec3 color_hsv;
+	int type_id;
+	int linked_list;
+};
+
+
+restrict buffer ssbo_cells {
+    Cell cells[];
+};
+
+uvec2 sid;
+
+uint ihash2(uvec2 s) {
+	uint s1 = ((s.y ^ s.x) * 0xEC7269E5u + 0x4C8A248Du) ^ ((s.x >> 5u) * 0xC5EB9396u);
+	s.x = ((s1 / 867u) * (s.x * 0x6C8FBCAFu)) ^ (s1 * (s.y & 0xF465C8F3u));
+	
+	return s.x;
+}
+
+float fhash2() {
+	sid.y++;
+	return (ihash2(sid) / 4294967295.f);
+}
+
+float map(float x, float in_min, float in_max, float out_min, float out_max) {
+	return (clamp(x, in_min, in_max) - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+bool compareDistanse(vec2 v, float l) {
+	return v.x * v.x + v.y * v.y < l * l;
+}
+
+void main() {
+	uint cid = gl_GlobalInvocationID.x;
+	sid = uvec2(cid * 0xF8ED0C13u, 124636u ^ cid);
+
+	float Rp = Dp / 2.;
+	
+	Cell cell;
+	cell.pos = -vec2(Dp);
+	while (compareDistanse(cell.pos - Rp, Rp) == false)
+		cell.pos = vec2(fhash2(), fhash2()) * Dp;
+
+	cell.radius = map(fhash2(), 0., 1., Ac * 0.6, Ac * 1.);
+	cell.angle = fhash2();
+
+	cells[cid] = cell;
+}
