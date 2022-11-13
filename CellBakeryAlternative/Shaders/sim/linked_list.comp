@@ -9,21 +9,26 @@ struct Cell {
 	vec2 pos;
 	float radius;
 	float angle;
-	vec3 color;
+	vec3 color_rgb;
+	vec3 color_hsv;
 	int type_id;
 	int linked_list;
 };
 
 restrict buffer ssbo_cells {
-    vec2 cells[];
+    Cell cells[];
 };
 
+mat2 rot(float a) { //матрица поворота по заданному углу
+	float s = sin(a);
+	float c = cos(a);
+	return mat2(c, -s, s, c);
+}
 
 void main() {
-	vec2 pixel_coords = gl_GlobalInvocationID.xy / mapSize;
+	uint workGroupID = gl_GlobalInvocationID.x * 16 + gl_GlobalInvocationID.y * 128 + gl_GlobalInvocationID.z * 1024;
 	
-	float brightness = length(1. - pixel_coords * 2.);
-	brightness *= pixel_coords.y;
-
-	imageStore(light_map, ivec2(gl_GlobalInvocationID.xy), vec4(brightness, vec3(0.0)));
+	for (uint cid = workGroupID; cid < workGroupID + 16; cid++) {
+		cells[cid].pos += vec2(.00001, 0.) * rot(-cells[cid].angle * 3.14159265358 * 2.);
+	}
 }
