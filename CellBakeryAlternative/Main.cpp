@@ -145,7 +145,7 @@ int Context::run() {
 	// Создание мира (ВНИМАНИЕ! Данные мира больше не используются, все вычисления переносятся на GPU)
 	///==============================
 	WorldCS world;
-	world.setup.Dp = 5.;
+	world.setup.Dp = 8.;
 	int Counter1 = 0;
 
 	world.setup.name = "Test world";
@@ -168,88 +168,12 @@ int Context::run() {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // выдаёт цвет ближайшего пикселя в пределах текстуры при вылете за границы
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, world.setup.out_mapSize, world.setup.out_mapSize, 0, GL_RED, GL_UNSIGNED_BYTE, world.light_map);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, world.setup.out_mapSize, world.setup.out_mapSize, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 
 		glBindImageTexture(0, light_map, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R8);
 	}
-	GLuint collision_map = 0; // текстура карты индексов коллизионных областей мира
-	{
-		glGenTextures(1, &collision_map);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, collision_map);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // без интерполяции
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // выдаёт цвет ближайшего пикселя в пределах текстуры при вылете за границы
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32I, world.setup.out_mapSize, world.setup.out_mapSize, 0, GL_RED_INTEGER, GL_INT, world.collision_map);
-	}
-	GLuint collision_data = 0; // информация о коллизиях
-	{
-		glGenTextures(1, &collision_data);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, collision_data);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // без интерполяции
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); // выдаёт цвет ближайшего пикселя в пределах текстуры при вылете за границы
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32I, 4096, world.setup.out_maxСollisionData / 4096, 0, GL_RED_INTEGER, GL_INT, &world.collision_data[0]);
-	}
-	GLuint cells_pos = 0; // позиции клеток
-	{
-		glGenTextures(1, &cells_pos);
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, cells_pos);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		float clr[4] = {0, 0, 0, 0};
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, clr); // свойство текстуры за пределами выдавать чёрный прозрачный цвет
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 4096, world.setup.set_max_ec / 4096, 0, GL_RGBA, GL_FLOAT, world.buffFloatPosCells);
-	}
-	GLuint cells_meta = 0; // метадата клеток
-	{
-		glGenTextures(1, &cells_meta);
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, cells_meta);
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		float clr[4] = {0, 0, 0, 0};
-		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, clr); // свойство текстуры за пределами выдавать чёрный прозрачный цвет
-
-		glBindTexture(GL_TEXTURE_2D, cells_meta); // также заполняем стартовыми данными для цикла
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, world.setup.set_max_ec / 4096, 0, GL_RGBA, GL_UNSIGNED_BYTE, world.buffByteMetaCells);
-	}
-
-
-	// Настройка симуляции
-	{
-		CellsSSBO.setSize(world.setup.set_max_ec * sizeof(Cell_ssboBlock));
-		CellsSSBO.bind(iniComputeShader.glID, "ssbo_cells");
-		glUseProgram(iniComputeShader.glID);
-		glUniform1i(glGetUniformLocation(iniComputeShader.glID, "mapSize"), world.setup.out_mapSize);
-		glUniform1f(glGetUniformLocation(iniComputeShader.glID, "mst"), world.view.mst);
-		glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Dp"), world.setup.Dp);
-		glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Ac"), world.setup.Ac);
-
-		glDispatchCompute(world.setup.set_max_ec, 1, 1);
-		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
-		CellsSSBO.bind(listComputeShader.glID, "ssbo_cells");
-		CellsSSBO.bind(cellsShader.glID, "ssbo_cells");
-	}
-
-	glEnable(GL_MULTISAMPLE);
+	//glEnable(GL_MULTISAMPLE);
 
 	// Цикл графики
 	///\/\/\/\/\/\/\/\///
@@ -281,9 +205,27 @@ int Context::run() {
 
 
 		// Вычисления
-		if (test) {
+		{
+
+			// Инициализация
+			if (count_of_frames == -1) {
+				CellsSSBO.setSize(world.setup.set_max_ec * sizeof(Cell_ssboBlock));
+				CellsSSBO.bind(iniComputeShader.glID, "ssbo_cells");
+				glUseProgram(iniComputeShader.glID);
+				glUniform1i(glGetUniformLocation(iniComputeShader.glID, "mapSize"), world.setup.out_mapSize);
+				glUniform1f(glGetUniformLocation(iniComputeShader.glID, "mst"), world.view.mst);
+				glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Dp"), world.setup.Dp);
+				glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Ac"), world.setup.Ac);
+
+				glDispatchCompute(world.setup.set_max_ec, 1, 1);
+				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+				CellsSSBO.bind(listComputeShader.glID, "ssbo_cells");
+				CellsSSBO.bind(cellsShader.glID, "ssbo_cells");
+			}
+
 			// свет
-			if (1) {
+			if (count_of_frames == -1) {
 				glUseProgram(lightComputeShader.glID);
 				glUniform1f(glGetUniformLocation(lightComputeShader.glID, "mapSize"), float(world.setup.out_mapSize));
 
@@ -295,7 +237,6 @@ int Context::run() {
 				//glMemoryBarrier(GL_ALL_BARRIER_BITS);
 				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 			}
-			
 		}
 
 		// Графика
@@ -404,23 +345,7 @@ int Context::run() {
 				glUniform1f(glGetUniformLocation(cellsShader.glID, "fTime"), count_of_frames / 60.);
 				glUniform1i(glGetUniformLocation(cellsShader.glID, "GM"), gmesh);
 				
-				glActiveTexture(GL_TEXTURE1);
-				glBindTexture(GL_TEXTURE_2D, collision_map);
-				glUniform1i(glGetUniformLocation(cellsShader.glID, "Collision"), 1);
-
-				glActiveTexture(GL_TEXTURE2);
-				glBindTexture(GL_TEXTURE_2D, collision_data);
-				glUniform1i(glGetUniformLocation(cellsShader.glID, "CollisionData"), 2);
-
-				glActiveTexture(GL_TEXTURE3);
-				glBindTexture(GL_TEXTURE_2D, cells_pos);
-				glUniform1i(glGetUniformLocation(cellsShader.glID, "CellsPos"), 3);
-
-				glActiveTexture(GL_TEXTURE4);
-				glBindTexture(GL_TEXTURE_2D, cells_meta);
-				glUniform1i(glGetUniformLocation(cellsShader.glID, "CellsMeta"), 4);
 				
-
 				glEnable(GL_BLEND);
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				glBindVertexArray(voidMesh.VAO);

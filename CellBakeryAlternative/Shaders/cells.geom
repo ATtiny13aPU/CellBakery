@@ -7,18 +7,14 @@ in int id[];
 
 uniform vec4 ViewWorld;
 uniform ivec2 WinSize;
-uniform isampler2D Collision;
-uniform isampler2D CollisionData;
-uniform sampler2D CellsPos;
-uniform sampler2D CellsMeta;
 uniform float fTime;
 
 uniform int GM;
 
 out vec2 Pos;
-out vec4 c_meta;
+out vec3 c_meta;
 out vec4 c_pos;
-
+flat out int type_id;
 
 struct Cell {
 	vec2 pos;
@@ -84,13 +80,13 @@ void main() {
 		vec2 WinK = (cell_pos_data.xy - ViewWorld.xy) / (ViewWorld.zw - ViewWorld.xy) * 2. - 1.;
 		vec2 WinR = cell_pos_data.z / (ViewWorld.zw - ViewWorld.xy);
 
-		vec4 cell_meta = texelFetch(CellsMeta, ivec2(cid & 0xFFF, cid / 0x1000), 0);
-
 		gl_Position.zw = vec2(0., 1.);
-		c_meta = cell_meta;
+		c_meta = cells[cid].color_rgb;
+		type_id = cells[cid].type_id;
+
 		c_pos = cell_pos_data;
 
-		int t = int(c_meta.a * 256.);
+		int t = cells[cid].type_id;
 		float r = cell_pos_data.z * t2kr[t];
 		WinR *= t2kr[t];
 
