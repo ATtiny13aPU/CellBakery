@@ -117,7 +117,7 @@ void WorldCS::RenderWorld() {
 
 
 	mec = setup.set_max_ec;
-	setup.set_max_ec = ceil(mec / 4096.) * 4096;
+	setup.set_max_ec = ceil(mec / 1024.) * 1024;
 	mec = setup.set_max_ec;
 	setup.out_maxСollisionData = ceil(mec * 20. / 4096.) * 4096;
 	int mecl = setup.out_maxСollisionData;

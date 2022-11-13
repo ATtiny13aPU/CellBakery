@@ -199,9 +199,12 @@ int Context::run() {
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
-		int boost = (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS);
-		int test = (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS);
-		int gmesh = (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS);
+		static key_trigger boost;
+		boost.push(glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS);
+		static key_trigger test;
+		test.push(glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS);
+		static key_trigger gmesh;
+		gmesh.push(glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS);
 
 
 		// Вычисления
@@ -212,10 +215,14 @@ int Context::run() {
 				CellsSSBO.setSize(world.setup.set_max_ec * sizeof(Cell_ssboBlock));
 				CellsSSBO.bind(iniComputeShader.glID, "ssbo_cells");
 				glUseProgram(iniComputeShader.glID);
-				glUniform1i(glGetUniformLocation(iniComputeShader.glID, "mapSize"), world.setup.out_mapSize);
-				glUniform1f(glGetUniformLocation(iniComputeShader.glID, "mst"), world.view.mst);
-				glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Dp"), world.setup.Dp);
-				glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Ac"), world.setup.Ac);
+				static bool first_call = 1;
+				if (first_call) {
+					first_call = 0;
+					glUniform1i(glGetUniformLocation(iniComputeShader.glID, "mapSize"), world.setup.out_mapSize);
+					glUniform1f(glGetUniformLocation(iniComputeShader.glID, "mst"), world.view.mst);
+					glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Dp"), world.setup.Dp);
+					glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Ac"), world.setup.Ac);
+				}
 
 				glDispatchCompute(world.setup.set_max_ec, 1, 1);
 				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
@@ -227,14 +234,31 @@ int Context::run() {
 			// свет
 			if (count_of_frames == -1) {
 				glUseProgram(lightComputeShader.glID);
-				glUniform1f(glGetUniformLocation(lightComputeShader.glID, "mapSize"), float(world.setup.out_mapSize));
+				static bool first_call = 1;
+				if (first_call) {
+					first_call = 0;
+					glUniform1f(glGetUniformLocation(lightComputeShader.glID, "mapSize"), float(world.setup.out_mapSize));
+				}
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, light_map);
 
-				glDispatchCompute(world.setup.out_mapSize, world.setup.out_mapSize, 1);
+				glDispatchCompute(world.setup.out_mapSize, world.setup.out_mapSize, 0);
 
 				//glMemoryBarrier(GL_ALL_BARRIER_BITS);
+				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+			}
+
+			if (test.is_press) {
+				glUseProgram(listComputeShader.glID);
+				static bool first_call = 1;
+				if (first_call) {
+					first_call = 0;
+					glUniform1f(glGetUniformLocation(lightComputeShader.glID, "mapSize"), float(world.setup.out_mapSize));
+				}
+
+				glDispatchCompute(8, 8, world.setup.set_max_ec / 1024);
+
 				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 			}
 		}
@@ -326,7 +350,7 @@ int Context::run() {
 				glUniform1i(glGetUniformLocation(petriShader.glID, "Light"), 0);
 
 				glBindVertexArray(fullScreenMesh.VAO);
-				for (int i = -1; i < 50 * boost; i++) {
+				for (int i = -1; i < 50 * boost.is_press; i++) {
 					glDrawArrays(GL_TRIANGLE_STRIP, 0, fullScreenMesh.size);
 				}
 			}
@@ -343,13 +367,13 @@ int Context::run() {
 				glUniform1f(glGetUniformLocation(cellsShader.glID, "Dp"), world.setup.Dp);
 				glUniform1f(glGetUniformLocation(cellsShader.glID, "Ac"), world.setup.Ac);
 				glUniform1f(glGetUniformLocation(cellsShader.glID, "fTime"), count_of_frames / 60.);
-				glUniform1i(glGetUniformLocation(cellsShader.glID, "GM"), gmesh);
+				glUniform1i(glGetUniformLocation(cellsShader.glID, "GM"), gmesh.is_press);
 				
 				
 				glEnable(GL_BLEND);
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				glBindVertexArray(voidMesh.VAO);
-				for (int i = -1; i < 50 * boost; i++) {
+				for (int i = -1; i < 50 * boost.is_press; i++) {
 					glDrawArraysInstanced(GL_POINTS, 0, voidMesh.size, world.setup.set_max_ec); //world.setup.set_max_ec
 				}
 				glDisable(GL_BLEND);
