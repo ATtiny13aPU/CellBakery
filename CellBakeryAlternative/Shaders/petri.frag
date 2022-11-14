@@ -1,15 +1,23 @@
-#version 330 core
+#version 430 core
 
 in vec2 WinK;
 out vec3 pixel;
 
 uniform vec4 ViewWorld;
 uniform ivec2 WinSize;
-uniform int mapSize;
+uniform int Dm;
 uniform float Dp;
 uniform float Ac;
 
-uniform sampler2D Light;
+struct Chunk {
+	int linked_list;
+	float brightness;
+};
+
+restrict buffer ssbo_grid {
+    Chunk chunks[];
+};
+
 
 const ivec2 vectorID[8] = ivec2[8] (ivec2(-1, -1), ivec2(0, -1), ivec2(1, -1), ivec2(-1, 0), ivec2(1, 0), ivec2(-1, 1), ivec2(0, 1), ivec2(1, 1));
 
@@ -42,9 +50,12 @@ void main() {
 
 	pixel = vec3(0.64, 0.70, 0.98);
 	float hDp = Dp * 0.5;
+	
+	ivec2 ipos = ivec2(Pos / Ac);
+	
+
 	if (compareDistanse(Pos - hDp, hDp)) {
-		//float ling = texelFetch(Light, ivec2(Pos / Ac), 0).r;
-		float ling = texture2D(Light, Pos / Ac / mapSize).r; 
+		float ling = chunks[ipos.x + ipos.y * Dm].brightness;
 		//	{
 		//		mat4x4 p;
 		//		for (int x = 0; x < 4; x++)
@@ -57,7 +68,7 @@ void main() {
 		pixel = mix(pixel, vec3(1.), ling * ling * 0.5);
 	} 
 	else if (compareDistanse(Pos - hDp, hDp + 0.01)) { // если это край чаши
-		float ling = texture(Light, Pos / Ac / mapSize).r; 
+		float ling = 0.;
 		ling *= ling;
 		pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3) * 0.5;
 		pixel = mix(pixel * 0.5, vec3(0.5), 0.5);

@@ -1,9 +1,6 @@
 #version 430
 
-layout(local_size_x = 1, local_size_y = 1) in;
-layout(r8, binding = 0) uniform image2D light_map;
-
-uniform float mapSize;
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 struct Cell {
 	vec2 pos;
@@ -22,6 +19,7 @@ restrict buffer ssbo_cells {
 
 struct Chunk {
 	int linked_list;
+	float brightness;
 };
 
 restrict buffer ssbo_grid {
@@ -40,7 +38,7 @@ void main() {
 	// строим связный список
 	for (uint cid = workGroupID; cid < workGroupID + 16; cid++) {
 		cells[cid].linked_list = 0;
-		int tid = atomicExchange(chunks[cells[cid].chank_id].linked_list, cells[cid].linked_list);
+		//int tid = atomicExchange(chunks[cells[cid].chank_id].linked_list, cells[cid].linked_list);
 	}
 	
 	//cells[cid].pos += vec2(.00002, 0.) * rot(cells[cid].angle * 3.14159265358 * 2.);
