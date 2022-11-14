@@ -13,6 +13,7 @@ struct Cell {
 	vec3 color_hsv;
 	int type_id;
 	int linked_list;
+	int is_first;
 };
 
 

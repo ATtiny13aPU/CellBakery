@@ -110,5 +110,8 @@
     <None Include="Shaders\sim\cells_physics.comp">
       <Filter>Шейдеры\sim\cells</Filter>
     </None>
+    <None Include="Shaders\sim\reset_grid.comp">
+      <Filter>Шейдеры\sim\initializer</Filter>
+    </None>
   </ItemGroup>
 </Project>

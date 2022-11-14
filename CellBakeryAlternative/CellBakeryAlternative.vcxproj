@@ -302,6 +302,7 @@
     <None Include="Shaders\sim\initializer.comp" />
     <None Include="Shaders\sim\light.comp" />
     <None Include="Shaders\sim\cells_physics.comp" />
+    <None Include="Shaders\sim\reset_grid.comp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
