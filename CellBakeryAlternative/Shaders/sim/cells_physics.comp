@@ -38,7 +38,7 @@ void main() {
 	// строим связный список
 	for (uint cid = workGroupID; cid < workGroupID + 16; cid++) {
 		cells[cid].linked_list = 0;
-		//int tid = atomicExchange(chunks[cells[cid].chank_id].linked_list, cells[cid].linked_list);
+		int tid = atomicExchange(chunks[cells[cid].chank_id].linked_list, cells[cid].linked_list);
 	}
 	
 	//cells[cid].pos += vec2(.00002, 0.) * rot(cells[cid].angle * 3.14159265358 * 2.);

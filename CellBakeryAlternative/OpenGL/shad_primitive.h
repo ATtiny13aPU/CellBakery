@@ -3,6 +3,8 @@
 namespace shad {
 	const bool using_external_code_of_shaders = 0;
 
+	static int _countOfBuffers = 0;
+
 	class Shader; 
 	class ComputeShader;
 	class SimpleMesh;
@@ -10,6 +12,7 @@ namespace shad {
 	class SSBO;
 
 	class VoidMesh;
+
 };
 
 class shad::SimpleMesh {
@@ -229,10 +232,13 @@ private:
 class shad::SSBO {
 public:
 	SSBO() : size(0) {
+		indexSB = _countOfBuffers;
 		glGenBuffers(1, &glID);
+		_countOfBuffers++;
 	}
 	~SSBO() {
 		glDeleteBuffers(1, &glID);
+		_countOfBuffers--;
 	}
 	void setSize(int s) {
 		size = s;
@@ -248,18 +254,15 @@ public:
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 
-	void loadFrom() {
-		
-	}
-
 	void bind(uint32_t pid, const char* name) {
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, glID);
-		glShaderStorageBlockBinding(pid, glGetProgramResourceIndex(pid, GL_SHADER_STORAGE_BLOCK, name), 1);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, glID);
+		glShaderStorageBlockBinding(pid, glGetProgramResourceIndex(pid, GL_SHADER_STORAGE_BLOCK, name), indexSB);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, indexSB, glID);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 	}
 	uint32_t glID;
 	int size;
+	int indexSB;
 private:
 };
 
