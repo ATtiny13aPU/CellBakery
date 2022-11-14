@@ -39,6 +39,7 @@ private:
 	shad::ComputeShader lightComputeShader;
 	shad::ComputeShader cellsPhysicsComputeShader;
 	shad::ComputeShader iniComputeShader;
+	shad::ComputeShader resetGridComputeShader;
 
 	shad::SSBO CellsSSBO;
 	shad::SSBO GridSSBO;
@@ -92,6 +93,16 @@ int Context::run() {
 	}
 
 	// шейдеры симуляции
+	
+	{
+		resetGridComputeShader.name = std::string("resetGridComputeShader");
+		std::ifstream inpf;
+		inpf.open("Shaders/sim/reset_grid.comp");
+		std::string sourseC{ std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>() };
+		inpf.close();
+		resetGridComputeShader.compile(sourseC.c_str());
+	}
+
 	{
 		iniComputeShader.name = std::string("iniComputeShader");
 		std::ifstream inpf;
@@ -152,13 +163,14 @@ int Context::run() {
 	// Создание мира (ВНИМАНИЕ! Данные мира больше не используются, все вычисления переносятся на GPU)
 	///==============================
 	WorldCS world;
-	world.Dp = 2.;
-	world.mec = 2000;
+	world.Dp = 1.;
+	world.mec = 1024;
 
 	world.iniWorld();
 
 
-	//glEnable(GL_MULTISAMPLE);
+	
+	glDisable(GL_MULTISAMPLE);
 
 	// Цикл графики
 	///\/\/\/\/\/\/\/\///
@@ -179,17 +191,18 @@ int Context::run() {
 			glViewport(0, 0, Xd, Yd);
 		}	///============================================================///
 
-		glClearColor(0.8f, 0.8f, 0.8f, 1.f);
-		glClear(GL_COLOR_BUFFER_BIT);
+	//	glClearColor(0.8f, 0.8f, 0.8f, 1.f);
+	//	glClear(GL_COLOR_BUFFER_BIT);
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		// Управление камерой мышью и клавой
-		static key_trigger boost, test, gmesh;
+		static key_trigger boost, test, gmesh, msaa;
 		vec2 mnPos, mxPos;
 		{
 			boost.push(glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS);
 			test.push(glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS);
 			gmesh.push(glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS);
+			msaa.push(glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS);
 			// управление камерой
 			{	///==============================
 				// движение клавиатурой
@@ -210,9 +223,9 @@ int Context::run() {
 					// получение эвента колёсика мыши
 					//float scroll = ImGui::GetIO().MouseWheel;
 					if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-						scroll -= 0.1 * (frameTime.get() / 1000.);
+						scroll -= 10. * (frameTime.get() / 1000.);
 					if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-						scroll += 0.1 * (frameTime.get() / 1000.);
+						scroll += 10. * (frameTime.get() / 1000.);
 
 					dmPos2 = dmPos1; // движение
 					glfwGetCursorPos(window, &dmPos1[0], &dmPos1[1]); dmPos1[0] = -dmPos1[0];
@@ -252,11 +265,16 @@ int Context::run() {
 
 			}	///==============================
 
-			world.view.Pos = clamp(world.view.Pos, -world.Dp, world.Dp);
+			world.view.Pos = clamp(world.view.Pos, -world.Dp * 0.9, world.Dp * 1.9);
 
 			mnPos = mPos_to_wPos(vec2(0, 0), world.view.mst, world.view.Pos);
 			mxPos = mPos_to_wPos(vec2(Xd, Yd), world.view.mst, world.view.Pos);
 		}
+
+		if (msaa.is_click)
+			glEnable(GL_MULTISAMPLE);
+		if (msaa.is_release)
+			glDisable(GL_MULTISAMPLE);
 
 		// Вычисления
 		{
@@ -275,9 +293,28 @@ int Context::run() {
 				GridSSBO.bind(cellsPhysicsComputeShader.glID, "ssbo_grid");
 				GridSSBO.bind(lightComputeShader.glID, "ssbo_grid");
 				GridSSBO.bind(petriShader.glID, "ssbo_grid");
+
+				glUseProgram(resetGridComputeShader.glID);
+				glDispatchCompute(world.Dm, world.Dm, 1);
+				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 			}
 
+			
+			// инициализатор клеток
+			if (count_of_frames == -1) {
+				glUseProgram(iniComputeShader.glID);
+				static bool first_call = 1;
+				if (first_call) {
+					first_call = 0;
+					glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Dp"), world.Dp);
+					glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Ac"), world.Ac);
+				}
+		
+				glDispatchCompute(world.mec, 1, 1);
+				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+			}
 
+			
 			// вычисление света
 			if (count_of_frames == -1) {
 				glUseProgram(lightComputeShader.glID);
@@ -294,30 +331,19 @@ int Context::run() {
 			}
 
 
-			// инициализатор клеток
-			if (count_of_frames == -1) {
-				glUseProgram(iniComputeShader.glID);
-				static bool first_call = 1;
-				if (first_call) {
-					first_call = 0;
-					glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Dp"), world.Dp);
-					glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Ac"), world.Ac);
-				}
-		
-				glDispatchCompute(world.mec, 1, 1);
-				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-			}
-
-			
 			// физика клеток
-			if (test.is_press) {
+			if (test.is_click) {
 				glUseProgram(cellsPhysicsComputeShader.glID);
 				static bool first_call = 1;
 				if (first_call) {
 					first_call = 0;
+					glUniform1i(glGetUniformLocation(cellsPhysicsComputeShader.glID, "Dm"), world.Dm);
+					glUniform1f(glGetUniformLocation(cellsPhysicsComputeShader.glID, "Dp"), world.Dp);
+					glUniform1f(glGetUniformLocation(cellsPhysicsComputeShader.glID, "Ac"), world.Ac);
 				}
 
 				glDispatchCompute(8, 8, world.mec / 1024);
+				//glDispatchCompute(1, 1, 1);
 
 				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 			}
@@ -410,7 +436,7 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	glfwWindowHint(GLFW_SAMPLES, 16);
+	glfwWindowHint(GLFW_SAMPLES, 64);
 
 	auto window = glfwCreateWindow(800, 600, "CellBakery Alternative", NULL, NULL);
 	if (window == NULL) return -1;
@@ -423,6 +449,9 @@ int main() {
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
+
+	int t;
+	std::cin >> t;
 	return r;
 }
 
