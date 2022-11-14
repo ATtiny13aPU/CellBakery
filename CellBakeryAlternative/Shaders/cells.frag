@@ -41,7 +41,7 @@ void main() {
 				if (r < 0.20 || r > 0.90)
 					b = 1;
 				else {
-					a = fract(atan(c_pos.y - Pos.y, c_pos.x - Pos.x) / 6.2831853 + c_pos.a);
+					a = fract(atan(c_pos.y - Pos.y, c_pos.x - Pos.x) / 6.2831853 - c_pos.a);
 					b = int(ihash2(uvec2(r * 5., a * 20.)) & 4u);
 				}
 				break;
@@ -74,7 +74,7 @@ void main() {
 
 	} else if (qd < qr * t2kr[t] * t2kr[t] || t == 1) {
 		float r = length(dp / c_pos.z); // относительный радиус
-		float a = fract(atan(c_pos.y - Pos.y, c_pos.x - Pos.x) / 6.2831853 + c_pos.a - 0.125);
+		float a = fract(atan(c_pos.y - Pos.y, c_pos.x - Pos.x) / 6.2831853 - c_pos.a - 0.5);
 		int b = 0;
 		
 		// Тип структуры
@@ -103,8 +103,8 @@ void main() {
 				pixel = vec4(c_meta.rgb * 0.5, 1.);
 				break;
 			default: // пустота
-				//pixel = vec4(c_meta.rgb * 0.5, 0.2);
-				discard;
+				pixel = vec4(c_meta.rgb * 0.5, 0.2);
+				//discard;
 		}
 	} else discard;
 }

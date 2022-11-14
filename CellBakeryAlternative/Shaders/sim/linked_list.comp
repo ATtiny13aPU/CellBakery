@@ -13,10 +13,19 @@ struct Cell {
 	vec3 color_hsv;
 	int type_id;
 	int linked_list;
+	int chank_id;
 };
 
 restrict buffer ssbo_cells {
     Cell cells[];
+};
+
+struct Chunk {
+	int linked_list;
+};
+
+restrict buffer ssbo_grid {
+    Chunk chunks[];
 };
 
 mat2 rot(float a) { //матрица поворота по заданному углу
@@ -28,7 +37,11 @@ mat2 rot(float a) { //матрица поворота по заданному углу
 void main() {
 	uint workGroupID = gl_GlobalInvocationID.x * 16 + gl_GlobalInvocationID.y * 128 + gl_GlobalInvocationID.z * 1024;
 	
+	// строим связный список
 	for (uint cid = workGroupID; cid < workGroupID + 16; cid++) {
-		cells[cid].pos += vec2(.00001, 0.) * rot(-cells[cid].angle * 3.14159265358 * 2.);
+		cells[cid].linked_list = 0;
+		int tid = atomicExchange(chunks[cells[cid].chank_id].linked_list, cells[cid].linked_list);
 	}
+	
+	//cells[cid].pos += vec2(.00002, 0.) * rot(cells[cid].angle * 3.14159265358 * 2.);
 }

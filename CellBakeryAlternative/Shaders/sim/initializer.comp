@@ -105,7 +105,7 @@ void main() {
 		cell.pos = vec2(fhash2(), fhash2()) * Dp;
 
 	cell.radius = map(fhash2(), 0., 1., Ac * 0.6, Ac * 1.);
-	cell.angle = fhash2();
+	cell.angle = 0.;
 
 	cell.color_hsv = vec3(fhash2(), fhash2() * 0.5 + 0.5, fhash2() * 0.5 + 0.5);
 	cell.color_rgb = HSV(cell.color_hsv.r, cell.color_hsv.g, cell.color_hsv.b);

@@ -26,7 +26,6 @@ struct Cell {
 	int linked_list;
 };
 
-
 restrict buffer ssbo_cells {
     Cell cells[];
 };
@@ -115,8 +114,9 @@ void main() {
 				float kWR = WinR.x / WinR.y;
 				WinR.x /= kWR;
 
-				WinR *= rot(-c_pos.a * 3.14159265358 * 2.);
-				vec2 vr = vec2(r) * rot(-c_pos.a * 3.14159265358 * 2.);
+				mat2x2 mr = rot((c_pos.a - 0.625) * 3.14159265358 * 2.);
+				WinR *= mr;
+				vec2 vr = vec2(r) * mr;
 
 				// 1:bottom-left
 				Pos = cell_pos_data.xy - vr;
