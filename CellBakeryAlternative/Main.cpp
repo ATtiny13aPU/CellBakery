@@ -243,7 +243,7 @@ int Context::run() {
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, light_map);
 
-				glDispatchCompute(world.setup.out_mapSize, world.setup.out_mapSize, 0);
+				glDispatchCompute(world.setup.out_mapSize, world.setup.out_mapSize, 1);
 
 				//glMemoryBarrier(GL_ALL_BARRIER_BITS);
 				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
