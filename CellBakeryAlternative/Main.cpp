@@ -37,7 +37,7 @@ private:
 	shad::Shader petriShader;
 
 	shad::ComputeShader lightComputeShader;
-	shad::ComputeShader listComputeShader;
+	shad::ComputeShader cellsPhysicsComputeShader;
 	shad::ComputeShader iniComputeShader;
 
 	shad::SSBO CellsSSBO;
@@ -91,6 +91,34 @@ int Context::run() {
 		fullScreenMesh.loadFrom(&m[0], m.size());
 	}
 
+	// шейдеры симуляции
+	{
+		iniComputeShader.name = std::string("iniComputeShader");
+		std::ifstream inpf;
+		inpf.open("Shaders/sim/initializer.comp");
+		std::string sourseC{ std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>() };
+		inpf.close();
+		iniComputeShader.compile(sourseC.c_str());
+	}
+
+	{
+		lightComputeShader.name = std::string("lightComputeShader");
+		std::ifstream inpf;
+		inpf.open("Shaders/sim/light.comp");
+		std::string sourseC{ std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>() };
+		inpf.close();
+		lightComputeShader.compile(sourseC.c_str());
+	}
+
+	{
+		cellsPhysicsComputeShader.name = std::string("cellsPhysicsComputeShader");
+		std::ifstream inpf;
+		inpf.open("Shaders/sim/cells_physics.comp");
+		std::string sourseC{ std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>() };
+		inpf.close();
+		cellsPhysicsComputeShader.compile(sourseC.c_str());
+	}
+
 
 	// шейдеры графики
 	{
@@ -120,38 +148,12 @@ int Context::run() {
 		cellsShader.compile(sourseV.c_str(), sourseF.c_str(), sourseG.c_str());
 	}
 
-	// шейдеры симуляции
-	{
-		iniComputeShader.name = std::string("iniComputeShader");
-		std::ifstream inpf;
-		inpf.open("Shaders/sim/initializer.comp");
-		std::string sourseC{ std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>() };
-		inpf.close();
-		iniComputeShader.compile(sourseC.c_str());
-	}
-
-	{
-		lightComputeShader.name = std::string("lightComputeShader");
-		std::ifstream inpf;
-		inpf.open("Shaders/sim/light.comp");
-		std::string sourseC{ std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>() };
-		inpf.close();
-		lightComputeShader.compile(sourseC.c_str());
-	}
-
-	{
-		listComputeShader.name = std::string("listComputeShader");
-		std::ifstream inpf;
-		inpf.open("Shaders/sim/linked_list.comp");
-		std::string sourseC{ std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>() };
-		inpf.close();
-		listComputeShader.compile(sourseC.c_str());
-	}
 
 	// Создание мира (ВНИМАНИЕ! Данные мира больше не используются, все вычисления переносятся на GPU)
 	///==============================
 	WorldCS world;
-	world.Dp = 8.;
+	world.Dp = 2.;
+	world.mec = 2000;
 
 	world.iniWorld();
 
@@ -208,9 +210,9 @@ int Context::run() {
 					// получение эвента колёсика мыши
 					//float scroll = ImGui::GetIO().MouseWheel;
 					if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-						scroll -= 0.05;
+						scroll -= 0.1 * (frameTime.get() / 1000.);
 					if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-						scroll += 0.03;
+						scroll += 0.1 * (frameTime.get() / 1000.);
 
 					dmPos2 = dmPos1; // движение
 					glfwGetCursorPos(window, &dmPos1[0], &dmPos1[1]); dmPos1[0] = -dmPos1[0];
@@ -221,25 +223,26 @@ int Context::run() {
 
 					/// компенсация движения
 					// dmPos3 *= vec2(std::min(vec2(dmPos2.x - dmPos1.x).length() * 0.05, 2.), std::min(vec2(dmPos2.y - dmPos1.y).length() * 0.05, 2.)) * 0.3;
+					const frac pk = 0.2;
 
 					while (scroll > 0.01) { // приближение
-						scroll -= 0.1;
+						scroll -= 0.1 * pk;
 						if (scroll < 0.) scroll = 0.;
 						vec2 mnPos = mPos_to_wPos(vec2(0, 0), world.view.mst, world.view.Pos);
 						vec2 mxPos = mPos_to_wPos(vec2(Xd, Yd), world.view.mst, world.view.Pos);
-						mnPos = mix(mnPos, mPos, +0.012);
-						mxPos = mix(mxPos, mPos, +0.012);
+						mnPos = mix(mnPos, mPos, +0.012 * pk);
+						mxPos = mix(mxPos, mPos, +0.012 * pk);
 						world.view.Pos = mix(mnPos, mxPos, 0.5);
 						world.view.mst = mnPos[1] - mxPos[1];
 
 						world.view.mst = std::max(world.view.mst, 0.00001 * world.Dp);
 					}
 					while (scroll < -0.01) { // отдаление 
-						scroll += 0.1;
+						scroll += 0.1 * pk;
 						vec2 mnPos = mPos_to_wPos(vec2(0, 0), world.view.mst, world.view.Pos);
 						vec2 mxPos = mPos_to_wPos(vec2(Xd, Yd), world.view.mst, world.view.Pos);
-						mnPos = mix(mnPos, mPos, -0.012);
-						mxPos = mix(mxPos, mPos, -0.012);
+						mnPos = mix(mnPos, mPos, -0.012 * pk);
+						mxPos = mix(mxPos, mPos, -0.012 * pk);
 						world.view.Pos = mix(mnPos, mxPos, 0.5);
 						world.view.mst = mnPos[1] - mxPos[1];
 
@@ -248,6 +251,8 @@ int Context::run() {
 				}	///==============================
 
 			}	///==============================
+
+			world.view.Pos = clamp(world.view.Pos, -world.Dp, world.Dp);
 
 			mnPos = mPos_to_wPos(vec2(0, 0), world.view.mst, world.view.Pos);
 			mxPos = mPos_to_wPos(vec2(Xd, Yd), world.view.mst, world.view.Pos);
@@ -258,33 +263,20 @@ int Context::run() {
 			// Инициализация ssbo буферов
 			if (count_of_frames == -1) {
 
-				CellsSSBO.setSize(world.mec * sizeof(Cell_ssboBlock));
+				CellsSSBO.setSize(world.mec * sizeof(Cell_ssboBlock) * 2);
 
 				CellsSSBO.bind(iniComputeShader.glID, "ssbo_cells");
-				CellsSSBO.bind(listComputeShader.glID, "ssbo_cells");
+				CellsSSBO.bind(cellsPhysicsComputeShader.glID, "ssbo_cells");
 				CellsSSBO.bind(cellsShader.glID, "ssbo_cells");
 
 
 				GridSSBO.setSize(world.Dm * world.Dm * (sizeof(Chunk_ssboBlock) + 4));
 
-				GridSSBO.bind(listComputeShader.glID, "ssbo_grid");
+				GridSSBO.bind(cellsPhysicsComputeShader.glID, "ssbo_grid");
 				GridSSBO.bind(lightComputeShader.glID, "ssbo_grid");
 				GridSSBO.bind(petriShader.glID, "ssbo_grid");
 			}
 
-			// инициализатор клеток
-			if (count_of_frames == -1) {
-				glUseProgram(iniComputeShader.glID);
-				static bool first_call = 1;
-				if (first_call) {
-					first_call = 0;
-					glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Dp"), world.Dp);
-					glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Ac"), world.Ac);
-				}
-		
-				glDispatchCompute(world.mec, 1, 1);
-				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-			}
 
 			// вычисление света
 			if (count_of_frames == -1) {
@@ -301,9 +293,25 @@ int Context::run() {
 				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 			}
 
+
+			// инициализатор клеток
+			if (count_of_frames == -1) {
+				glUseProgram(iniComputeShader.glID);
+				static bool first_call = 1;
+				if (first_call) {
+					first_call = 0;
+					glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Dp"), world.Dp);
+					glUniform1f(glGetUniformLocation(iniComputeShader.glID, "Ac"), world.Ac);
+				}
+		
+				glDispatchCompute(world.mec, 1, 1);
+				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+			}
+
+			
 			// физика клеток
 			if (test.is_press) {
-				glUseProgram(listComputeShader.glID);
+				glUseProgram(cellsPhysicsComputeShader.glID);
 				static bool first_call = 1;
 				if (first_call) {
 					first_call = 0;
@@ -339,21 +347,23 @@ int Context::run() {
 					glDrawArrays(GL_TRIANGLE_STRIP, 0, fullScreenMesh.size);
 				}
 			}
+			
+
 			// клетки
-			if (0) {
+			if (1) {
 
 				glUseProgram(cellsShader.glID);
 				static bool first_call = 1;
 				if (first_call) {
 					first_call = 0;
-					glUniform1i(glGetUniformLocation(cellsShader.glID, "mapSize"), world.Dm);
+					glUniform1i(glGetUniformLocation(cellsShader.glID, "Dm"), world.Dm);
 					glUniform1f(glGetUniformLocation(cellsShader.glID, "Dp"), world.Dp);
 					glUniform1f(glGetUniformLocation(cellsShader.glID, "Ac"), world.Ac);
 				}
 				glUniform4f(glGetUniformLocation(cellsShader.glID, "ViewWorld"), mnPos[0], mxPos[1], mxPos[0], mnPos[1]);
 				glUniform2i(glGetUniformLocation(cellsShader.glID, "WinSize"), Xd, Yd);
-				glUniform2f(glGetUniformLocation(cellsShader.glID, "cPos"), world.view.Pos[0], world.view.Pos[1]);
-				glUniform2f(glGetUniformLocation(cellsShader.glID, "mPos"), mPos[0], mPos[1]);
+		//		glUniform2f(glGetUniformLocation(cellsShader.glID, "cPos"), world.view.Pos[0], world.view.Pos[1]);
+		//		glUniform2f(glGetUniformLocation(cellsShader.glID, "mPos"), mPos[0], mPos[1]);
 				glUniform1f(glGetUniformLocation(cellsShader.glID, "mst"), world.view.mst);
 				glUniform1f(glGetUniformLocation(cellsShader.glID, "fTime"), count_of_frames / 60.);
 				glUniform1i(glGetUniformLocation(cellsShader.glID, "GM"), gmesh.is_press);

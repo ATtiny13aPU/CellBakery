@@ -301,7 +301,7 @@
     <None Include="Shaders\petri.vert" />
     <None Include="Shaders\sim\initializer.comp" />
     <None Include="Shaders\sim\light.comp" />
-    <None Include="Shaders\sim\linked_list.comp" />
+    <None Include="Shaders\sim\cells_physics.comp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -104,11 +104,11 @@
     <None Include="Shaders\sim\light.comp">
       <Filter>Шейдеры\sim\light</Filter>
     </None>
-    <None Include="Shaders\sim\linked_list.comp">
-      <Filter>Шейдеры\sim\cells</Filter>
-    </None>
     <None Include="Shaders\sim\initializer.comp">
       <Filter>Шейдеры\sim\initializer</Filter>
+    </None>
+    <None Include="Shaders\sim\cells_physics.comp">
+      <Filter>Шейдеры\sim\cells</Filter>
     </None>
   </ItemGroup>
 </Project>
