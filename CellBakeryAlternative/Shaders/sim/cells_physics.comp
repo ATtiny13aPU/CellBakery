@@ -3,6 +3,7 @@
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 uniform int Dm;
+uniform int index;
 uniform float Ac;
 
 const int nullID = 0x7FFFFFFF;
@@ -73,6 +74,8 @@ void main() {
 void main() {
 	int workGroupID = int(gl_GlobalInvocationID.x * 16 + gl_GlobalInvocationID.y * 128 + gl_GlobalInvocationID.z * 1024);
 	
+    switch(index) {
+        case 1:
 	for (int cid = workGroupID; cid < workGroupID + 16; cid++) {
 		cells[cid].chank_id = int(cells[cid].pos.x / Ac) + int(cells[cid].pos.y / Ac) * Dm;
 		cells[cid].linked_list = 0;
@@ -81,14 +84,12 @@ void main() {
 
 	for (int cid = workGroupID; cid < workGroupID + 16; cid++)
 		chunks[cells[cid].chank_id].linked_list = nullID;
+	break;
 
-	memoryBarrierShared();
-	barrier();
-
+        case 2:
 	// строим связный список
 	for (int cid = workGroupID; cid < workGroupID + 16; cid++) {
-		int tid = cid;
-		tid = atomicExchange(chunks[cells[cid].chank_id].linked_list, tid);
+		int tid = atomicExchange(chunks[cells[cid].chank_id].linked_list, cid);
 
 		cells[cid].linked_list = tid;
 		if (tid == nullID)
@@ -97,18 +98,14 @@ void main() {
 	//		cells[tid].is_first = 0;
 	}
 
-	memoryBarrierShared();
-	barrier();
-
 //	// старшие клетки в списке ставят метку на карте
 //	for (uint cid = workGroupID; cid < workGroupID  + 16; cid++)
 //		if (cells[cid].is_first == 1)
 //			chunks[cells[cid].chank_id].brightness += 0.4;
 
 	//cells[cid].pos += vec2(.00002, 0.) * rot(cells[cid].angle * 3.14159265358 * 2.);
-
-	for (int cid = workGroupID; cid < workGroupID  + 16; cid++)
-		chunks[cells[cid].chank_id].linked_list = nullID;
+        break;
+    }
 
 	return;
 }

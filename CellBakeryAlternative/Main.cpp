@@ -341,10 +341,14 @@ int Context::run() {
 					glUniform1f(glGetUniformLocation(cellsPhysicsComputeShader.glID, "Dp"), world.Dp);
 					glUniform1f(glGetUniformLocation(cellsPhysicsComputeShader.glID, "Ac"), world.Ac);
 				}
-
+                                static int indexLoc = glGetUniformLocation(cellsPhysicsComputeShader.glID, "index");
+                                
+				glUniform1i(indexLoc, 1);
 				glDispatchCompute(8, 8, world.mec / 1024);
-				//glDispatchCompute(1, 1, 1);
-
+				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+                                
+                                glUniform1i(indexLoc, 2);
+				glDispatchCompute(8, 8, world.mec / 1024);
 				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 			}
 		}
@@ -449,9 +453,6 @@ int main() {
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
-
-	int t;
-	std::cin >> t;
 	return r;
 }
 
