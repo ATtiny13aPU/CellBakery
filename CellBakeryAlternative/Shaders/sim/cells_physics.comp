@@ -32,15 +32,15 @@ restrict buffer ssbo_grid {
     Chunk chunks[];
 };
 
-mat2 rot(float a) { //матрица поворота по заданному углу
+mat2 rot(float a) { //РјР°С‚СЂРёС†Р° РїРѕРІРѕСЂРѕС‚Р° РїРѕ Р·Р°РґР°РЅРЅРѕРјСѓ СѓРіР»Сѓ
 	float s = sin(a);
 	float c = cos(a);
 	return mat2(c, -s, s, c);
 }
 
 /*
-// Рабочий однопоточный вариант. 
-// Нельзя запускать без изменения glDispatchCompute(8, 8, world.mec / 1024); на glDispatchCompute(1, 1, 1); на CPU
+// Р Р°Р±РѕС‡РёР№ РѕРґРЅРѕРїРѕС‚РѕС‡РЅС‹Р№ РІР°СЂРёР°РЅС‚. 
+// РќРµР»СЊР·СЏ Р·Р°РїСѓСЃРєР°С‚СЊ Р±РµР· РёР·РјРµРЅРµРЅРёСЏ glDispatchCompute(8, 8, world.mec / 1024); РЅР° glDispatchCompute(1, 1, 1); РЅР° CPU
 void main() {
 	int workGroupID = int(gl_GlobalInvocationID.x * 16 + gl_GlobalInvocationID.y * 128 + gl_GlobalInvocationID.z * 1024);
 	
@@ -53,7 +53,7 @@ void main() {
 	for (int cid = 0; cid < 1024; cid++)
 		chunks[cells[cid].chank_id].linked_list = nullID;
 
-	// строим связный список
+	// СЃС‚СЂРѕРёРј СЃРІСЏР·РЅС‹Р№ СЃРїРёСЃРѕРє
 	for (int cid = 0; cid < 1024; cid++) {
 		int tid = chunks[cells[cid].chank_id].linked_list;
 		chunks[cells[cid].chank_id].linked_list = cid;
@@ -85,7 +85,7 @@ void main() {
 	memoryBarrierShared();
 	barrier();
 
-	// строим связный список
+	// СЃС‚СЂРѕРёРј СЃРІСЏР·РЅС‹Р№ СЃРїРёСЃРѕРє
 	for (int cid = workGroupID; cid < workGroupID + 16; cid++) {
 		int tid = cid;
 		tid = atomicExchange(chunks[cells[cid].chank_id].linked_list, tid);
@@ -100,7 +100,7 @@ void main() {
 	memoryBarrierShared();
 	barrier();
 
-//	// старшие клетки в списке ставят метку на карте
+//	// СЃС‚Р°СЂС€РёРµ РєР»РµС‚РєРё РІ СЃРїРёСЃРєРµ СЃС‚Р°РІСЏС‚ РјРµС‚РєСѓ РЅР° РєР°СЂС‚Рµ
 //	for (uint cid = workGroupID; cid < workGroupID  + 16; cid++)
 //		if (cells[cid].is_first == 1)
 //			chunks[cells[cid].chank_id].brightness += 0.4;
