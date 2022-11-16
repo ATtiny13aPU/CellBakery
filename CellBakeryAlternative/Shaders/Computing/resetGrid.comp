@@ -4,6 +4,8 @@ layout(local_size_x = 1, local_size_y = 1) in;
 
 uniform int Dm;
 
+const int nullID = 0x7FFFFFFF;
+
 struct Chunk {
 	int linked_list;
 	float brightness;
@@ -15,6 +17,6 @@ restrict buffer ssbo_grid {
 
 void main() {
 
-	chunks[gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * Dm].linked_list = 0;
+	chunks[gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * Dm].linked_list = nullID;
 	chunks[gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * Dm].brightness = 0.;
 }

@@ -294,15 +294,16 @@
     <ClInclude Include="world.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\cells.frag" />
-    <None Include="Shaders\cells.geom" />
-    <None Include="Shaders\cells.vert" />
-    <None Include="Shaders\petri.frag" />
-    <None Include="Shaders\petri.vert" />
-    <None Include="Shaders\sim\initializer.comp" />
-    <None Include="Shaders\sim\light.comp" />
-    <None Include="Shaders\sim\cells_physics.comp" />
-    <None Include="Shaders\sim\reset_grid.comp" />
+    <None Include="Shaders\Computing\cellsPhysics_list.comp" />
+    <None Include="Shaders\Computing\cellsPhysics_process.comp" />
+    <None Include="Shaders\Computing\light.comp" />
+    <None Include="Shaders\Computing\resetCells.comp" />
+    <None Include="Shaders\Computing\resetGrid.comp" />
+    <None Include="Shaders\Graphics\cells.frag" />
+    <None Include="Shaders\Graphics\cells.geom" />
+    <None Include="Shaders\Graphics\cells.vert" />
+    <None Include="Shaders\Graphics\petri.frag" />
+    <None Include="Shaders\Graphics\petri.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
