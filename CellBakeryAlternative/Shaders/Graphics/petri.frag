@@ -53,9 +53,9 @@ void main() {
 	
 	ivec2 ipos = ivec2(Pos / Ac);
 	
+	float ling = chunks[ipos.x + ipos.y * Dm].brightness;
 
 	if (compareDistanse(Pos - hDp, hDp)) {
-		float ling = chunks[ipos.x + ipos.y * Dm].brightness;
 		//	{
 		//		mat4x4 p;
 		//		for (int x = 0; x < 4; x++)
@@ -68,7 +68,6 @@ void main() {
 		pixel = mix(pixel, vec3(1.), ling * ling * 0.5);
 	} 
 	else if (compareDistanse(Pos - hDp, hDp + 0.01)) { // если это край чаши
-		float ling = 0.;
 		ling *= ling;
 		pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3) * 0.5;
 		pixel = mix(pixel * 0.5, vec3(0.5), 0.5);

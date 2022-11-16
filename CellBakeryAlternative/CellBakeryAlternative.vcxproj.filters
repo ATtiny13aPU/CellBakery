@@ -23,23 +23,26 @@
     <Filter Include="Исходные файлы\Библиотеки\OSL">
       <UniqueIdentifier>{ef39ec40-7972-488e-b9d9-aed7e707a63f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Шейдеры\cells">
-      <UniqueIdentifier>{d1f4234f-cbe0-42e6-ad07-433a502824d8}</UniqueIdentifier>
+    <Filter Include="Шейдеры\Graphics">
+      <UniqueIdentifier>{64964520-5999-40fc-9c22-a54ed3888788}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Шейдеры\petri">
-      <UniqueIdentifier>{eed09186-5511-4df5-b3d2-8d9d288775f6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Шейдеры\sim">
+    <Filter Include="Шейдеры\Сomputing">
       <UniqueIdentifier>{57baf64a-1802-46b9-b2fb-2b874ce7b9fd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Шейдеры\sim\light">
+    <Filter Include="Шейдеры\Сomputing\grid">
       <UniqueIdentifier>{f529e4ea-6556-44ff-afa3-f039e472dd84}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Шейдеры\sim\cells">
+    <Filter Include="Шейдеры\Сomputing\cells">
       <UniqueIdentifier>{371831c3-1784-4035-884d-04716462dff0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Шейдеры\sim\initializer">
+    <Filter Include="Шейдеры\Сomputing\initializer">
       <UniqueIdentifier>{86c5d057-a2c0-45af-a615-418637746430}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Шейдеры\Graphics\petri">
+      <UniqueIdentifier>{eed09186-5511-4df5-b3d2-8d9d288775f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Шейдеры\Graphics\cells">
+      <UniqueIdentifier>{d1f4234f-cbe0-42e6-ad07-433a502824d8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -86,32 +89,35 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\cells.vert">
-      <Filter>Шейдеры\cells</Filter>
+    <None Include="Shaders\Graphics\cells.frag">
+      <Filter>Шейдеры\Graphics\cells</Filter>
     </None>
-    <None Include="Shaders\cells.frag">
-      <Filter>Шейдеры\cells</Filter>
+    <None Include="Shaders\Graphics\cells.geom">
+      <Filter>Шейдеры\Graphics\cells</Filter>
     </None>
-    <None Include="Shaders\cells.geom">
-      <Filter>Шейдеры\cells</Filter>
+    <None Include="Shaders\Graphics\cells.vert">
+      <Filter>Шейдеры\Graphics\cells</Filter>
     </None>
-    <None Include="Shaders\petri.vert">
-      <Filter>Шейдеры\petri</Filter>
+    <None Include="Shaders\Graphics\petri.frag">
+      <Filter>Шейдеры\Graphics\petri</Filter>
     </None>
-    <None Include="Shaders\petri.frag">
-      <Filter>Шейдеры\petri</Filter>
+    <None Include="Shaders\Graphics\petri.vert">
+      <Filter>Шейдеры\Graphics\petri</Filter>
     </None>
-    <None Include="Shaders\sim\light.comp">
-      <Filter>Шейдеры\sim\light</Filter>
+    <None Include="Shaders\Computing\resetCells.comp">
+      <Filter>Шейдеры\Сomputing\initializer</Filter>
     </None>
-    <None Include="Shaders\sim\initializer.comp">
-      <Filter>Шейдеры\sim\initializer</Filter>
+    <None Include="Shaders\Computing\resetGrid.comp">
+      <Filter>Шейдеры\Сomputing\initializer</Filter>
     </None>
-    <None Include="Shaders\sim\cells_physics.comp">
-      <Filter>Шейдеры\sim\cells</Filter>
+    <None Include="Shaders\Computing\light.comp">
+      <Filter>Шейдеры\Сomputing\grid</Filter>
     </None>
-    <None Include="Shaders\sim\reset_grid.comp">
-      <Filter>Шейдеры\sim\initializer</Filter>
+    <None Include="Shaders\Computing\cellsPhysics_list.comp">
+      <Filter>Шейдеры\Сomputing\cells</Filter>
+    </None>
+    <None Include="Shaders\Computing\cellsPhysics_process.comp">
+      <Filter>Шейдеры\Сomputing\cells</Filter>
     </None>
   </ItemGroup>
 </Project>
