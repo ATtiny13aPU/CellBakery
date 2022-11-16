@@ -30,17 +30,19 @@ private:
 	int Vsync = 1, VsyncNow = Vsync;
 
 	GLFWwindow *window;
+
 	shad::VoidMesh voidMesh;
-	shad::Shader cellsShader;
-
 	shad::SimpleMesh fullScreenMesh;
-	shad::Shader petriShader;
-
+	
 	shad::ComputeShader resetCellsComputeShader; // стартовая загрузка данных в ssbo_cells
 	shad::ComputeShader resetGridComputeShader; // стартовая загрузка данных в ssbo_chunk
 	shad::ComputeShader lightComputeShader; // вычисление brightness в ssbo_chunk
 	shad::ComputeShader cellsPhysics_listComputeShader; // генерация связного списка
-	shad::ComputeShader cellsPhysics_processComputeShader; // нахождение и обработка коллизий
+	shad::ComputeShader cellsPhysics_processForcesComputeShader; // нахождение и обработка коллизий (суммирование сил)
+	shad::ComputeShader cellsPhysics_processPositionComputeShader; // пересчёт скорости и позиции, а также затирание ID в чанке, пересчёт позиции чанка клетки
+
+	shad::Shader cellsShader;
+	shad::Shader petriShader;
 
 	shad::SSBO CellsSSBO;
 	shad::SSBO GridSSBO;
@@ -75,6 +77,7 @@ private:
 	};
 
 	struct Chunk_ssboBlock {
+		int32_t first_list_ID;
 		int32_t linked_list;
 		float brightness;
 	};
@@ -95,7 +98,6 @@ int Context::run() {
 
 	// шейдеры симуляции
 
-	// resetGrid.comp
 	{
 		resetGridComputeShader.name = std::string("resetGridComputeShader");
 		std::ifstream inpf;
@@ -133,14 +135,22 @@ int Context::run() {
 	}
 
 	{
-		cellsPhysics_processComputeShader.name = std::string("cellsPhysics_processComputeShader");
+		cellsPhysics_processForcesComputeShader.name = std::string("cellsPhysics_processForceComputeShader");
 		std::ifstream inpf;
-		inpf.open("Shaders/Computing/cellsPhysics_process.comp");
+		inpf.open("Shaders/Computing/cellsPhysics_processForces.comp");
 		std::string sourseC{ std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>() };
 		inpf.close();
-		cellsPhysics_processComputeShader.compile(sourseC.c_str());
+		cellsPhysics_processForcesComputeShader.compile(sourseC.c_str());
 	}
 
+	{
+		cellsPhysics_processPositionComputeShader.name = std::string("cellsPhysics_processPositionComputeShader");
+		std::ifstream inpf;
+		inpf.open("Shaders/Computing/cellsPhysics_processPositions.comp");
+		std::string sourseC{ std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>() };
+		inpf.close();
+		cellsPhysics_processPositionComputeShader.compile(sourseC.c_str());
+	}
 
 	// шейдеры графики
 
@@ -175,7 +185,7 @@ int Context::run() {
 	// Создание мира (ВНИМАНИЕ! Данные мира больше не используются, все вычисления переносятся на GPU)
 	///==============================
 	WorldCS world;
-	world.Dp = 1.;
+	world.Dp = 3.;
 	world.mec = 1024;
 
 	world.iniWorld();
@@ -293,12 +303,13 @@ int Context::run() {
 			// Инициализация ssbo буферов
 			if (count_of_frames == -1) {
 				// Поле мира
-				GridSSBO.setSize(world.Dm * world.Dm * (sizeof(Chunk_ssboBlock) + 4));
+				GridSSBO.setSize(world.Dm * world.Dm * (sizeof(Chunk_ssboBlock) + 4) * 2.);
 
 				GridSSBO.bind(resetGridComputeShader.glID, "ssbo_grid");
 				GridSSBO.bind(lightComputeShader.glID, "ssbo_grid");
 				GridSSBO.bind(cellsPhysics_listComputeShader.glID, "ssbo_grid");
-				GridSSBO.bind(cellsPhysics_processComputeShader.glID, "ssbo_grid");
+				GridSSBO.bind(cellsPhysics_processForcesComputeShader.glID, "ssbo_grid");
+				GridSSBO.bind(cellsPhysics_processPositionComputeShader.glID, "ssbo_grid");
 				GridSSBO.bind(petriShader.glID, "ssbo_grid");
 
 				// Клетки
@@ -306,7 +317,8 @@ int Context::run() {
 
 				CellsSSBO.bind(resetCellsComputeShader.glID, "ssbo_cells");
 				CellsSSBO.bind(cellsPhysics_listComputeShader.glID, "ssbo_cells");
-				CellsSSBO.bind(cellsPhysics_processComputeShader.glID, "ssbo_cells");
+				CellsSSBO.bind(cellsPhysics_processForcesComputeShader.glID, "ssbo_cells");
+				CellsSSBO.bind(cellsPhysics_processPositionComputeShader.glID, "ssbo_cells");
 				CellsSSBO.bind(cellsShader.glID, "ssbo_cells");
 			}
 
@@ -314,6 +326,7 @@ int Context::run() {
 			// инициализатор поля
 			if (count_of_frames == -1) {
 				glUseProgram(resetGridComputeShader.glID);
+				glUniform1i(glGetUniformLocation(resetGridComputeShader.glID, "Dm"), world.Dm);
 				glDispatchCompute(world.Dm, world.Dm, 1);
 				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 			}
@@ -350,40 +363,57 @@ int Context::run() {
 				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 			}
 
+			for (int i = 0; i < 1; i++) {
+				// физика клеток: этап построения списков
+				if (test.is_press) {
+					glUseProgram(cellsPhysics_listComputeShader.glID);
+					static bool first_call = 1;
+					if (first_call) {
+						first_call = 0;
+						glUniform1i(glGetUniformLocation(cellsPhysics_listComputeShader.glID, "Dm"), world.Dm);
+						glUniform1f(glGetUniformLocation(cellsPhysics_listComputeShader.glID, "Dp"), world.Dp);
+						glUniform1f(glGetUniformLocation(cellsPhysics_listComputeShader.glID, "Ac"), world.Ac);
+					}
 
-			// физика клеток: этап построения списков
-			if (test.is_click) {
-				glUseProgram(cellsPhysics_listComputeShader.glID);
-				static bool first_call = 1;
-				if (first_call) {
-					first_call = 0;
-					glUniform1i(glGetUniformLocation(cellsPhysics_listComputeShader.glID, "Dm"), world.Dm);
-					glUniform1f(glGetUniformLocation(cellsPhysics_listComputeShader.glID, "Dp"), world.Dp);
-					glUniform1f(glGetUniformLocation(cellsPhysics_listComputeShader.glID, "Ac"), world.Ac);
+					glDispatchCompute(8, 8, world.mec / 1024);
+					//glDispatchCompute(1, 1, 1);
+
+					glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 				}
 
-				glDispatchCompute(8, 8, world.mec / 1024);
-				//glDispatchCompute(1, 1, 1);
 
-				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-			}
+				// физика клеток: этап обработки коллизий через списки
+				if (test.is_press) {
+					glUseProgram(cellsPhysics_processForcesComputeShader.glID);
+					static bool first_call = 1;
+					if (first_call) {
+						first_call = 0;
+						glUniform1i(glGetUniformLocation(cellsPhysics_processForcesComputeShader.glID, "Dm"), world.Dm);
+						glUniform1f(glGetUniformLocation(cellsPhysics_processForcesComputeShader.glID, "Dp"), world.Dp);
+						glUniform1f(glGetUniformLocation(cellsPhysics_processForcesComputeShader.glID, "Ac"), world.Ac);
+					}
 
+					glDispatchCompute(8, 8, world.mec / 1024);
 
-			// физика клеток: этап обработки коллизий через списки
-			if (test.is_click) {
-				glUseProgram(cellsPhysics_processComputeShader.glID);
-				static bool first_call = 1;
-				if (first_call) {
-					first_call = 0;
-					glUniform1i(glGetUniformLocation(cellsPhysics_processComputeShader.glID, "Dm"), world.Dm);
-					glUniform1f(glGetUniformLocation(cellsPhysics_processComputeShader.glID, "Dp"), world.Dp);
-					glUniform1f(glGetUniformLocation(cellsPhysics_processComputeShader.glID, "Ac"), world.Ac);
+					glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 				}
 
-				glDispatchCompute(8, 8, world.mec / 1024);
-				//glDispatchCompute(1, 1, 1);
 
-				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+				// физика клеток: применение прошлого этапа
+				if (test.is_press) {
+					glUseProgram(cellsPhysics_processPositionComputeShader.glID);
+					static bool first_call = 1;
+					if (first_call) {
+						first_call = 0;
+						glUniform1i(glGetUniformLocation(cellsPhysics_processPositionComputeShader.glID, "Dm"), world.Dm);
+						glUniform1f(glGetUniformLocation(cellsPhysics_processPositionComputeShader.glID, "Dp"), world.Dp);
+						glUniform1f(glGetUniformLocation(cellsPhysics_processPositionComputeShader.glID, "Ac"), world.Ac);
+					}
+
+					glDispatchCompute(8, 8, world.mec / 1024);
+
+					glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+				}
 			}
 		}
 
@@ -488,7 +518,7 @@ int main() {
 	glfwDestroyWindow(window);
 	glfwTerminate();
 
-	int t;
-	std::cin >> t;
+	//int t;
+	//std::cin >> t;
 	return r;
 }

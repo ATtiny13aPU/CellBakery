@@ -25,6 +25,9 @@ struct Cell {
 	int type_id;
 	int linked_list;
 	int is_first;
+	float weight;
+	vec2 velocity;
+	vec2 force;
 };
 
 restrict buffer ssbo_cells {

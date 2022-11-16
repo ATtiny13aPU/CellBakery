@@ -2,6 +2,7 @@
 
 layout(local_size_x = 1, local_size_y = 1) in;
 
+uniform int Dm;
 uniform float Dp;
 uniform float Ac;
 
@@ -17,6 +18,9 @@ struct Cell {
 	int linked_list;
 	int chank_id;
 	int is_first;
+	float weight;
+	vec2 velocity;
+	vec2 force;
 };
 
 
@@ -109,13 +113,17 @@ void main() {
 	cell.angle = 0.;
 
 	cell.color_hsv = vec3(fhash2(), fhash2() * 0.5 + 0.5, fhash2() * 0.5 + 0.5);
-	cell.color_rgb = HSV(cell.color_hsv.r, cell.color_hsv.g, cell.color_hsv.b);
+	cell.color_rgb = vec3(0.5);//HSV(cell.color_hsv.r, cell.color_hsv.g, cell.color_hsv.b);
 
 	cell.type_id = int(ihash2(sid) % 1u);
 
-	cells[cid] = cell;
+	cell.chank_id = int(cell.pos.x / Ac) + int(cell.pos.y / Ac) * Dm;
+	cell.linked_list = nullID;
+	cell.is_first = 0;
 
-	cells[cid].chank_id = int(cells[cid].pos.x / Ac) + int(cells[cid].pos.y / Ac);
-	cells[cid].linked_list = nullID;
-	cells[cid].is_first = 0;
+	cell.weight = 1.;
+	cell.velocity = vec2(0.);
+	cell.force = vec2(0.);
+
+	cells[cid] = cell;
 }

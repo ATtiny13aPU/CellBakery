@@ -295,7 +295,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Computing\cellsPhysics_list.comp" />
-    <None Include="Shaders\Computing\cellsPhysics_process.comp" />
+    <None Include="Shaders\Computing\cellsPhysics_processForces.comp" />
+    <None Include="Shaders\Computing\cellsPhysics_processPositions.comp" />
     <None Include="Shaders\Computing\light.comp" />
     <None Include="Shaders\Computing\resetCells.comp" />
     <None Include="Shaders\Computing\resetGrid.comp" />

@@ -15,8 +15,11 @@ struct Cell {
 	vec3 color_hsv;
 	int type_id;
 	int linked_list;
-	int chank_id;
+	int chunk_id;
 	int is_first;
+	float weight;
+	vec2 velocity;
+	vec2 force;
 };
 
 restrict buffer ssbo_cells {
@@ -24,6 +27,7 @@ restrict buffer ssbo_cells {
 };
 
 struct Chunk {
+	int first_list_ID;
 	int linked_list;
 	float brightness;
 };
@@ -36,18 +40,16 @@ restrict buffer ssbo_grid {
 void main() {
 	int workGroupID = int(gl_GlobalInvocationID.x * 16 + gl_GlobalInvocationID.y * 128 + gl_GlobalInvocationID.z * 1024);
 	
-	// старшие клетки в списке ставят метку на карте
-	for (int cid = workGroupID; cid < workGroupID  + 16; cid++)
-		if (cells[cid].linked_list == nullID) {
-				cells[cid].color_rgb = vec3(1.);
-				chunks[cells[cid].chank_id].brightness += 0.4;
-			} else {
-				int i = 1;
-				int tid = cid;
-				do {
-					i++;
-					tid = cells[tid].linked_list;
-				} while (tid != nullID && i < 10);
-				cells[cid].color_rgb = vec3((i % 3 == 0), ((i + 1) % 3) == 0, ((i + 2) % 3) == 0);
-			}
+	for (int cid = workGroupID; cid < workGroupID + 16; cid++) {
+		//chunks[cells[cid].chank_id].linked_list = nullID;
+		if (cells[cid].force.x > 0.5) {
+			cells[cid].color_rgb = vec3(1., 0., 0.);
+		}
+		
+
+		cells[cid].force = vec2(0.);
+
+		cells[cid].is_first = 0;
+		cells[cid].linked_list = nullID;
+	}
 }
