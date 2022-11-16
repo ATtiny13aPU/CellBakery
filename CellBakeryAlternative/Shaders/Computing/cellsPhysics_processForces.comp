@@ -1,0 +1,113 @@
+#version 430
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+uniform int Dm;
+uniform float Ac;
+
+const int nullID = 0x7FFFFFFF;
+
+struct Cell {
+	vec2 pos;
+	float radius;
+	float angle;
+	vec3 color_rgb;
+	vec3 color_hsv;
+	int type_id;
+	int linked_list;
+	int chunk_id;
+	int is_first;
+	float weight;
+	vec2 velocity;
+	vec2 force;
+};
+
+restrict buffer ssbo_cells {
+    Cell cells[];
+};
+
+struct Chunk {
+	int first_list_ID;
+	int linked_list;
+	float brightness;
+};
+
+restrict buffer ssbo_grid {
+    Chunk chunks[];
+};
+
+
+const int limit = 100;
+int buff[limit + 1]; // буфер id клеток коллизий
+int currentBuffIndex;
+
+// «аписать значени€ из св€зного списка в буффер
+int writeToBuffer(int startID) {
+	buff[currentBuffIndex++] = startID;
+	int nextID = cells[startID].linked_list;
+	int offset = currentBuffIndex;
+	while (currentBuffIndex < 100) {
+		if (nextID != nullID) {
+			buff[currentBuffIndex++] = nextID;
+			nextID = cells[nextID].linked_list;
+		} else {
+			return currentBuffIndex - offset + 1;
+		}
+	}
+	return currentBuffIndex - offset + 1;
+}
+
+
+// ќбработать возможную коллизию между парой клеток
+void processCollision (int c1id, int c2id) {
+	cells[c1id].color_rgb = vec3(0., 1., 0.);
+	cells[c2id].color_rgb = vec3(0., 1., 0.);
+
+	vec2 delta_pos = cells[c1id].pos - cells[c2id].pos;
+	float sum_radius = (cells[c1id].radius + cells[c2id].radius) / 2.;
+	if (length(delta_pos) < sum_radius) {
+		cells[c1id].force += vec2(1.);
+		cells[c2id].force += vec2(1.);
+	}
+}
+
+
+void main() {
+	int workGroupID = int(gl_GlobalInvocationID.x * 16 + gl_GlobalInvocationID.y * 128 + gl_GlobalInvocationID.z * 1024);
+	
+	// старшие клетки в списке став€т метку на карте
+	for (int cid = workGroupID; cid < workGroupID + 16; cid++)
+		if (cells[cid].is_first == 1) {
+			currentBuffIndex = 0;
+			
+			int ins = 1, outs = 0; // размер внутреннего списка // размер внешнего списка
+
+			// «аписываем св€зный список текущего чанка в буфер
+			ins = writeToBuffer(cid);
+			
+
+			// «аписываем св€зный список соседних чанков со старшим id в буфер
+			int this_chid = cells[cid].chunk_id;
+			int chunk_indexes[5] = int[5](this_chid + 1, this_chid + Dm - 1, this_chid + Dm, this_chid + Dm + 1, Dm * Dm);
+			for (int h = 0; chunk_indexes[h] < Dm * Dm; h++) 
+				if(chunks[chunk_indexes[h]].first_list_ID != nullID) {
+					outs += writeToBuffer(chunks[chunk_indexes[h]].first_list_ID);
+				}
+
+			// данные в буфере сейчас представл€ют из себ€ сначала номера инициаторов, а после подчинЄнных
+
+			
+			if (currentBuffIndex > 98)
+				chunks[this_chid].brightness = 1.;
+
+			// обрабатываем все коллизии внутри чанка
+			for (int c1 = 0; c1 < ins; c1++)
+				for (int c2 = c1 + 1; c2 < ins; c2++)
+					processCollision(buff[c1], buff[c2]);
+
+			// обрабатываем все коллизии снаружи чанка
+			for (int c1 = 0; c1 < ins; c1++)
+				for (int c2 = 0; c2 < outs; c2++)
+					processCollision(buff[c1], buff[ins + c2]);
+		}
+}

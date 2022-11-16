@@ -15,8 +15,11 @@ struct Cell {
 	vec3 color_hsv;
 	int type_id;
 	int linked_list;
-	int chank_id;
+	int chunk_id;
 	int is_first;
+	float weight;
+	vec2 velocity;
+	vec2 force;
 };
 
 restrict buffer ssbo_cells {
@@ -24,6 +27,7 @@ restrict buffer ssbo_cells {
 };
 
 struct Chunk {
+	int first_list_ID;
 	int linked_list;
 	float brightness;
 };
@@ -39,10 +43,12 @@ void main() {
 	// строим связный список
 	for (int cid = workGroupID; cid < workGroupID + 16; cid++) {
 		int tid = cid;
-		tid = atomicExchange(chunks[cells[cid].chank_id].linked_list, tid);
+		tid = atomicExchange(chunks[cells[cid].chunk_id].linked_list, tid);
 		if (tid != nullID)
 			cells[tid].linked_list = cid;
-		else
+		else {
 			cells[cid].is_first = 1;
+			chunks[cells[cid].chunk_id].first_list_ID = cid;
+		}
 	}
 }

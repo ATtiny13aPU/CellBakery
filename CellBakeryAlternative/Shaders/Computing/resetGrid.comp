@@ -7,6 +7,7 @@ uniform int Dm;
 const int nullID = 0x7FFFFFFF;
 
 struct Chunk {
+	int first_list_ID;
 	int linked_list;
 	float brightness;
 };
@@ -16,7 +17,7 @@ restrict buffer ssbo_grid {
 };
 
 void main() {
-
+	chunks[gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * Dm].first_list_ID = nullID;
 	chunks[gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * Dm].linked_list = nullID;
 	chunks[gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * Dm].brightness = 0.;
 }

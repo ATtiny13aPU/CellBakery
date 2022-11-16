@@ -116,7 +116,10 @@
     <None Include="Shaders\Computing\cellsPhysics_list.comp">
       <Filter>Шейдеры\Сomputing\cells</Filter>
     </None>
-    <None Include="Shaders\Computing\cellsPhysics_process.comp">
+    <None Include="Shaders\Computing\cellsPhysics_processForces.comp">
+      <Filter>Шейдеры\Сomputing\cells</Filter>
+    </None>
+    <None Include="Shaders\Computing\cellsPhysics_processPositions.comp">
       <Filter>Шейдеры\Сomputing\cells</Filter>
     </None>
   </ItemGroup>

@@ -10,9 +10,11 @@ uniform float Dp;
 uniform float Ac;
 
 struct Chunk {
+	int first_list_ID;
 	int linked_list;
 	float brightness;
 };
+
 
 restrict buffer ssbo_grid {
     Chunk chunks[];
@@ -52,7 +54,9 @@ void main() {
 	float hDp = Dp * 0.5;
 	
 	ivec2 ipos = ivec2(Pos / Ac);
+	vec2 frpos = fract(Pos / Ac);
 	
+
 	float ling = chunks[ipos.x + ipos.y * Dm].brightness;
 
 	if (compareDistanse(Pos - hDp, hDp)) {
@@ -66,10 +70,15 @@ void main() {
 		ling *= sqrt(ling);
 		pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3);
 		pixel = mix(pixel, vec3(1.), ling * ling * 0.5);
+
+		pixel *= pow(min(1., frpos.x * 10.) * min(1., frpos.y * 10.), 0.2);
 	} 
 	else if (compareDistanse(Pos - hDp, hDp + 0.01)) { // если это край чаши
-		ling *= ling;
-		pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3) * 0.5;
+		ling *= sqrt(ling);
+		//pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3) * 0.5;
+		pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3);
+		pixel = mix(pixel, vec3(1.), ling * ling * 0.5);
+
 		pixel = mix(pixel * 0.5, vec3(0.5), 0.5);
 	}
 }

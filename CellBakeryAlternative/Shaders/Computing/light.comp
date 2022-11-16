@@ -5,6 +5,7 @@ layout(local_size_x = 1, local_size_y = 1) in;
 uniform int Dm;
 
 struct Chunk {
+	int first_list_ID;
 	int linked_list;
 	float brightness;
 };
@@ -19,5 +20,5 @@ void main() {
 	float brightness = length(1. - pixel_coords * 2.);
 	brightness *= pixel_coords.y;
 
-	chunks[gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * Dm].brightness = brightness;
+	chunks[gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * Dm].brightness = 0.;//brightness;
 }
