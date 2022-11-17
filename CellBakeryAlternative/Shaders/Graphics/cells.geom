@@ -11,12 +11,11 @@ uniform float fTime;
 
 uniform int GM;
 
-out vec2 Pos;
-out vec3 c_meta;
-out vec4 c_pos;
-flat out int type_id;
+out vec2 dp;
+flat out int c_id;
 
 struct Cell {
+	ivec2 ipos;
 	vec2 pos;
 	float radius;
 	float angle;
@@ -30,7 +29,7 @@ struct Cell {
 	vec2 force;
 };
 
-restrict buffer ssbo_cells {
+readonly buffer ssbo_cells {
     Cell cells[];
 };
 
@@ -72,87 +71,70 @@ const float t2kr[18] = float[](1., 1., 1., 1.3, 1., 1., 1., 1.3, 1.2, 1.15, 1.15
 
 void main() {
 	int cid = id[0];
-	vec4 cell_pos_data;
-	//cell_pos_data = texelFetch(CellsPos, ivec2(cid & 0xFFF, cid / 0x1000), 0);
-	cell_pos_data.xy = cells[cid].pos;
-	cell_pos_data.z = cells[cid].radius;
-	cell_pos_data.w = cells[cid].angle;
+	
+	vec2 pos = cells[cid].pos;
+	float r = cells[cid].radius;
 
 	// отсекаем вне экрана
-	if (lengthRect(ViewWorld.xy, ViewWorld.zw, cell_pos_data.xy) < cell_pos_data.z) {
-		vec2 WinK = (cell_pos_data.xy - ViewWorld.xy) / (ViewWorld.zw - ViewWorld.xy) * 2. - 1.;
-		vec2 WinR = cell_pos_data.z / (ViewWorld.zw - ViewWorld.xy);
+	if (lengthRect(ViewWorld.xy, ViewWorld.zw, pos) < cells[cid].radius) {
+		vec2 WinK = (pos - ViewWorld.xy) / (ViewWorld.zw - ViewWorld.xy) * 2. - 1.;
+		vec2 WinR = cells[cid].radius / (ViewWorld.zw - ViewWorld.xy);
 
 		gl_Position.zw = vec2(0., 1.);
-		c_meta = cells[cid].color_rgb;
-		type_id = cells[cid].type_id;
+		
+		//type_id = cells[cid].type_id;
+		c_id = cid;
 
-		c_pos = cell_pos_data;
+		//c_meta = cells[cid].color_rgb;
+		//c_pos = vec4(pos, r, cells[cid].angle);
 
 		int t = cells[cid].type_id;
-		float r = cell_pos_data.z * t2kr[t];
+		r *= t2kr[t];
 		WinR *= t2kr[t];
 
 		// 4-угольник
-		if (GM == 0) {
-			if(t != 1) {
-				vec2 p1 = WinK - WinR, p2 = WinK + WinR;
+		if(t != 1) {
+			vec2 p1 = WinK - WinR, p2 = WinK + WinR;
 
-				// 1:bottom-left
-				Pos = cell_pos_data.xy - r;
-				gl_Position.xy = p1;
-				EmitVertex();
-				// 2:bottom-right
-				Pos = vec2(cell_pos_data.x + r, cell_pos_data.y - r);
-				gl_Position.xy = vec2(p2.x, p1.y);
-				EmitVertex();
-				// 3:top-left
-				Pos = vec2(cell_pos_data.x - r, cell_pos_data.y + r);
-				gl_Position.xy = vec2(p1.x, p2.y);
-				EmitVertex();
-				// 4:top-right
-				Pos = cell_pos_data.xy + r;
-				gl_Position.xy = p2;
-				EmitVertex();
-			} else {
-				float kWR = WinR.x / WinR.y;
-				WinR.x /= kWR;
-
-				mat2x2 mr = rot((c_pos.a - 0.625) * 3.14159265358 * 2.);
-				WinR *= mr;
-				vec2 vr = vec2(r) * mr;
-
-				// 1:bottom-left
-				Pos = cell_pos_data.xy - vr;
-				gl_Position.xy = WinK - vec2(WinR.x * kWR, WinR.y);
-				EmitVertex();
-				// 2:bottom-right
-				Pos = cell_pos_data.xy + vec2(vr.y, -vr.x);
-				gl_Position.xy = WinK + vec2(WinR.y * kWR, -WinR.x);
-				EmitVertex();
-				// 3:top-left
-				Pos = cell_pos_data.xy + vec2(-vr.y, vr.x);
-				gl_Position.xy = WinK + vec2(-WinR.y * kWR, WinR.x);
-				EmitVertex();
-				// 4:top-right
-				Pos = cell_pos_data.xy + vr * 2.;
-				gl_Position.xy = WinK + vec2(WinR.x * kWR, WinR.y) * 2.;
-				EmitVertex();
-			}
-		}
-		// 3-угольник
-		else {
 			// 1:bottom-left
-			Pos = vec2(cell_pos_data.x - r * 1.7320508, cell_pos_data.y - r);
-			gl_Position.xy = vec2(WinK.x - WinR.x * 1.7320508, WinK.y - WinR.y);
+			dp = vec2(-r);
+			gl_Position.xy = p1;
 			EmitVertex();
 			// 2:bottom-right
-			Pos = vec2(cell_pos_data.x + r * 1.7320508, cell_pos_data.y - r);
-			gl_Position.xy = vec2(WinK.x + WinR.x * 1.7320508, WinK.y - WinR.y);
+			dp = vec2(r, -r);
+			gl_Position.xy = vec2(p2.x, p1.y);
 			EmitVertex();
-			// 4:top
-			Pos = vec2(cell_pos_data.x, cell_pos_data.y + r * 2.);
-			gl_Position.xy = vec2(WinK.x, WinK.y + WinR.y * 2.);
+			// 3:top-left
+			dp = vec2(-r, r);
+			gl_Position.xy = vec2(p1.x, p2.y);
+			EmitVertex();
+			// 4:top-right
+			dp = vec2(+r);
+			gl_Position.xy = p2;
+			EmitVertex();
+		} else {
+			float kWR = WinR.x / WinR.y;
+			WinR.x /= kWR;
+
+			mat2x2 mr = rot((cells[cid].angle - 0.625) * 3.14159265358 * 2.);
+			WinR *= mr;
+			vec2 vr = vec2(r) * mr;
+
+			// 1:bottom-left
+			dp = vec2(-vr);
+			gl_Position.xy = WinK - vec2(WinR.x * kWR, WinR.y);
+			EmitVertex();
+			// 2:bottom-right
+			dp = vec2(vr.y, -vr.x);
+			gl_Position.xy = WinK + vec2(WinR.y * kWR, -WinR.x);
+			EmitVertex();
+			// 3:top-left
+			dp = vec2(-vr.y, vr.x);
+			gl_Position.xy = WinK + vec2(-WinR.y * kWR, WinR.x);
+			EmitVertex();
+			// 4:top-right
+			dp = vec2(vr * 2.);
+			gl_Position.xy = WinK + vec2(WinR.x * kWR, WinR.y) * 2.;
 			EmitVertex();
 		}
 		EndPrimitive();

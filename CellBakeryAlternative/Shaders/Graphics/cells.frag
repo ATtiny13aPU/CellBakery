@@ -2,12 +2,29 @@
 
 uniform float fTime;
 
-in vec2 Pos;
-in vec3 c_meta;
-in vec4 c_pos;
-flat in int type_id;
+in vec2 dp; // Дельта позиции относительно центра в мировых координатах
+flat in int c_id;
 
 out vec4 pixel;
+
+struct Cell {
+	ivec2 ipos;
+	vec2 pos;
+	float radius;
+	float angle;
+	vec3 color_rgb;
+	vec3 color_hsv;
+	int type_id;
+	int linked_list;
+	int is_first;
+	float weight;
+	vec2 velocity;
+	vec2 force;
+};
+
+readonly buffer ssbo_cells {
+    Cell cells[];
+};
 
 uint ihash2(uvec2 s) {
 	uint s1 = ((s.y ^ s.x) * 0xEC7269E5u + 0x4C8A248Du) ^ ((s.x >> 5u) * 0xC5EB9396u);
@@ -16,17 +33,18 @@ uint ihash2(uvec2 s) {
 	return s.x;
 }
 
+
 const float t2kr[18] = float[](1., 1., 1., 1.3, 1., 1., 1., 1.3, 1.2, 1.15, 1.15, 1.15, 1., 1., 1., 1., 1., 1.1);
 
 void main() {
-	vec2 dp = Pos - c_pos.xy; // дельта позиции
+	int cid = c_id;
 	float qd = dot(dp, dp); // вкадрат расстояния до целевой клетки
-	float qr = c_pos.z * c_pos.z; // вкадрат радиуса целевой клетки
-	int t = type_id;
-
+	float c_r = cells[cid].radius;
+	float qr = c_r * c_r; // вкадрат радиуса целевой клетки
+	int t = cells[cid].type_id;
 
 	if (qd < qr) {
-		float r = length(dp / c_pos.z); // относительный радиус
+		float r = length(dp / cells[cid].radius); // относительный радиус
 		float a;
 		int b = 0;
 
@@ -41,7 +59,7 @@ void main() {
 				if (r < 0.20 || r > 0.90)
 					b = 1;
 				else {
-					a = fract(atan(c_pos.y - Pos.y, c_pos.x - Pos.x) / 6.2831853 - c_pos.a);
+					a = fract(atan(-dp.y, -dp.x) / 6.2831853 - cells[cid].angle);
 					b = int(ihash2(uvec2(r * 5., a * 20.)) & 4u);
 				}
 				break;
@@ -58,23 +76,23 @@ void main() {
 		// Тип заливки
 		switch (b) {
 			case(4): // хлоропласт
-				pixel = vec4(normalize(c_meta.rgb * vec3(0.5, 1.3, 0.3)) * 0.5, 0.90);
+				pixel = vec4(normalize(cells[cid].color_rgb * vec3(0.5, 1.3, 0.3)) * 0.5, 0.90);
 				break;
 			case(3): // пустота
 				discard;
 			case(2): // жир липоцита
-				pixel = vec4((c_meta.rgb + vec3(0.5, 0.25, 0.25) * 3.) * 0.25, 0.90);
+				pixel = vec4((cells[cid].color_rgb + vec3(0.5, 0.25, 0.25) * 3.) * 0.25, 0.90);
 				break;
 			case(1): // тёмная заливка
-				pixel = vec4(c_meta.rgb * 0.5, 1.);
+				pixel = vec4(cells[cid].color_rgb * 0.5, 1.);
 				break;
 			default: // светлая заливка
-				pixel = vec4(c_meta.rgb, 0.67);
+				pixel = vec4(cells[cid].color_rgb, 0.67);
 		}
 
 	} else if (qd < qr * t2kr[t] * t2kr[t] || t == 1) {
-		float r = length(dp / c_pos.z); // относительный радиус
-		float a = fract(atan(c_pos.y - Pos.y, c_pos.x - Pos.x) / 6.2831853 - c_pos.a - 0.5);
+		float r = length(dp / c_r); // относительный радиус
+		float a = fract(atan(-dp.y, -dp.x) / 6.2831853 - cells[cid].angle - 0.5);
 		int b = 0;
 		
 		// Тип структуры
@@ -97,13 +115,13 @@ void main() {
 		// Тип заливки
 		switch (b) {
 			case(2): // тёмная заливка
-				pixel = vec4(c_meta.rgb * 0.5, 1.);
+				pixel = vec4(cells[cid].color_rgb * 0.5, 1.);
 				break;
 			case(1): // тёмная заливка
-				pixel = vec4(c_meta.rgb * 0.5, 1.);
+				pixel = vec4(cells[cid].color_rgb * 0.5, 1.);
 				break;
 			default: // пустота
-				pixel = vec4(c_meta.rgb * 0.5, 0.2);
+				pixel = vec4(cells[cid].color_rgb * 0.5, 0.2);
 				//discard;
 		}
 	} else discard;

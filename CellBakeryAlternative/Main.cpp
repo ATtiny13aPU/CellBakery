@@ -21,7 +21,7 @@ private:
 class Context {
 public:
 	int run();
-	Context(GLFWwindow *w) : window(w), frameTime(60) {};
+	Context(GLFWwindow *w) : window(w), frameTime(60), frameTimeLowLatency(3) {};
 private:
 	int err = 0;
 	Randomaizer RAND;
@@ -51,6 +51,7 @@ private:
 	std::ostringstream buff; // текст буффер
 	ch_tp frame_time_point[2]; // две переменные времени
 	fastLinearFilter frameTime;
+	fastLinearFilter frameTimeLowLatency;
 
 	vec2 mPos, dmPos1, dmPos2;
 	float scroll = 0.;
@@ -67,7 +68,8 @@ private:
 	}
 
 	struct Cell_ssboBlock {
-		fvec4 pos;
+		uvec2 ipos;
+		fvec2 pos;
 		float radius;
 		float angle;
 		fvec4 color_rgb;
@@ -235,13 +237,13 @@ int Context::run() {
 				// движение клавиатурой
 				{	///==============================
 					if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-						world.view.Pos[0] -= (frameTime.get() / 1000.) * world.view.mst;
+						world.view.Pos[0] -= (frameTimeLowLatency.get() / 1000.) * world.view.mst;
 					if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-						world.view.Pos[0] += (frameTime.get() / 1000.) * world.view.mst;
+						world.view.Pos[0] += (frameTimeLowLatency.get() / 1000.) * world.view.mst;
 					if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-						world.view.Pos[1] -= (frameTime.get() / 1000.) * world.view.mst;
+						world.view.Pos[1] -= (frameTimeLowLatency.get() / 1000.) * world.view.mst;
 					if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-						world.view.Pos[1] += (frameTime.get() / 1000.) * world.view.mst;
+						world.view.Pos[1] += (frameTimeLowLatency.get() / 1000.) * world.view.mst;
 				}	///==============================
 
 
@@ -250,9 +252,9 @@ int Context::run() {
 					// получение эвента колёсика мыши
 					//float scroll = ImGui::GetIO().MouseWheel;
 					if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-						scroll -= 10. * (frameTime.get() / 1000.);
+						scroll -= 10. * (frameTimeLowLatency.get() / 1000.);
 					if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-						scroll += 10. * (frameTime.get() / 1000.);
+						scroll += 10. * (frameTimeLowLatency.get() / 1000.);
 
 					dmPos2 = dmPos1; // движение
 					glfwGetCursorPos(window, &dmPos1[0], &dmPos1[1]); dmPos1[0] = -dmPos1[0];
@@ -289,7 +291,6 @@ int Context::run() {
 						world.view.mst = std::min(world.view.mst, world.Dp * 2.);
 					}
 				}	///==============================
-
 			}	///==============================
 
 			world.view.Pos = clamp(world.view.Pos, -world.Dp * 0.9, world.Dp * 1.9);
@@ -435,6 +436,8 @@ int Context::run() {
 					glUniform1f(glGetUniformLocation(petriShader.glID, "Ac"), world.Ac);
 				}
 				glUniform4f(glGetUniformLocation(petriShader.glID, "ViewWorld"), mnPos[0], mxPos[1], mxPos[0], mnPos[1]);
+				vec2 dPos = mnPos - world.Dp;
+				glUniform4f(glGetUniformLocation(petriShader.glID, "deltaViewWorld"), dPos[0], dPos[1], dPos[0], dPos[1]);
 				glUniform2i(glGetUniformLocation(petriShader.glID, "WinSize"), Xd, Yd);
 				glUniform2f(glGetUniformLocation(petriShader.glID, "cPos"), world.view.Pos[0], world.view.Pos[1]);
 				glUniform2f(glGetUniformLocation(petriShader.glID, "mPos"), mPos[0], mPos[1]);
@@ -446,7 +449,7 @@ int Context::run() {
 					glDrawArrays(GL_TRIANGLE_STRIP, 0, fullScreenMesh.size);
 				}
 			}
-			
+
 
 			// клетки
 			if (1) {
@@ -485,8 +488,9 @@ int Context::run() {
 			bool swapBit = count_of_frames % 2;
 			frame_time_point[swapBit] = chGetTime();
 			frameTime.push(chDurationMillis(frame_time_point[swapBit], frame_time_point[!swapBit]));
+			frameTimeLowLatency.push(chDurationMillis(frame_time_point[swapBit], frame_time_point[!swapBit]));
 			if (count_of_frames % 100000 == 0)
-				frameTime.resum();
+				frameTime.resum(), frameTimeLowLatency.resum();
 
 			buff << "fps - " << std::fixed << std::setprecision(1) << 1000. / frameTime.get();
 			buff << "  ms - " << std::fixed << std::setprecision(2) << frameTime.get();

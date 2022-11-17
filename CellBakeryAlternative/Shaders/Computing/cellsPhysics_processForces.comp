@@ -8,6 +8,7 @@ uniform float Ac;
 const int nullID = 0x7FFFFFFF;
 
 struct Cell {
+	ivec2 ipos;
 	vec2 pos;
 	float radius;
 	float angle;
@@ -60,12 +61,12 @@ int writeToBuffer(int startID) {
 
 // Обработать возможную коллизию между парой клеток
 void processCollision (int c1id, int c2id) {
-	cells[c1id].color_rgb = vec3(0., 1., 0.);
-	cells[c2id].color_rgb = vec3(0., 1., 0.);
+//	cells[c1id].color_rgb = vec3(0., 1., 0.);
+//	cells[c2id].color_rgb = vec3(0., 1., 0.);
 
 	vec2 delta_pos = cells[c1id].pos - cells[c2id].pos;
 	float sum_radius = (cells[c1id].radius + cells[c2id].radius) / 2.;
-	if (length(delta_pos) < sum_radius) {
+	if (dot(delta_pos, delta_pos) < sum_radius * sum_radius) {
 		cells[c1id].force += vec2(1.);
 		cells[c2id].force += vec2(1.);
 	}

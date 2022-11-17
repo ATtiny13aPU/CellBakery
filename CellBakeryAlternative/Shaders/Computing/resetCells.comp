@@ -9,6 +9,7 @@ uniform float Ac;
 const int nullID = 0x7FFFFFFF;
 
 struct Cell {
+	ivec2 ipos;
 	vec2 pos;
 	float radius;
 	float angle;

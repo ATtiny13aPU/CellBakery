@@ -4,6 +4,8 @@ in vec2 WinK;
 out vec3 pixel;
 
 uniform vec4 ViewWorld;
+uniform vec4 deltaViewWorld;
+
 uniform ivec2 WinSize;
 uniform int Dm;
 uniform float Dp;
@@ -16,7 +18,7 @@ struct Chunk {
 };
 
 
-restrict buffer ssbo_grid {
+readonly buffer ssbo_grid {
     Chunk chunks[];
 };
 
@@ -50,8 +52,10 @@ float bicubicInterpolate(vec2 uv, mat4x4 p) {
 void main() {
 	vec2 Pos = mix(ViewWorld.xy, ViewWorld.zw, WinK);
 
+	//vec2 lPos = mix(deltaViewWorld.xy, deltaViewWorld.zw, WinK);
+
 	pixel = vec3(0.64, 0.70, 0.98);
-	float hDp = Dp * 0.5;
+	float Rp = Dp * 0.5;
 	
 	ivec2 ipos = ivec2(Pos / Ac);
 	vec2 frpos = fract(Pos / Ac);
@@ -59,7 +63,7 @@ void main() {
 
 	float ling = chunks[ipos.x + ipos.y * Dm].brightness;
 
-	if (compareDistanse(Pos - hDp, hDp)) {
+	if (compareDistanse(Pos - Rp, Rp)) {
 		//	{
 		//		mat4x4 p;
 		//		for (int x = 0; x < 4; x++)
@@ -73,7 +77,7 @@ void main() {
 
 		//pixel *= pow(min(1., frpos.x * 10.) * min(1., frpos.y * 10.), 0.2);
 	} 
-	else if (compareDistanse(Pos - hDp, hDp + 0.01)) { // если это край чаши
+	else if (compareDistanse(Pos - Rp, Rp + 0.01)) { // если это край чаши
 		ling *= sqrt(ling);
 		pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3) * 0.5;
 		//pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3);
