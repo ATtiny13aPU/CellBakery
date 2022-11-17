@@ -71,13 +71,13 @@ void main() {
 		pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3);
 		pixel = mix(pixel, vec3(1.), ling * ling * 0.5);
 
-		pixel *= pow(min(1., frpos.x * 10.) * min(1., frpos.y * 10.), 0.2);
+		//pixel *= pow(min(1., frpos.x * 10.) * min(1., frpos.y * 10.), 0.2);
 	} 
 	else if (compareDistanse(Pos - hDp, hDp + 0.01)) { // если это край чаши
 		ling *= sqrt(ling);
-		//pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3) * 0.5;
-		pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3);
-		pixel = mix(pixel, vec3(1.), ling * ling * 0.5);
+		pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3) * 0.5;
+		//pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3);
+		//pixel = mix(pixel, vec3(1.), ling * ling * 0.5);
 
 		pixel = mix(pixel * 0.5, vec3(0.5), 0.5);
 	}

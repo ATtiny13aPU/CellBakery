@@ -67,13 +67,18 @@ private:
 	}
 
 	struct Cell_ssboBlock {
-		fvec2 pos;
+		fvec4 pos;
 		float radius;
 		float angle;
-		fvec3 color_rgb;
-		fvec3 color_hsv;
-		int32_t type_id;
-		int32_t linked_list;
+		fvec4 color_rgb;
+		fvec4 color_hsv;
+		int type_id;
+		int linked_list;
+		int chunk_id;
+		int is_first;
+		float weight;
+		fvec4 velocity;
+		fvec4 force;
 	};
 
 	struct Chunk_ssboBlock {
@@ -185,8 +190,8 @@ int Context::run() {
 	// Создание мира (ВНИМАНИЕ! Данные мира больше не используются, все вычисления переносятся на GPU)
 	///==============================
 	WorldCS world;
-	world.Dp = 3.;
-	world.mec = 1024;
+	world.Dp = 150.;
+	world.mec = 15000000;
 
 	world.iniWorld();
 
@@ -303,7 +308,7 @@ int Context::run() {
 			// Инициализация ssbo буферов
 			if (count_of_frames == -1) {
 				// Поле мира
-				GridSSBO.setSize(world.Dm * world.Dm * (sizeof(Chunk_ssboBlock) + 4) * 2.);
+				GridSSBO.setSize(world.Dm * world.Dm * (sizeof(Chunk_ssboBlock) + 4));
 
 				GridSSBO.bind(resetGridComputeShader.glID, "ssbo_grid");
 				GridSSBO.bind(lightComputeShader.glID, "ssbo_grid");
@@ -313,7 +318,7 @@ int Context::run() {
 				GridSSBO.bind(petriShader.glID, "ssbo_grid");
 
 				// Клетки
-				CellsSSBO.setSize(world.mec * sizeof(Cell_ssboBlock) * 2);
+				CellsSSBO.setSize(world.mec * sizeof(Cell_ssboBlock));
 
 				CellsSSBO.bind(resetCellsComputeShader.glID, "ssbo_cells");
 				CellsSSBO.bind(cellsPhysics_listComputeShader.glID, "ssbo_cells");
