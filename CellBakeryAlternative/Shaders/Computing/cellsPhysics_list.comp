@@ -40,7 +40,7 @@ restrict buffer ssbo_grid {
 void main() {
 	int workGroupID = int(gl_GlobalInvocationID.x * 16 + gl_GlobalInvocationID.y * 128 + gl_GlobalInvocationID.z * 1024);
 	
-	// строим связный список
+	// СЃС‚СЂРѕРёРј СЃРІСЏР·РЅС‹Р№ СЃРїРёСЃРѕРє
 	for (int cid = workGroupID; cid < workGroupID + 16; cid++) {
 		int tid = cid;
 		tid = atomicExchange(chunks[cells[cid].chunk_id].linked_list, tid);

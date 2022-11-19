@@ -1,6 +1,6 @@
 #version 430
 
-layout(local_size_x = 1, local_size_y = 1) in;
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 uniform int Dm;
 uniform float Dp;
@@ -99,36 +99,38 @@ vec3 HSV(float h, float s, float v) {
 }
 
 void main() {
-	uint cid = gl_GlobalInvocationID.x;
-	sid = uvec2(cid * 0xF8ED0C13u, 124636u ^ cid);
-
-	float Rp = Dp / 2.;
+	int workGroupID = int(gl_GlobalInvocationID.x * 16 + gl_GlobalInvocationID.y * 128 + gl_GlobalInvocationID.z * 1024);
+	for (int cid = workGroupID; cid < workGroupID + 16; cid++) {
+		sid = uvec2(cid * 0xF8ED0C13u, 124636u ^ cid);
 	
-	Cell cell;
-	cell.pos = -vec2(Dp);
+		float Rp = Dp / 2.;
+		
+		Cell cell;
+		cell.pos = -vec2(Dp);
+		
+		cell.radius = map(fhash2(), 0., 1., 0.6, 1.);
 	
-	cell.radius = map(fhash2(), 0., 1., 0.6, 1.);
-
-	while (compareDistanse(cell.pos - Rp, Rp - cell.radius * 0.5) == false)
-		cell.pos = vec2(fhash2(), fhash2()) * Dp;
-
-	cell.ipos = ivec2(cell.pos);
-	cell.pos = fract(cell.pos);
-
-	cell.angle = 0.;
-
-	cell.color_hsv = vec3(fhash2(), fhash2() * 0.5 + 0.5, fhash2() * 0.5 + 0.5);
-	cell.color_rgb = vec3(0.5);//HSV(cell.color_hsv.r, cell.color_hsv.g, cell.color_hsv.b);
-
-	cell.type_id = int(ihash2(sid) % 1u);
-
-	cell.chank_id = cell.ipos.x + cell.ipos.y * Dm;
-	cell.linked_list = nullID;
-	cell.is_first = 0;
-
-	cell.weight = 1.;
-	cell.velocity = vec2(0.);
-	cell.force = vec2(0.);
-
-	cells[cid] = cell;
+		while (compareDistanse(cell.pos - Rp, Rp - cell.radius * 0.5) == false)
+			cell.pos = vec2(fhash2(), fhash2()) * Dp;
+	
+		cell.ipos = ivec2(cell.pos);
+		cell.pos = fract(cell.pos);
+	
+		cell.angle = 0.;
+	
+		cell.color_hsv = vec3(fhash2(), fhash2() * 0.5 + 0.5, fhash2() * 0.5 + 0.5);
+		cell.color_rgb = vec3(0.5);//HSV(cell.color_hsv.r, cell.color_hsv.g, cell.color_hsv.b);
+	
+		cell.type_id = 20;
+	
+		cell.chank_id = cell.ipos.x + cell.ipos.y * Dm;
+		cell.linked_list = nullID;
+		cell.is_first = 0;
+	
+		cell.weight = 1.;
+		cell.velocity = vec2(0.);
+		cell.force = vec2(0.);
+	
+		cells[cid] = cell;
+	}
 }

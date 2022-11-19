@@ -63,18 +63,18 @@ void main() {
 	float ling = chunks[ipos.x + ipos.y * Dm].brightness;
 
 	if (compareDistanse(Pos - Rp, Rp)) {
-		{
-			mat4x4 p;
-			for (int x = 0; x < 4; x++)
-				for (int y = 0; y < 4; y++)
-					p[x][y] = chunks[ipos.x + x - 1 + (ipos.y + y - 1) * Dm].brightness;
-			ling = clamp(bicubicInterpolate(frpos, p), 0., 1.);
-		}
+//		{
+//			mat4x4 p;
+//			for (int x = 0; x < 4; x++)
+//				for (int y = 0; y < 4; y++)
+//					p[x][y] = chunks[ipos.x + x - 1 + (ipos.y + y - 1) * Dm].brightness;
+//			ling = clamp(bicubicInterpolate(frpos, p), 0., 1.);
+//		}
 		ling *= sqrt(ling);
 		pixel = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3);
 		pixel = mix(pixel, vec3(1.), ling * ling * 0.5);
 
-		pixel *= pow(min(1., frpos.x * 10.) * min(1., frpos.y * 10.), 0.2);
+	//	pixel *= pow(min(1., frpos.x * 10.) * min(1., frpos.y * 10.), 0.2);
 	} 
 	else if (compareDistanse(Pos - Rp, Rp + 0.01 / 0.03)) { // если это край чаши
 		ling *= sqrt(ling);

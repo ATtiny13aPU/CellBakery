@@ -38,10 +38,10 @@ restrict buffer ssbo_grid {
 
 
 const int limit = 100;
-int buff[limit + 1]; // буфер id клеток коллизий
+int buff[limit + 1]; // Р±СѓС„РµСЂ id РєР»РµС‚РѕРє РєРѕР»Р»РёР·РёР№
 int currentBuffIndex;
 
-// Записать значения из связного списка в буффер
+// Р—Р°РїРёСЃР°С‚СЊ Р·РЅР°С‡РµРЅРёСЏ РёР· СЃРІСЏР·РЅРѕРіРѕ СЃРїРёСЃРєР° РІ Р±СѓС„С„РµСЂ
 int writeToBuffer(int startID) {
 	buff[currentBuffIndex++] = startID;
 	int nextID = cells[startID].linked_list;
@@ -58,7 +58,7 @@ int writeToBuffer(int startID) {
 }
 
 
-// Обработать возможную коллизию между парой клеток
+// РћР±СЂР°Р±РѕС‚Р°С‚СЊ РІРѕР·РјРѕР¶РЅСѓСЋ РєРѕР»Р»РёР·РёСЋ РјРµР¶РґСѓ РїР°СЂРѕР№ РєР»РµС‚РѕРє
 void processCollision (int c1id, int c2id) {
 //	cells[c1id].color_rgb = vec3(0., 1., 0.);
 //	cells[c2id].color_rgb = vec3(0., 1., 0.);
@@ -66,6 +66,7 @@ void processCollision (int c1id, int c2id) {
 	vec2 delta_pos = (cells[c1id].pos - cells[c2id].pos) + (cells[c1id].ipos - cells[c2id].ipos);
 	float sum_radius = (cells[c1id].radius + cells[c2id].radius) / 2.;
 	if (dot(delta_pos, delta_pos) < sum_radius * sum_radius) {
+		
 		cells[c1id].force += vec2(1.);
 		cells[c2id].force += vec2(1.);
 	}
@@ -75,17 +76,17 @@ void processCollision (int c1id, int c2id) {
 void main() {
 	int workGroupID = int(gl_GlobalInvocationID.x * 16 + gl_GlobalInvocationID.y * 128 + gl_GlobalInvocationID.z * 1024);
 	
-	// старшие клетки в списке ставят метку на карте
+	// СЃС‚Р°СЂС€РёРµ РєР»РµС‚РєРё РІ СЃРїРёСЃРєРµ СЃС‚Р°РІСЏС‚ РјРµС‚РєСѓ РЅР° РєР°СЂС‚Рµ
 	for (int cid = workGroupID; cid < workGroupID + 16; cid++)
 		if (cells[cid].is_first == 1) {
 			currentBuffIndex = 0;
 			
-			int ins = 1, outs = 0; // размер внутреннего списка // размер внешнего списка
+			int ins = 1, outs = 0; // СЂР°Р·РјРµСЂ РІРЅСѓС‚СЂРµРЅРЅРµРіРѕ СЃРїРёСЃРєР° // СЂР°Р·РјРµСЂ РІРЅРµС€РЅРµРіРѕ СЃРїРёСЃРєР°
 
-			// Записываем связный список текущего чанка в буфер
+			// Р—Р°РїРёСЃС‹РІР°РµРј СЃРІСЏР·РЅС‹Р№ СЃРїРёСЃРѕРє С‚РµРєСѓС‰РµРіРѕ С‡Р°РЅРєР° РІ Р±СѓС„РµСЂ
 			ins = writeToBuffer(cid);
 			
-			// Записываем связный список соседних чанков со старшим id в буфер
+			// Р—Р°РїРёСЃС‹РІР°РµРј СЃРІСЏР·РЅС‹Р№ СЃРїРёСЃРѕРє СЃРѕСЃРµРґРЅРёС… С‡Р°РЅРєРѕРІ СЃРѕ СЃС‚Р°СЂС€РёРј id РІ Р±СѓС„РµСЂ
 			int this_chid = cells[cid].chunk_id;
 			chunks[this_chid].linked_list = nullID;
 
@@ -95,15 +96,15 @@ void main() {
 					outs += writeToBuffer(chunks[chunk_indexes[h]].first_list_ID);
 				}
 
-			// данные в буфере сейчас представляют из себя сначала номера инициаторов, а после подчинённых
+			// РґР°РЅРЅС‹Рµ РІ Р±СѓС„РµСЂРµ СЃРµР№С‡Р°СЃ РїСЂРµРґСЃС‚Р°РІР»СЏСЋС‚ РёР· СЃРµР±СЏ СЃРЅР°С‡Р°Р»Р° РЅРѕРјРµСЂР° РёРЅРёС†РёР°С‚РѕСЂРѕРІ, Р° РїРѕСЃР»Рµ РїРѕРґС‡РёРЅС‘РЅРЅС‹С…
 			
 
-			// обрабатываем все коллизии внутри чанка
+			// РѕР±СЂР°Р±Р°С‚С‹РІР°РµРј РІСЃРµ РєРѕР»Р»РёР·РёРё РІРЅСѓС‚СЂРё С‡Р°РЅРєР°
 			for (int c1 = 0; c1 < ins; c1++)
 				for (int c2 = c1 + 1; c2 < ins; c2++)
 					processCollision(buff[c1], buff[c2]);
 
-			// обрабатываем все коллизии снаружи чанка
+			// РѕР±СЂР°Р±Р°С‚С‹РІР°РµРј РІСЃРµ РєРѕР»Р»РёР·РёРё СЃРЅР°СЂСѓР¶Рё С‡Р°РЅРєР°
 			for (int c1 = 0; c1 < ins; c1++)
 				for (int c2 = 0; c2 < outs; c2++)
 					processCollision(buff[c1], buff[ins + c2]);

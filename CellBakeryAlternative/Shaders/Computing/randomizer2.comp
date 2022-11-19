@@ -65,6 +65,4 @@ void main() {
 
 	hash[g].xy = u2hash2(uvec2((g * 0x54ED8F61u) ^ uFrame, hash[((g * 0x5FA372CFu) | 0x100u) & 0x17Fu].y));
 	hash[g].zw = u2hash2(uvec2((g * 0xC33321F7u) ^ uFrame, hash[((g * 0x1B8B5013u) | 0x100u) & 0x17Fu].w));
-//	hash[g].xy = u2hash2(uvec2((g * 0x54ED8F61u) ^ uFrame, (g * 0x54ED8F61u) ^ uFrame));
-//	hash[g].zw = u2hash2(uvec2((g * 0xC33321F7u) ^ uFrame, (g * 0x1B8B5013u) ^ uFrame));
 }

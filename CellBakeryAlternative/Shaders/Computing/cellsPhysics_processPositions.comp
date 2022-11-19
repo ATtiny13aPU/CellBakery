@@ -54,9 +54,12 @@ void main() {
 	for (int cid = workGroupID; cid < workGroupID + 16; cid++) {
 		if (cells[cid].force.x > 0.5) {
 			cells[cid].color_rgb = vec3(0.8, 0.2, 0.2);
-			cells[cid].pos += (vec2(uhash1(cid), uhash1(cid + 0xFFFFFFFu)) / 4294967295.) * 0.1 - 0.05;
+		//	if ((uhash1(cid) & 1u) == 0u)
+		//		cells[cid].pos += (vec2(uhash1(cid), uhash1(cid + 0xFFFFFFFu))/ 4294967295.) * 0.01 - 0.005; //  vec2() 
+			
 		} else {
 			cells[cid].color_rgb = vec3(0.3, 0.7, 0.3);
+		//	cells[cid].pos += (0.) * 0.1 - 0.35; // uhash1(cid), uhash1(cid + 0xFFFFFFFu) vec2() / 4294967295.
 		}
 
 

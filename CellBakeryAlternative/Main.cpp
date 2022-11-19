@@ -215,9 +215,15 @@ int Context::run() {
 	// Создание мира (ВНИМАНИЕ! Данные мира больше не используются, все вычисления переносятся на GPU)
 	///==============================
 	WorldCS world;
+	//world.Dp = 2. / 0.03;
+	//world.mec = 1024;
 	world.Dp = 2. / 0.03;
 	world.mec = 1024;
-
+	std::cout << "enter Dp = ";
+	std::cin >> world.Dp;
+	world.Dp /= 0.03;
+	std::cout << "\nenter max enable cells = ";
+	std::cin >> world.mec;
 	world.iniWorld();
 
 
@@ -328,13 +334,13 @@ int Context::run() {
 			glDisable(GL_MULTISAMPLE);
 
 		// Вычисления
-		for (int upd = 0; upd < 10 * test.is_press; upd++)
+		for (int upd = 0; upd < 1 * test.is_press || count_of_updates == 0; upd++)
 		{
 			// Инициализация ssbo буферов
 			if (count_of_updates == 0) {
 				// Рандомайзер
-				std::vector<uint32_t> bu(384 * 4, 0u);
-				RandSSBO.loadFrom(4 * 384 * 4, &(bu[0]));
+				std::vector<uint32_t> bu(384 * 4 * 10, 0u);
+				RandSSBO.loadFrom(4 * 384 * 4 * 10, &(bu[0]));
 				
 				RandSSBO.bind(randomizer1ComputeShader.glID, "ssbo_rand");
 				RandSSBO.bind(randomizer2ComputeShader.glID, "ssbo_rand");
@@ -380,7 +386,7 @@ int Context::run() {
 					glUniform1i(glGetUniformLocation(resetCellsComputeShader.glID, "Dm"), world.Dm);
 				}
 		
-				glDispatchCompute(world.mec, 1, 1);
+				glDispatchCompute(8, 8, world.mec / 1024);
 				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 			}
 
@@ -402,7 +408,7 @@ int Context::run() {
 
 
 			// рандомайзер этап 1
-			if (1) {
+			if (0) {
 				glUseProgram(randomizer1ComputeShader.glID);
 				glUniform1i(glGetUniformLocation(randomizer1ComputeShader.glID, "uFrame"), count_of_updates);
 				glDispatchCompute(8, 16, 1);
@@ -410,7 +416,7 @@ int Context::run() {
 			
 
 			// физика клеток: этап построения списков
-			if (1) {
+			if (0) {
 					glUseProgram(cellsPhysics_listComputeShader.glID);
 					static bool first_call = 1;
 					if (first_call) {
@@ -427,7 +433,7 @@ int Context::run() {
 
 
 			// рандомайзер этап 2
-			if (1) {
+			if (0) {
 				glUseProgram(randomizer2ComputeShader.glID);
 				glUniform1i(glGetUniformLocation(randomizer2ComputeShader.glID, "uFrame"), count_of_updates + 29u);
 				glDispatchCompute(16, 16, 1);
@@ -435,7 +441,7 @@ int Context::run() {
 
 
 			// физика клеток: этап обработки коллизий через списки
-			if (1) {
+			if (0) {
 					glUseProgram(cellsPhysics_processForcesComputeShader.glID);
 					static bool first_call = 1;
 					if (first_call) {
@@ -451,7 +457,7 @@ int Context::run() {
 
 
 			// физика клеток: применение прошлого этапа
-			if (1) {
+			if (0) {
 					glUseProgram(cellsPhysics_processPositionComputeShader.glID);
 					static bool first_call = 1;
 					if (first_call) {
