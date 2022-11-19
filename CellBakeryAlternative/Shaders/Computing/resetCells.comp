@@ -4,7 +4,6 @@ layout(local_size_x = 1, local_size_y = 1) in;
 
 uniform int Dm;
 uniform float Dp;
-uniform float Ac;
 
 const int nullID = 0x7FFFFFFF;
 
@@ -107,10 +106,15 @@ void main() {
 	
 	Cell cell;
 	cell.pos = -vec2(Dp);
-	while (compareDistanse(cell.pos - Rp, Rp) == false)
+	
+	cell.radius = map(fhash2(), 0., 1., 0.6, 1.);
+
+	while (compareDistanse(cell.pos - Rp, Rp - cell.radius * 0.5) == false)
 		cell.pos = vec2(fhash2(), fhash2()) * Dp;
 
-	cell.radius = map(fhash2(), 0., 1., Ac * 0.6, Ac * 1.);
+	cell.ipos = ivec2(cell.pos);
+	cell.pos = fract(cell.pos);
+
 	cell.angle = 0.;
 
 	cell.color_hsv = vec3(fhash2(), fhash2() * 0.5 + 0.5, fhash2() * 0.5 + 0.5);
@@ -118,7 +122,7 @@ void main() {
 
 	cell.type_id = int(ihash2(sid) % 1u);
 
-	cell.chank_id = int(cell.pos.x / Ac) + int(cell.pos.y / Ac) * Dm;
+	cell.chank_id = cell.ipos.x + cell.ipos.y * Dm;
 	cell.linked_list = nullID;
 	cell.is_first = 0;
 

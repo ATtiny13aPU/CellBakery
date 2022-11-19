@@ -122,5 +122,11 @@
     <None Include="Shaders\Computing\cellsPhysics_processPositions.comp">
       <Filter>Шейдеры\Сomputing\cells</Filter>
     </None>
+    <None Include="Shaders\Computing\randomizer1.comp">
+      <Filter>Шейдеры\Сomputing</Filter>
+    </None>
+    <None Include="Shaders\Computing\randomizer2.comp">
+      <Filter>Шейдеры\Сomputing</Filter>
+    </None>
   </ItemGroup>
 </Project>

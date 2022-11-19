@@ -298,6 +298,8 @@
     <None Include="Shaders\Computing\cellsPhysics_processForces.comp" />
     <None Include="Shaders\Computing\cellsPhysics_processPositions.comp" />
     <None Include="Shaders\Computing\light.comp" />
+    <None Include="Shaders\Computing\randomizer1.comp" />
+    <None Include="Shaders\Computing\randomizer2.comp" />
     <None Include="Shaders\Computing\resetCells.comp" />
     <None Include="Shaders\Computing\resetGrid.comp" />
     <None Include="Shaders\Graphics\cells.frag" />

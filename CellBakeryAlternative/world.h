@@ -33,7 +33,6 @@ public:
 
 	std::string name = "Unnamed";
 	frac Dp; // Диаметр чаши в мм при создании
-	frac Ac = 0.03; // Размер сетки мира
 	int Dm = 1;
 	int mec = 100000; // максимальное число клеток
 	int mefp = 10000; // максимальное число свободных частиц
@@ -48,9 +47,7 @@ void WorldCS::iniWorld() {
 	view.mst *= Dp;
 	view.Pos = vec2(Dp / 2.);
 
-	Dm = ceil(Dp / Ac / 1.) * 1;
-
-	Ac = Dp / Dm;
+	Dm = ceil(Dp);
 
 	mec = ceil(mec / 1024.) * 1024;
 }

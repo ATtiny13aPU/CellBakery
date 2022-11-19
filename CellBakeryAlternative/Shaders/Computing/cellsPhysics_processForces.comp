@@ -3,7 +3,6 @@
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 uniform int Dm;
-uniform float Ac;
 
 const int nullID = 0x7FFFFFFF;
 
@@ -64,7 +63,7 @@ void processCollision (int c1id, int c2id) {
 //	cells[c1id].color_rgb = vec3(0., 1., 0.);
 //	cells[c2id].color_rgb = vec3(0., 1., 0.);
 
-	vec2 delta_pos = cells[c1id].pos - cells[c2id].pos;
+	vec2 delta_pos = (cells[c1id].pos - cells[c2id].pos) + (cells[c1id].ipos - cells[c2id].ipos);
 	float sum_radius = (cells[c1id].radius + cells[c2id].radius) / 2.;
 	if (dot(delta_pos, delta_pos) < sum_radius * sum_radius) {
 		cells[c1id].force += vec2(1.);
@@ -86,9 +85,10 @@ void main() {
 			// Записываем связный список текущего чанка в буфер
 			ins = writeToBuffer(cid);
 			
-
 			// Записываем связный список соседних чанков со старшим id в буфер
 			int this_chid = cells[cid].chunk_id;
+			chunks[this_chid].linked_list = nullID;
+
 			int chunk_indexes[5] = int[5](this_chid + 1, this_chid + Dm - 1, this_chid + Dm, this_chid + Dm + 1, Dm * Dm);
 			for (int h = 0; chunk_indexes[h] < Dm * Dm; h++) 
 				if(chunks[chunk_indexes[h]].first_list_ID != nullID) {
@@ -96,10 +96,7 @@ void main() {
 				}
 
 			// данные в буфере сейчас представляют из себя сначала номера инициаторов, а после подчинённых
-
 			
-			if (currentBuffIndex > 98)
-				chunks[this_chid].brightness = 1.;
 
 			// обрабатываем все коллизии внутри чанка
 			for (int c1 = 0; c1 < ins; c1++)

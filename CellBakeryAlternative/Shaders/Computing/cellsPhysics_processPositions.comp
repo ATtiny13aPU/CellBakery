@@ -3,9 +3,12 @@
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 uniform int Dm;
-uniform float Ac;
 
 const int nullID = 0x7FFFFFFF;
+
+readonly buffer ssbo_rand {
+    uvec4 hash[];
+};
 
 struct Cell {
 	ivec2 ipos;
@@ -38,19 +41,36 @@ restrict buffer ssbo_grid {
 };
 
 
+uint uhash1(uint s) {
+	uvec4 s1;
+	s1.xy = (uvec2(s >> 16u, s & 0xFFFFu) * hash[0].xy) + hash[0].zw;
+	s1 = ((uvec4(s1.xy >> 16u, s1.xy & 0xFFFFu) * hash[1]) + hash[2]) * hash[3];
+	return ((s1.x ^ s1.y) * hash[4].x) ^ ((s1.z ^ s1.w) * hash[4].y) * hash[4].w;
+}
+
 void main() {
 	int workGroupID = int(gl_GlobalInvocationID.x * 16 + gl_GlobalInvocationID.y * 128 + gl_GlobalInvocationID.z * 1024);
 	
 	for (int cid = workGroupID; cid < workGroupID + 16; cid++) {
-		//chunks[cells[cid].chank_id].linked_list = nullID;
 		if (cells[cid].force.x > 0.5) {
-			cells[cid].color_rgb = vec3(1., 0., 0.);
+			cells[cid].color_rgb = vec3(0.8, 0.2, 0.2);
+			cells[cid].pos += (vec2(uhash1(cid), uhash1(cid + 0xFFFFFFFu)) / 4294967295.) * 0.1 - 0.05;
+		} else {
+			cells[cid].color_rgb = vec3(0.3, 0.7, 0.3);
 		}
-		
+
 
 		cells[cid].force = vec2(0.);
 
-		cells[cid].is_first = 0;
+		if (cells[cid].is_first != 0) {
+			chunks[cells[cid].chunk_id].first_list_ID = nullID;
+			cells[cid].is_first = 0;
+		}
+		
 		cells[cid].linked_list = nullID;
+		
+		cells[cid].ipos += ivec2(floor(cells[cid].pos));
+		cells[cid].chunk_id = cells[cid].ipos.x + cells[cid].ipos.y * Dm;
+		cells[cid].pos = fract(cells[cid].pos);
 	}
 }

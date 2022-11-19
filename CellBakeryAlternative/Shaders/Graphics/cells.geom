@@ -72,7 +72,7 @@ const float t2kr[18] = float[](1., 1., 1., 1.3, 1., 1., 1., 1.3, 1.2, 1.15, 1.15
 void main() {
 	int cid = id[0];
 	
-	vec2 pos = cells[cid].pos;
+	vec2 pos = cells[cid].pos + cells[cid].ipos;
 	float r = cells[cid].radius;
 
 	// отсекаем вне экрана

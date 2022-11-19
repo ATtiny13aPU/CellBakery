@@ -18,6 +18,7 @@ public:
 private:
 };
 
+
 class Context {
 public:
 	int run();
@@ -33,7 +34,9 @@ private:
 
 	shad::VoidMesh voidMesh;
 	shad::SimpleMesh fullScreenMesh;
-	
+
+	shad::ComputeShader randomizer1ComputeShader; // шейдер генерации ключей рандомайзеров
+	shad::ComputeShader randomizer2ComputeShader; // шейдер генерации ключей рандомайзеров
 	shad::ComputeShader resetCellsComputeShader; // стартовая загрузка данных в ssbo_cells
 	shad::ComputeShader resetGridComputeShader; // стартовая загрузка данных в ssbo_chunk
 	shad::ComputeShader lightComputeShader; // вычисление brightness в ssbo_chunk
@@ -46,8 +49,10 @@ private:
 
 	shad::SSBO CellsSSBO;
 	shad::SSBO GridSSBO;
+	shad::SSBO RandSSBO;
 
-	uint32_t count_of_frames = -1;
+	uint32_t count_of_frames = 0;
+	uint32_t count_of_updates = 0;
 	std::ostringstream buff; // текст буффер
 	ch_tp frame_time_point[2]; // две переменные времени
 	fastLinearFilter frameTime;
@@ -104,6 +109,24 @@ int Context::run() {
 	}
 
 	// шейдеры симуляции
+
+	{
+		randomizer1ComputeShader.name = std::string("randomizer1ComputeShader");
+		std::ifstream inpf;
+		inpf.open("Shaders/Computing/randomizer1.comp");
+		std::string sourseC{ std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>() };
+		inpf.close();
+		randomizer1ComputeShader.compile(sourseC.c_str());
+	}
+
+	{
+		randomizer2ComputeShader.name = std::string("randomizer2ComputeShader");
+		std::ifstream inpf;
+		inpf.open("Shaders/Computing/randomizer2.comp");
+		std::string sourseC{ std::istreambuf_iterator<char>(inpf), std::istreambuf_iterator<char>() };
+		inpf.close();
+		randomizer2ComputeShader.compile(sourseC.c_str());
+	}
 
 	{
 		resetGridComputeShader.name = std::string("resetGridComputeShader");
@@ -192,13 +215,13 @@ int Context::run() {
 	// Создание мира (ВНИМАНИЕ! Данные мира больше не используются, все вычисления переносятся на GPU)
 	///==============================
 	WorldCS world;
-	world.Dp = 150.;
-	world.mec = 15000000;
+	world.Dp = 2. / 0.03;
+	world.mec = 1024;
 
 	world.iniWorld();
 
 
-	
+
 	glDisable(GL_MULTISAMPLE);
 
 	// Цикл графики
@@ -305,11 +328,20 @@ int Context::run() {
 			glDisable(GL_MULTISAMPLE);
 
 		// Вычисления
+		for (int upd = 0; upd < 10 * test.is_press; upd++)
 		{
 			// Инициализация ssbo буферов
-			if (count_of_frames == -1) {
+			if (count_of_updates == 0) {
+				// Рандомайзер
+				std::vector<uint32_t> bu(384 * 4, 0u);
+				RandSSBO.loadFrom(4 * 384 * 4, &(bu[0]));
+				
+				RandSSBO.bind(randomizer1ComputeShader.glID, "ssbo_rand");
+				RandSSBO.bind(randomizer2ComputeShader.glID, "ssbo_rand");
+				RandSSBO.bind(cellsPhysics_processPositionComputeShader.glID, "ssbo_rand");
+
 				// Поле мира
-				GridSSBO.setSize(world.Dm * world.Dm * (sizeof(Chunk_ssboBlock) + 4));
+				GridSSBO.setSize((world.Dm + 2) * (world.Dm + 2) * (sizeof(Chunk_ssboBlock)));
 
 				GridSSBO.bind(resetGridComputeShader.glID, "ssbo_grid");
 				GridSSBO.bind(lightComputeShader.glID, "ssbo_grid");
@@ -330,7 +362,7 @@ int Context::run() {
 
 
 			// инициализатор поля
-			if (count_of_frames == -1) {
+			if (count_of_updates == 0) {
 				glUseProgram(resetGridComputeShader.glID);
 				glUniform1i(glGetUniformLocation(resetGridComputeShader.glID, "Dm"), world.Dm);
 				glDispatchCompute(world.Dm, world.Dm, 1);
@@ -339,13 +371,12 @@ int Context::run() {
 
 
 			// инициализатор клеток
-			if (count_of_frames == -1) {
+			if (count_of_updates == 0) {
 				glUseProgram(resetCellsComputeShader.glID);
 				static bool first_call = 1;
 				if (first_call) {
 					first_call = 0;
 					glUniform1f(glGetUniformLocation(resetCellsComputeShader.glID, "Dp"), world.Dp);
-					glUniform1f(glGetUniformLocation(resetCellsComputeShader.glID, "Ac"), world.Ac);
 					glUniform1i(glGetUniformLocation(resetCellsComputeShader.glID, "Dm"), world.Dm);
 				}
 		
@@ -355,30 +386,37 @@ int Context::run() {
 
 			
 			// вычисление света
-			if (count_of_frames == -1) {
+			if (count_of_updates == 0) {
 				glUseProgram(lightComputeShader.glID);
 				static bool first_call = 1;
 				if (first_call) {
 					first_call = 0;
-					glUniform1i(glGetUniformLocation(lightComputeShader.glID, "Dm"), world.Dm);
+					glUniform1i(glGetUniformLocation(lightComputeShader.glID, "Dm"), world.Dm + 2);
 				}
 
-				glDispatchCompute(world.Dm, world.Dm, 1);
+				glDispatchCompute(world.Dm + 2, world.Dm + 2, 1);
 
 				//glMemoryBarrier(GL_ALL_BARRIER_BITS);
 				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 			}
 
-			for (int i = 0; i < 1; i++) {
-				// физика клеток: этап построения списков
-				if (test.is_press) {
+
+			// рандомайзер этап 1
+			if (1) {
+				glUseProgram(randomizer1ComputeShader.glID);
+				glUniform1i(glGetUniformLocation(randomizer1ComputeShader.glID, "uFrame"), count_of_updates);
+				glDispatchCompute(8, 16, 1);
+			}
+			
+
+			// физика клеток: этап построения списков
+			if (1) {
 					glUseProgram(cellsPhysics_listComputeShader.glID);
 					static bool first_call = 1;
 					if (first_call) {
 						first_call = 0;
 						glUniform1i(glGetUniformLocation(cellsPhysics_listComputeShader.glID, "Dm"), world.Dm);
 						glUniform1f(glGetUniformLocation(cellsPhysics_listComputeShader.glID, "Dp"), world.Dp);
-						glUniform1f(glGetUniformLocation(cellsPhysics_listComputeShader.glID, "Ac"), world.Ac);
 					}
 
 					glDispatchCompute(8, 8, world.mec / 1024);
@@ -388,15 +426,22 @@ int Context::run() {
 				}
 
 
-				// физика клеток: этап обработки коллизий через списки
-				if (test.is_press) {
+			// рандомайзер этап 2
+			if (1) {
+				glUseProgram(randomizer2ComputeShader.glID);
+				glUniform1i(glGetUniformLocation(randomizer2ComputeShader.glID, "uFrame"), count_of_updates + 29u);
+				glDispatchCompute(16, 16, 1);
+			}
+
+
+			// физика клеток: этап обработки коллизий через списки
+			if (1) {
 					glUseProgram(cellsPhysics_processForcesComputeShader.glID);
 					static bool first_call = 1;
 					if (first_call) {
 						first_call = 0;
 						glUniform1i(glGetUniformLocation(cellsPhysics_processForcesComputeShader.glID, "Dm"), world.Dm);
 						glUniform1f(glGetUniformLocation(cellsPhysics_processForcesComputeShader.glID, "Dp"), world.Dp);
-						glUniform1f(glGetUniformLocation(cellsPhysics_processForcesComputeShader.glID, "Ac"), world.Ac);
 					}
 
 					glDispatchCompute(8, 8, world.mec / 1024);
@@ -405,22 +450,22 @@ int Context::run() {
 				}
 
 
-				// физика клеток: применение прошлого этапа
-				if (test.is_press) {
+			// физика клеток: применение прошлого этапа
+			if (1) {
 					glUseProgram(cellsPhysics_processPositionComputeShader.glID);
 					static bool first_call = 1;
 					if (first_call) {
 						first_call = 0;
 						glUniform1i(glGetUniformLocation(cellsPhysics_processPositionComputeShader.glID, "Dm"), world.Dm);
 						glUniform1f(glGetUniformLocation(cellsPhysics_processPositionComputeShader.glID, "Dp"), world.Dp);
-						glUniform1f(glGetUniformLocation(cellsPhysics_processPositionComputeShader.glID, "Ac"), world.Ac);
 					}
 
 					glDispatchCompute(8, 8, world.mec / 1024);
 
 					glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 				}
-			}
+
+			count_of_updates++;
 		}
 
 		// Графика
@@ -431,9 +476,8 @@ int Context::run() {
 				static bool first_call = 1;
 				if (first_call) {
 					first_call = 0;
-					glUniform1i(glGetUniformLocation(petriShader.glID, "Dm"), world.Dm);
+					glUniform1i(glGetUniformLocation(petriShader.glID, "Dm"), world.Dm + 2);
 					glUniform1f(glGetUniformLocation(petriShader.glID, "Dp"), world.Dp);
-					glUniform1f(glGetUniformLocation(petriShader.glID, "Ac"), world.Ac);
 				}
 				glUniform4f(glGetUniformLocation(petriShader.glID, "ViewWorld"), mnPos[0], mxPos[1], mxPos[0], mnPos[1]);
 				vec2 dPos = mnPos - world.Dp;
@@ -460,7 +504,6 @@ int Context::run() {
 					first_call = 0;
 					glUniform1i(glGetUniformLocation(cellsShader.glID, "Dm"), world.Dm);
 					glUniform1f(glGetUniformLocation(cellsShader.glID, "Dp"), world.Dp);
-					glUniform1f(glGetUniformLocation(cellsShader.glID, "Ac"), world.Ac);
 				}
 				glUniform4f(glGetUniformLocation(cellsShader.glID, "ViewWorld"), mnPos[0], mxPos[1], mxPos[0], mnPos[1]);
 				glUniform2i(glGetUniformLocation(cellsShader.glID, "WinSize"), Xd, Yd);
