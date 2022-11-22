@@ -95,6 +95,22 @@ private:
 	};
 };
 
+void glGetIntegervCout(int l) {
+	int size = 0;
+	glGetIntegerv(l, &size);
+	std::cout << size << '\n';
+}
+
+void glGetIntegeri_vCout(int l) {
+	int size = 0;
+	glGetIntegeri_v(l, 0, &size);
+	std::cout << size << ' ';
+	glGetIntegeri_v(l, 1, &size);
+	std::cout << size << ' ';
+	glGetIntegeri_v(l, 2, &size);
+	std::cout << size << '\n';
+}
+
 int Context::run() {
 	if (err != 0)
 		return err;
@@ -211,6 +227,12 @@ int Context::run() {
 		cellsShader.compile(sourseV.c_str(), sourseF.c_str(), sourseG.c_str());
 	}
 
+	glGetIntegervCout(GL_MAX_SHADER_STORAGE_BLOCK_SIZE);
+	glGetIntegeri_vCout(GL_MAX_COMPUTE_WORK_GROUP_COUNT);
+	glGetIntegeri_vCout(GL_MAX_COMPUTE_WORK_GROUP_SIZE);
+	glGetIntegervCout(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS);
+//	glGetIntegerv();
+//	std::cout << size;
 
 	// Создание мира (ВНИМАНИЕ! Данные мира больше не используются, все вычисления переносятся на GPU)
 	///==============================
@@ -386,7 +408,7 @@ int Context::run() {
 					glUniform1i(glGetUniformLocation(resetCellsComputeShader.glID, "Dm"), world.Dm);
 				}
 		
-				glDispatchCompute(8, 8, world.mec / 1024);
+				glDispatchCompute(16, world.mec / 16, 1);
 				glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 			}
 
@@ -416,7 +438,7 @@ int Context::run() {
 			
 
 			// физика клеток: этап построения списков
-			if (0) {
+			if (1) {
 					glUseProgram(cellsPhysics_listComputeShader.glID);
 					static bool first_call = 1;
 					if (first_call) {
@@ -441,7 +463,7 @@ int Context::run() {
 
 
 			// физика клеток: этап обработки коллизий через списки
-			if (0) {
+			if (1) {
 					glUseProgram(cellsPhysics_processForcesComputeShader.glID);
 					static bool first_call = 1;
 					if (first_call) {
@@ -457,7 +479,7 @@ int Context::run() {
 
 
 			// физика клеток: применение прошлого этапа
-			if (0) {
+			if (1) {
 					glUseProgram(cellsPhysics_processPositionComputeShader.glID);
 					static bool first_call = 1;
 					if (first_call) {
