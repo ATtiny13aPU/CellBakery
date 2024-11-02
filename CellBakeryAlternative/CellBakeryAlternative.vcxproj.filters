@@ -23,6 +23,9 @@
     <Filter Include="Исходные файлы\Графика">
       <UniqueIdentifier>{6318bbec-0747-4db0-893e-f0ea5b10fd69}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Библиотеки\Imgui">
+      <UniqueIdentifier>{fb5cc7fb-b511-4b79-be1b-ab9bc5a3fe54}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -30,6 +33,24 @@
     </ClCompile>
     <ClCompile Include="OpenGL\glad.c">
       <Filter>Библиотеки\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\ImGui\imgui.cpp">
+      <Filter>Библиотеки\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\ImGui\imgui_draw.cpp">
+      <Filter>Библиотеки\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\ImGui\imgui_impl_glfw.cpp">
+      <Filter>Библиотеки\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\ImGui\imgui_impl_opengl3.cpp">
+      <Filter>Библиотеки\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\ImGui\imgui_tables.cpp">
+      <Filter>Библиотеки\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\ImGui\imgui_widgets.cpp">
+      <Filter>Библиотеки\Imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

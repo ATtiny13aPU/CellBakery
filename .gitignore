@@ -18,8 +18,8 @@ CellBakeryAlternative/x64/Release/
 CellBakeryAlternative/x64/Release Console/
 
 CellBakeryAlternative/OpenGL/
-CellBakeryAlternative/ImGui/
 
+*.ttf
 *.c
 
 .vs/
