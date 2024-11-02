@@ -12,6 +12,7 @@ struct Cell {
 	vec2 pos;
 	float radius;
 	float angle;
+	float rotate_vel;
 	vec3 color_rgb;
 	vec3 color_hsv;
 	int type_id;
@@ -19,7 +20,7 @@ struct Cell {
 	int is_first;
 	float weight;
 	vec2 velocity;
-	vec2 force;
+	vec2 impulse;
 };
 
 readonly buffer ssbo_cells {

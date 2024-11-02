@@ -6,12 +6,14 @@ uniform int Dm;
 uniform float Dp;
 
 const int nullID = 0x7FFFFFFF;
+const int deadID = 0x7FFFFFFE;
 
 struct Cell {
 	ivec2 ipos;
 	vec2 pos;
 	float radius;
 	float angle;
+	float rotate_vel;
 	vec3 color_rgb;
 	vec3 color_hsv;
 	int type_id;
@@ -20,7 +22,7 @@ struct Cell {
 	int is_first;
 	float weight;
 	vec2 velocity;
-	vec2 force;
+	ivec2 force;
 };
 
 
@@ -33,8 +35,12 @@ uvec2 sid;
 uint ihash2(uvec2 s) {
 	uint s1 = ((s.y ^ s.x) * 0xEC7269E5u + 0x4C8A248Du) ^ ((s.x >> 5u) * 0xC5EB9396u);
 	s.x = ((s1 / 867u) * (s.x * 0x6C8FBCAFu)) ^ (s1 * (s.y & 0xF465C8F3u));
-	
-	return s.x;
+	uvec4 s2 = (uvec4(s >> 16u, s & 0xFFFFu) * uvec4(0x404B6841u, 0xE48E763Du, 0xABDDB121u, 0x572F50FBu)) + 
+    uvec4(0x8C10CAE9u, 0x5C08C39Fu, 0xF30C9AE7u, 0xD1CC61D7u);
+	s2 = (uvec4((s2.xz ^ s2.yw) >> 16u, (s2.xz ^ s2.yw) & 0xFFFFu) * uvec4(0x78F38F33u, 0xC9B48A87u, 0xD2854EE5u, 0xCE985B49u)) +
+    uvec4(0x6D95A9B9u, 0xD7B87323u, 0x61BF7D4Du, 0xE4857E25u);
+	s = uvec2(s2.x ^ s2.z, s2.y ^ s2. w) * uvec2(0xCA5333C9u, 0x02BDCF69u);
+	return s.x ^ s.y;
 }
 
 float fhash2() {
@@ -109,26 +115,52 @@ void main() {
 	
 	cell.radius = map(fhash2(), 0., 1., 0.6, 1.);
 
-	while (compareDistanse(cell.pos - Rp, Rp - cell.radius * 0.5) == false)
+	while (compareDistanse((cell.pos - Rp) * 1.2, Rp - cell.radius * 0.5) == false)
 		cell.pos = vec2(fhash2(), fhash2()) * Dp;
+
+//	if (fhash2() > 0.999)
+//		cell.color_rgb = mix(vec3(0.), vec3(0.9, 0.4, 0.), 1. - length(cell.pos / Dp - 0.5) * 2.);
+//	else
+//		cell.color_rgb = mix(vec3(0.), vec3(1.5, 0.8, 0.), 1. - length(cell.pos / Dp - 0.5) * 2.);
 
 	cell.ipos = ivec2(cell.pos);
 	cell.pos = fract(cell.pos);
 
-	cell.angle = 0.;
+	cell.angle = fhash2();
+	cell.rotate_vel = (fhash2() - 0.5) * 4.;
 
 	cell.color_hsv = vec3(fhash2(), fhash2() * 0.5 + 0.5, fhash2() * 0.5 + 0.5);
-	cell.color_rgb = vec3(0.5);//HSV(cell.color_hsv.r, cell.color_hsv.g, cell.color_hsv.b);
+	cell.color_rgb = HSV(cell.color_hsv.r, cell.color_hsv.g, cell.color_hsv.b);
 
 	cell.type_id = int(ihash2(sid) % 1u);
 
 	cell.chank_id = cell.ipos.x + cell.ipos.y * Dm;
-	cell.linked_list = nullID;
+	cell.linked_list = deadID + int((ihash2(sid) & 0xE000u) < 1 || true);
 	cell.is_first = 0;
 
-	cell.weight = 1.;
+	cell.weight = 0.015;
 	cell.velocity = vec2(0.);
-	cell.force = vec2(0.);
+	cell.force = ivec2(0);
 
 	cells[cid] = cell;
 }
+
+
+// Фагоцит 0
+// Жгутоцит 1
+// Фотоцит 2
+// Девороцит 3
+// Липоцит 4
+// Кератиноцит 5
+// Буецит 6
+// Клейкоцит 7
+// Вироцит 8
+// Нитроцит 9
+// Стереоцит 10
+// Сенсеоцит 11
+// Миоцит 12
+// Нейроцит 13
+// Секроцит 14
+// Стволоцит 15
+// Гамета 16
+// Цилиоцит 17

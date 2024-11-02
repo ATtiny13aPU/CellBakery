@@ -28,41 +28,9 @@ uvec2 u2hash2(uvec2 s) {
 	return uvec2(s1.x ^ s1.z, s1.y ^ s1. w) * uvec2(0x0ABA7A13u, 0x8BD25905u);
 }
 
-uint uhash4(uvec4 s) {
-	uvec4 s1, s2;
-
-	s1 = (uvec4(s.zw >> 16u, s.zw & 0xFFFFu) * uvec4(0x71217B47u, 0x87E9615Fu, 0xBA96E469u, 0x9F7AFBB5u)) + 
-	uvec4(0x41526BCDu, 0x8D1C8F5Du, 0x340B0C59u, 0x51AB5713u);
-
-	s1 = (uvec4((s1.xz ^ s1.yw) >> 16u, (s1.xz ^ s1.yw) & 0xFFFFu) * uvec4(0xB7B5D5DBu, 0x35C75427u, 0x982CC8CFu, 0x51824591u)) + 
-	uvec4(0x6B2FDB87u, 0x28232A37u, 0x1EC27BDFu, 0x8DC8079Fu) ^ (s);
-
-	s1 = (uvec4((s1.xy ^ s1.zw) >> 16u, (s1.xy ^ s1.zw) & 0xFFFFu) * uvec4(0x3795BCB5u, 0xC2BFF81Bu, 0xA05194E9u, 0xAA48F4E5u)) + 
-	uvec4(0x6084455Fu, 0xAFB852D5u, 0x84973225u, 0x4D17B761u);
-
-	s1 = (uvec4((s1.xz ^ s1.yw) >> 16u, (s1.xz ^ s1.yw) & 0xFFFFu) * uvec4(0xD2D96441u, 0x3B76C561u, 0x5C597335u, 0xCC82F905u)) +
-	uvec4(0xAFF8F95Du, 0x05DDA739u, 0x8D2AF67Fu, 0xF6E649B3u);
-
-
-	s2 = (uvec4(s.xy >> 16u, s.xy & 0xFFFFu) * uvec4(0xD1358937u, 0x3FA29D3Du, 0xE668FCF9u, 0x9F9D257Fu)) + 
-	uvec4(0xC2F41E4Du, 0x067B1B8Du, 0x2AB52157u, 0x78321A05u);
-
-	s2 = (uvec4((s2.xz ^ s2.yw) >> 16u, (s2.xz ^ s2.yw) & 0xFFFFu) * uvec4(0x1760A9B1u, 0xD53DF509u, 0xC7DDC9D9u, 0xD08AF30Bu)) + 
-	uvec4(0xC699F1A1u, 0x9C9885C7u, 0x2F71BC5Fu, 0x98B1D685u) ^ (s);
-
-	s2 = (uvec4((s2.xy ^ s2.zw) >> 16u, (s2.xy ^ s2.zw) & 0xFFFFu) * uvec4(0x821DA417u, 0x15D81063u, 0x15FADA2Fu, 0xC0F5B591u)) + 
-	uvec4(0x3F8FA15Fu, 0x0A2818FDu, 0x104EEA71u, 0x2F060EE1u);
-
-	s2 = (uvec4((s2.xz ^ s2.yw) >> 16u, (s2.xz ^ s2.yw) & 0xFFFFu) * uvec4(0x51BFC0FBu, 0x369D933Fu, 0x0EFDF55Fu, 0xCD5BA4D1u)) +
-	uvec4(0x3C320C3Fu, 0xF4D45287u, 0x87F4294Du, 0x2738D7C9u);
-
-	return ((((s1.x ^ s2.x) * 0xB462A63Du) ^ ((s1.y ^ s2.y) * 0xAA13ED13u) * 0x2F1FEEBBu) ^ 
-	(((s1.z ^ s2.z) * 0xE89238CBu) ^ ((s1.w ^ s2.w) * 0xA0E55C97u) * 0x143FB695u)) * 0xFB8EEDC7u;
-}
-
 void main() {
-	uint g = gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * 16;
-
-	hash[g].xy = u2hash2(uvec2((g * 0x54ED8F61u) ^ uFrame, hash[((g * 0x5FA372CFu) | 0x100u) & 0x17Fu].y));
-	hash[g].zw = u2hash2(uvec2((g * 0xC33321F7u) ^ uFrame, hash[((g * 0x1B8B5013u) | 0x100u) & 0x17Fu].w));
+	uint g = gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * 8;
+	
+	hash[g].xy = u2hash2(hash[g | 0x80u].wz * uvec2(0x2A6F307Cu, 0x70F0C685u) ^ uvec2(uFrame));
+	hash[g].zw = u2hash2(hash[(hash[g | 0x80u].x & 0x7Fu) | 0x80u].yx * uvec2(0x995BFB0Eu, 0x6031F2AAu) ^ uvec2(uFrame));
 }

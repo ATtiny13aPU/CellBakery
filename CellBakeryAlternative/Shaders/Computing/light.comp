@@ -3,6 +3,7 @@
 layout(local_size_x = 1, local_size_y = 1) in;
 
 uniform int Dm;
+uniform float Rp;
 
 struct Chunk {
 	int first_list_ID;
@@ -24,10 +25,12 @@ uint ihash2(uvec2 s) {
 void main() {
 	vec2 pixel_coords = gl_GlobalInvocationID.xy / float(Dm);
 	
-	float brightness = length(1. - pixel_coords * 2.);
+	//float brightness = length(1. - pixel_coords * 2.);
+	//brightness *= pixel_coords.y;
+	float brightness = max(0., 1. - length(pixel_coords * 2. - 1.));
 	// (ihash2(gl_GlobalInvocationID.xy * uvec2(0x52679u, 0xFF10FED1u)) & 0xFFFFu) / float(0xFFFF);//
 	//brightness = sqrt(brightness);
-	brightness *= pixel_coords.y;
+	
 
 	chunks[gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * (Dm)].brightness = brightness;
 }

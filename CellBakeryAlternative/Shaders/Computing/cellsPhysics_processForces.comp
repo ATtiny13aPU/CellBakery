@@ -3,14 +3,18 @@
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 uniform int Dm;
+uniform float sqrRp;
+//uniform float sdt;
 
 const int nullID = 0x7FFFFFFF;
+const int deadID = 0x7FFFFFFE;
 
 struct Cell {
 	ivec2 ipos;
 	vec2 pos;
 	float radius;
 	float angle;
+	float rotate_vel;
 	vec3 color_rgb;
 	vec3 color_hsv;
 	int type_id;
@@ -19,7 +23,7 @@ struct Cell {
 	int is_first;
 	float weight;
 	vec2 velocity;
-	vec2 force;
+	ivec2 force;
 };
 
 restrict buffer ssbo_cells {
@@ -46,7 +50,7 @@ int writeToBuffer(int startID) {
 	buff[currentBuffIndex++] = startID;
 	int nextID = cells[startID].linked_list;
 	int offset = currentBuffIndex;
-	while (currentBuffIndex < 100) {
+	while (currentBuffIndex < limit) {
 		if (nextID != nullID) {
 			buff[currentBuffIndex++] = nextID;
 			nextID = cells[nextID].linked_list;
@@ -60,15 +64,18 @@ int writeToBuffer(int startID) {
 
 // Обработать возможную коллизию между парой клеток
 void processCollision (int c1id, int c2id) {
-//	cells[c1id].color_rgb = vec3(0., 1., 0.);
-//	cells[c2id].color_rgb = vec3(0., 1., 0.);
 
 	vec2 delta_pos = (cells[c1id].pos - cells[c2id].pos) + (cells[c1id].ipos - cells[c2id].ipos);
 	float sum_radius = (cells[c1id].radius + cells[c2id].radius) / 2.;
 	if (dot(delta_pos, delta_pos) < sum_radius * sum_radius) {
-		
-		cells[c1id].force += vec2(1.);
-		cells[c2id].force += vec2(1.);
+	//	delta_pos = delta_pos + (cells[c1id].velocity - cells[c2id].velocity) * sdt * 12.;
+
+		ivec2 f = ivec2(normalize(delta_pos) * (2. / (pow(max(0.01, dot(delta_pos, delta_pos) / (sum_radius * sum_radius)), 0.2)) - 2) * 16777216.);
+
+		atomicAdd(cells[c1id].force.x, f.x);
+		atomicAdd(cells[c1id].force.y, f.y);
+		atomicAdd(cells[c2id].force.x, -f.x);
+		atomicAdd(cells[c2id].force.y, -f.y);
 	}
 }
 

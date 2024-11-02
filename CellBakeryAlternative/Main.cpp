@@ -2,6 +2,14 @@
 
 using namespace osl;
 
+
+class TextEditor {
+public:
+	shad::SSBO texture;
+
+};
+
+
 class key_trigger {
 public:
 	void push(bool t) {
@@ -17,7 +25,6 @@ public:
 	bool is_press = 0, is_click = 0, is_release = 0;
 private:
 };
-
 
 class Context {
 public:
@@ -77,6 +84,7 @@ private:
 		fvec2 pos;
 		float radius;
 		float angle;
+		float rotate_vel;
 		fvec4 color_rgb;
 		fvec4 color_hsv;
 		int type_id;
@@ -84,8 +92,8 @@ private:
 		int chunk_id;
 		int is_first;
 		float weight;
-		fvec4 velocity;
-		fvec4 force;
+		fvec2 velocity;
+		fvec2 force;
 	};
 
 	struct Chunk_ssboBlock {
@@ -237,18 +245,18 @@ int Context::run() {
 	// Создание мира (ВНИМАНИЕ! Данные мира больше не используются, все вычисления переносятся на GPU)
 	///==============================
 	WorldCS world;
-	//world.Dp = 2. / 0.03;
-	//world.mec = 1024;
-	world.Dp = 2. / 0.03;
-	world.mec = 1024;
-	std::cout << "enter Dp = ";
-	std::cin >> world.Dp;
-	world.Dp /= 0.03;
-	std::cout << "\nenter max enable cells = ";
-	std::cin >> world.mec;
+	world.Dp = 6. / 0.03;
+	world.mec = 100024;
+//	world.Dp = 2. / 0.03;
+//	world.mec = 1024;
+//	std::cout << "enter Dp = ";
+//	std::cin >> world.Dp;
+//	world.Dp /= 0.03;
+//	std::cout << "\nenter max enable cells = ";
+//	std::cin >> world.mec;
 	world.iniWorld();
 
-
+	world.dt = 1. / 60.;
 
 	glDisable(GL_MULTISAMPLE);
 
@@ -276,11 +284,12 @@ int Context::run() {
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		// Управление камерой мышью и клавой
-		static key_trigger boost, test, gmesh, msaa;
+		static key_trigger boost, test, test2, gmesh, msaa;
 		vec2 mnPos, mxPos;
 		{
 			boost.push(glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS);
 			test.push(glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS);
+			test2.push(glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS);
 			gmesh.push(glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS);
 			msaa.push(glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS);
 			// управление камерой
@@ -350,6 +359,17 @@ int Context::run() {
 			mxPos = mPos_to_wPos(vec2(Xd, Yd), world.view.mst, world.view.Pos);
 		}
 
+		if (test2.is_click)
+			test.push(1);
+		if (test2.is_click) {
+			glfwSwapInterval(Vsync);
+			world.dt = 1. / 10.;
+		}
+		if (test2.is_release) {
+			glfwSwapInterval(Vsync);
+			world.dt = 1. / 60.;
+		}
+
 		if (msaa.is_click)
 			glEnable(GL_MULTISAMPLE);
 		if (msaa.is_release)
@@ -362,7 +382,7 @@ int Context::run() {
 			if (count_of_updates == 0) {
 				// Рандомайзер
 				std::vector<uint32_t> bu(384 * 4 * 10, 0u);
-				RandSSBO.loadFrom(4 * 384 * 4 * 10, &(bu[0]));
+				RandSSBO.loadFrom(256 * 16, &(bu[0]));
 				
 				RandSSBO.bind(randomizer1ComputeShader.glID, "ssbo_rand");
 				RandSSBO.bind(randomizer2ComputeShader.glID, "ssbo_rand");
@@ -420,6 +440,7 @@ int Context::run() {
 				if (first_call) {
 					first_call = 0;
 					glUniform1i(glGetUniformLocation(lightComputeShader.glID, "Dm"), world.Dm + 2);
+					glUniform1f(glGetUniformLocation(lightComputeShader.glID, "Rp"), world.Dp / 2.);
 				}
 
 				glDispatchCompute(world.Dm + 2, world.Dm + 2, 1);
@@ -430,7 +451,7 @@ int Context::run() {
 
 
 			// рандомайзер этап 1
-			if (0) {
+			if (1) {
 				glUseProgram(randomizer1ComputeShader.glID);
 				glUniform1i(glGetUniformLocation(randomizer1ComputeShader.glID, "uFrame"), count_of_updates);
 				glDispatchCompute(8, 16, 1);
@@ -455,10 +476,10 @@ int Context::run() {
 
 
 			// рандомайзер этап 2
-			if (0) {
+			if (1) {
 				glUseProgram(randomizer2ComputeShader.glID);
 				glUniform1i(glGetUniformLocation(randomizer2ComputeShader.glID, "uFrame"), count_of_updates + 29u);
-				glDispatchCompute(16, 16, 1);
+				glDispatchCompute(8, 16, 1);
 			}
 
 
@@ -469,8 +490,9 @@ int Context::run() {
 					if (first_call) {
 						first_call = 0;
 						glUniform1i(glGetUniformLocation(cellsPhysics_processForcesComputeShader.glID, "Dm"), world.Dm);
-						glUniform1f(glGetUniformLocation(cellsPhysics_processForcesComputeShader.glID, "Dp"), world.Dp);
+						glUniform1f(glGetUniformLocation(cellsPhysics_processForcesComputeShader.glID, "sqrRp"), world.Dp * world.Dp / 4.);
 					}
+					glUniform1f(glGetUniformLocation(cellsPhysics_processForcesComputeShader.glID, "sdt"), world.dt);
 
 					glDispatchCompute(8, 8, world.mec / 1024);
 
@@ -486,7 +508,9 @@ int Context::run() {
 						first_call = 0;
 						glUniform1i(glGetUniformLocation(cellsPhysics_processPositionComputeShader.glID, "Dm"), world.Dm);
 						glUniform1f(glGetUniformLocation(cellsPhysics_processPositionComputeShader.glID, "Dp"), world.Dp);
+						glUniform1f(glGetUniformLocation(cellsPhysics_processPositionComputeShader.glID, "sqrRp"), world.Dp * world.Dp / 4.);
 					}
+					glUniform1f(glGetUniformLocation(cellsPhysics_processPositionComputeShader.glID, "sdt"), world.dt);
 
 					glDispatchCompute(8, 8, world.mec / 1024);
 

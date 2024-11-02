@@ -30,7 +30,7 @@ public:
 		frac mst = 1.02; // Масштаб зрения (чем больше, тем меньше выглядит субстрат)
 	};
 	View view;
-
+	double dt = 1.;
 	std::string name = "Unnamed";
 	frac Dp; // Диаметр чаши в мм при создании
 	int Dm = 1;

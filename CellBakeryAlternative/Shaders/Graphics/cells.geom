@@ -3,6 +3,8 @@
 layout(points) in;
 layout(triangle_strip, max_vertices = 4) out;
 
+const int deadID = 0x7FFFFFFE;
+
 in int id[];
 
 uniform vec4 ViewWorld;
@@ -19,6 +21,7 @@ struct Cell {
 	vec2 pos;
 	float radius;
 	float angle;
+	float rotate_vel;
 	vec3 color_rgb;
 	vec3 color_hsv;
 	int type_id;
@@ -26,7 +29,7 @@ struct Cell {
 	int is_first;
 	float weight;
 	vec2 velocity;
-	vec2 force;
+	vec2 impulse;
 };
 
 readonly buffer ssbo_cells {
@@ -76,7 +79,7 @@ void main() {
 	float r = cells[cid].radius;
 
 	// отсекаем вне экрана
-	if (lengthRect(ViewWorld.xy, ViewWorld.zw, pos) < cells[cid].radius) {
+	if (cells[cid].linked_list != deadID && lengthRect(ViewWorld.xy, ViewWorld.zw, pos) < cells[cid].radius) {
 		vec2 WinK = (pos - ViewWorld.xy) / (ViewWorld.zw - ViewWorld.xy) * 2. - 1.;
 		vec2 WinR = cells[cid].radius / (ViewWorld.zw - ViewWorld.xy);
 

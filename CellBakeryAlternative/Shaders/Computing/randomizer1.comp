@@ -29,8 +29,8 @@ uvec2 u2hash2(uvec2 s) {
 }
 
 void main() {
-	uint g = gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * 16;
-
-	hash[g + 0xFFu].xy = u2hash2(uvec2((hash[g].x * 0x10022B91u) ^ uFrame, hash[(g * 0x1EEF8381u) & 0xFFu].y));
-	hash[g + 0xFFu].zw = u2hash2(uvec2((hash[g].z * 0xC08DFFAFu) ^ uFrame, hash[(g * 0x4EB3838Au) & 0xFFu].w));
+	uint g = gl_GlobalInvocationID.x + gl_GlobalInvocationID.y * 8;
+	
+	hash[g | 0x80u].xy = u2hash2(hash[g].wz * uvec2(0x1EEF8381u, 0x10022B91u) ^ uvec2(uFrame));
+	hash[g | 0x80u].zw = u2hash2(hash[g].yx * uvec2(0x43474523u, 0x9E72E0F7u) ^ uvec2(uFrame));
 }
