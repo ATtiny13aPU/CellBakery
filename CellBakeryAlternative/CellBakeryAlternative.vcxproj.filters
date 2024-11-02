@@ -5,23 +5,8 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Исходные файлы\Библиотеки">
-      <UniqueIdentifier>{c5814647-5653-4da8-88a7-7689d07ca747}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Исходные файлы\Библиотеки\JIO">
-      <UniqueIdentifier>{a4a84a9d-aab2-42cb-9f16-51490ebd9069}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Исходные файлы\Библиотеки\OpenGL">
-      <UniqueIdentifier>{bcf9a52a-4f60-418a-b208-a01665fe1417}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Шейдеры">
       <UniqueIdentifier>{2f0ddf48-75d3-4a14-aa4d-a6024cde1479}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Исходные файлы\Игра">
-      <UniqueIdentifier>{51beb6ad-6715-46d9-beed-c1d9de49c5e5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Исходные файлы\Библиотеки\OSL">
-      <UniqueIdentifier>{ef39ec40-7972-488e-b9d9-aed7e707a63f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Шейдеры\Graphics">
       <UniqueIdentifier>{64964520-5999-40fc-9c22-a54ed3888788}</UniqueIdentifier>
@@ -29,20 +14,11 @@
     <Filter Include="Шейдеры\Сomputing">
       <UniqueIdentifier>{57baf64a-1802-46b9-b2fb-2b874ce7b9fd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Шейдеры\Сomputing\grid">
-      <UniqueIdentifier>{f529e4ea-6556-44ff-afa3-f039e472dd84}</UniqueIdentifier>
+    <Filter Include="Библиотеки">
+      <UniqueIdentifier>{34b6ebfa-935a-4f42-9c62-9f9e11cc6e44}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Шейдеры\Сomputing\cells">
-      <UniqueIdentifier>{371831c3-1784-4035-884d-04716462dff0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Шейдеры\Сomputing\initializer">
-      <UniqueIdentifier>{86c5d057-a2c0-45af-a615-418637746430}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Шейдеры\Graphics\petri">
-      <UniqueIdentifier>{eed09186-5511-4df5-b3d2-8d9d288775f6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Шейдеры\Graphics\cells">
-      <UniqueIdentifier>{d1f4234f-cbe0-42e6-ad07-433a502824d8}</UniqueIdentifier>
+    <Filter Include="Библиотеки\OpenGL">
+      <UniqueIdentifier>{ddfc9bb5-cd80-4612-a732-ae542d900b92}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -50,83 +26,12 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="OpenGL\glad.c">
-      <Filter>Исходные файлы\Библиотеки\OpenGL</Filter>
+      <Filter>Библиотеки\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Vector.hpp">
-      <Filter>Исходные файлы\Библиотеки\JIO</Filter>
-    </ClInclude>
     <ClInclude Include="include.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="world.h">
-      <Filter>Исходные файлы\Игра</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGL\gl_func.h">
-      <Filter>Исходные файлы\Библиотеки\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGL\stb_image.h">
-      <Filter>Исходные файлы\Библиотеки\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="OSL\include.h">
-      <Filter>Исходные файлы\Библиотеки\OSL</Filter>
-    </ClInclude>
-    <ClInclude Include="OSL\Randomizer.h">
-      <Filter>Исходные файлы\Библиотеки\OSL</Filter>
-    </ClInclude>
-    <ClInclude Include="OSL\Vector234.h">
-      <Filter>Исходные файлы\Библиотеки\OSL</Filter>
-    </ClInclude>
-    <ClInclude Include="OSL\typedef.h">
-      <Filter>Исходные файлы\Библиотеки\OSL</Filter>
-    </ClInclude>
-    <ClInclude Include="OpenGL\shad_primitive.h">
-      <Filter>Исходные файлы\Библиотеки\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="OSL\miniMath.h">
-      <Filter>Исходные файлы\Библиотеки\OSL</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\Graphics\cells.frag">
-      <Filter>Шейдеры\Graphics\cells</Filter>
-    </None>
-    <None Include="Shaders\Graphics\cells.geom">
-      <Filter>Шейдеры\Graphics\cells</Filter>
-    </None>
-    <None Include="Shaders\Graphics\cells.vert">
-      <Filter>Шейдеры\Graphics\cells</Filter>
-    </None>
-    <None Include="Shaders\Graphics\petri.frag">
-      <Filter>Шейдеры\Graphics\petri</Filter>
-    </None>
-    <None Include="Shaders\Graphics\petri.vert">
-      <Filter>Шейдеры\Graphics\petri</Filter>
-    </None>
-    <None Include="Shaders\Computing\resetCells.comp">
-      <Filter>Шейдеры\Сomputing\initializer</Filter>
-    </None>
-    <None Include="Shaders\Computing\resetGrid.comp">
-      <Filter>Шейдеры\Сomputing\initializer</Filter>
-    </None>
-    <None Include="Shaders\Computing\light.comp">
-      <Filter>Шейдеры\Сomputing\grid</Filter>
-    </None>
-    <None Include="Shaders\Computing\cellsPhysics_list.comp">
-      <Filter>Шейдеры\Сomputing\cells</Filter>
-    </None>
-    <None Include="Shaders\Computing\cellsPhysics_processForces.comp">
-      <Filter>Шейдеры\Сomputing\cells</Filter>
-    </None>
-    <None Include="Shaders\Computing\cellsPhysics_processPositions.comp">
-      <Filter>Шейдеры\Сomputing\cells</Filter>
-    </None>
-    <None Include="Shaders\Computing\randomizer1.comp">
-      <Filter>Шейдеры\Сomputing</Filter>
-    </None>
-    <None Include="Shaders\Computing\randomizer2.comp">
-      <Filter>Шейдеры\Сomputing</Filter>
-    </None>
   </ItemGroup>
 </Project>

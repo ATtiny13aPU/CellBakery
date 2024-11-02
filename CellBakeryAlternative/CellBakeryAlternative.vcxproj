@@ -38,7 +38,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{B9A6247E-40AE-4FB6-881B-30FA5A1113AC}</ProjectGuid>
     <RootNamespace>CellBakeryAlternative</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -130,16 +130,16 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glad\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <Version>37.1</Version>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
-      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN32\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN32\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Version>1</Version>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Console|Win32'">
@@ -148,15 +148,15 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glad\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <Version>37.1</Version>
-      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN32\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN32\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Version>1</Version>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -165,15 +165,16 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glad\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
-      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN64\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN64\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Version>1</Version>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Console|x64'">
@@ -182,14 +183,15 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glad\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN64\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN64\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Version>1</Version>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -200,7 +202,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glad\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -208,9 +210,9 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <Version>37.1</Version>
+      <Version>1</Version>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
-      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN32\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN32\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -222,7 +224,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glad\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -230,8 +232,8 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <Version>37.1</Version>
-      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN32\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <Version>1</Version>
+      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN32\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -243,7 +245,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glad\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -252,8 +254,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
-      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN64\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN64\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Version>1</Version>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Console|x64'">
@@ -264,7 +267,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glad\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -272,8 +275,9 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL450\glfw-3.3.2.bin.WIN64\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN64\lib-vc2017;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glfw3.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <Version>1</Version>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -282,31 +286,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include.h" />
-    <ClInclude Include="OpenGL\gl_func.h" />
-    <ClInclude Include="OpenGL\shad_primitive.h" />
-    <ClInclude Include="OpenGL\stb_image.h" />
-    <ClInclude Include="OSL\include.h" />
-    <ClInclude Include="OSL\miniMath.h" />
-    <ClInclude Include="OSL\Randomizer.h" />
-    <ClInclude Include="OSL\typedef.h" />
-    <ClInclude Include="OSL\Vector234.h" />
-    <ClInclude Include="Vector.hpp" />
-    <ClInclude Include="world.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\Computing\cellsPhysics_list.comp" />
-    <None Include="Shaders\Computing\cellsPhysics_processForces.comp" />
-    <None Include="Shaders\Computing\cellsPhysics_processPositions.comp" />
-    <None Include="Shaders\Computing\light.comp" />
-    <None Include="Shaders\Computing\randomizer1.comp" />
-    <None Include="Shaders\Computing\randomizer2.comp" />
-    <None Include="Shaders\Computing\resetCells.comp" />
-    <None Include="Shaders\Computing\resetGrid.comp" />
-    <None Include="Shaders\Graphics\cells.frag" />
-    <None Include="Shaders\Graphics\cells.geom" />
-    <None Include="Shaders\Graphics\cells.vert" />
-    <None Include="Shaders\Graphics\petri.frag" />
-    <None Include="Shaders\Graphics\petri.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

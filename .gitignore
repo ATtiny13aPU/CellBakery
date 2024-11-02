@@ -17,4 +17,9 @@ CellBakeryAlternative/x64/Debug Console/
 CellBakeryAlternative/x64/Release/
 CellBakeryAlternative/x64/Release Console/
 
+CellBakeryAlternative/OpenGL/
+CellBakeryAlternative/ImGui/
+
+*.c
+
 .vs/
