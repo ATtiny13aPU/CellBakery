@@ -20,6 +20,9 @@
     <Filter Include="Библиотеки\OpenGL">
       <UniqueIdentifier>{ddfc9bb5-cd80-4612-a732-ae542d900b92}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\Графика">
+      <UniqueIdentifier>{6318bbec-0747-4db0-893e-f0ea5b10fd69}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -32,6 +35,24 @@
   <ItemGroup>
     <ClInclude Include="include.h">
       <Filter>Исходные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="starting.h">
+      <Filter>Исходные файлы\Графика</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics.h">
+      <Filter>Исходные файлы\Графика</Filter>
+    </ClInclude>
+    <ClInclude Include="compute.h">
+      <Filter>Исходные файлы\Графика</Filter>
+    </ClInclude>
+    <ClInclude Include="gui.h">
+      <Filter>Исходные файлы\Графика</Filter>
+    </ClInclude>
+    <ClInclude Include="control.h">
+      <Filter>Исходные файлы\Графика</Filter>
+    </ClInclude>
+    <ClInclude Include="context.h">
+      <Filter>Исходные файлы\Графика</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -10,3 +10,12 @@
 #define NOMINMAX
 #undef min
 #undef max
+
+class Context;
+
+#include "context.h"
+#include "starting.h"
+#include "control.h"
+#include "compute.h"
+#include "graphics.h"
+#include "gui.h"
