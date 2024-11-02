@@ -1,18 +1,18 @@
-#pragma once
+п»ї#pragma once
 
 
 inline void Context::control() {
-	// Работа с glfw3
+	// Р Р°Р±РѕС‚Р° СЃ glfw3
 	{
 		if (VsyncNow != Vsync) {
 			glfwSwapInterval(Vsync);
 			VsyncNow = Vsync;
 		}
 
-		// Получаем эвенты
+		// РџРѕР»СѓС‡Р°РµРј СЌРІРµРЅС‚С‹
 		glfwPollEvents();
 
-		// Настраиваем камеру под разрешение окна
+		// РќР°СЃС‚СЂР°РёРІР°РµРј РєР°РјРµСЂСѓ РїРѕРґ СЂР°Р·СЂРµС€РµРЅРёРµ РѕРєРЅР°
 		int new_xsize_display, new_ysize_display;
 		glfwGetFramebufferSize(window, &new_xsize_display, &new_ysize_display);
 		if (uint32_t(new_xsize_display) != winSize[0] || uint32_t(new_ysize_display) != winSize[1]) {

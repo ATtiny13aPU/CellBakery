@@ -1,9 +1,9 @@
-#pragma once
+п»ї#pragma once
 
 
 
 int Context::run() {
-	// Цикл графики
+	// Р¦РёРєР» РіСЂР°С„РёРєРё
 	glfwSwapInterval(Vsync);
 
 	while (!glfwWindowShouldClose(window)) {

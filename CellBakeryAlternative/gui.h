@@ -1,17 +1,17 @@
-#pragma once
+п»ї#pragma once
 
 
 
 inline void Context::gui() {
 
-	// Работа с ImGui
+	// Р Р°Р±РѕС‚Р° СЃ ImGui
 	{
-		// Что-то нужное для ImGui
+		// Р§С‚Рѕ-С‚Рѕ РЅСѓР¶РЅРѕРµ РґР»СЏ ImGui
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		// Запускаем рендер меню
+		// Р—Р°РїСѓСЃРєР°РµРј СЂРµРЅРґРµСЂ РјРµРЅСЋ
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	}
