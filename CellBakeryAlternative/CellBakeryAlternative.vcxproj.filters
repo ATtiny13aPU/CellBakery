@@ -26,6 +26,15 @@
     <Filter Include="Библиотеки\Imgui">
       <UniqueIdentifier>{fb5cc7fb-b511-4b79-be1b-ab9bc5a3fe54}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Шейдеры\Graphics\cells">
+      <UniqueIdentifier>{776a5b44-3a0f-454d-b9e4-1c01c5c8b302}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Шейдеры\Graphics\petri">
+      <UniqueIdentifier>{bf52f0ec-f8f7-45f3-a143-de926f8277c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Шейдеры\Graphics\post">
+      <UniqueIdentifier>{35593ae7-5915-4d44-82c7-2601270e900f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -75,5 +84,28 @@
     <ClInclude Include="context.h">
       <Filter>Исходные файлы\Графика</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\Graphics\cells.frag">
+      <Filter>Шейдеры\Graphics\cells</Filter>
+    </None>
+    <None Include="Shaders\Graphics\cells.geom">
+      <Filter>Шейдеры\Graphics\cells</Filter>
+    </None>
+    <None Include="Shaders\Graphics\cells.vert">
+      <Filter>Шейдеры\Graphics\cells</Filter>
+    </None>
+    <None Include="Shaders\Graphics\petri.frag">
+      <Filter>Шейдеры\Graphics\petri</Filter>
+    </None>
+    <None Include="Shaders\Graphics\petri.vert">
+      <Filter>Шейдеры\Graphics\petri</Filter>
+    </None>
+    <None Include="Shaders\Graphics\cellsPostProcessing.frag">
+      <Filter>Шейдеры\Graphics\post</Filter>
+    </None>
+    <None Include="Shaders\Graphics\cellsPostProcessing.vert">
+      <Filter>Шейдеры\Graphics\post</Filter>
+    </None>
   </ItemGroup>
 </Project>

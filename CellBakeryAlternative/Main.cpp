@@ -1,27 +1,27 @@
 ﻿#include "include.h"
 
-
 int main() {
 	std::locale::global(std::locale("en_US.UTF-8"));
 	
 	if (!glfwInit()) {
-		std::cerr << "Ошибка инициализации GLFW" << std::endl;
+		std::cerr << u8"Ошибка инициализации GLFW" << std::endl;
 		return 1;
 	}
-	
+
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	auto window = glfwCreateWindow(800, 600, "CellBakeryRecovery", nullptr, nullptr);
 	if (window == nullptr) {
-		std::cerr << "Ошибка создания окна" << std::endl;
+		std::cerr << u8"Ошибка создания окна" << std::endl;
 		return 2;
 	}
 	
 	glfwMakeContextCurrent(window);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cerr << "Ошибка загрузки функций glad" << std::endl;
+		std::cerr << u8"Ошибка загрузки функций glad" << std::endl;
 		return 3;
 	}
 
@@ -55,11 +55,11 @@ int main() {
 			ImGui::GetIO().Fonts->AddFontFromFileTTF(font.generic_string().c_str(), 18.f, nullptr, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
 		}
 		else {
-			std::cout << "Imgui: файл шрифта не найден\n" << std::endl;
+			std::cout << u8"Imgui: файл шрифта не найден\n" << std::endl;
 		}
 	}
 	catch (const fs::filesystem_error& e) {
-		std::cerr << "filesystem error: " << e.what() << std::endl;
+		std::cerr << u8"filesystem error: " << e.what() << std::endl;
 	}
 
 	// не сохранять состояние меню imgui в файл

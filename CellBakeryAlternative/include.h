@@ -19,9 +19,13 @@
 #undef max
 
 #include <OSL/include.h>
+#include <SHAD/include.h>
 
 #include <filesystem>
 namespace fs = std::filesystem;
+
+#include <regex>
+
 
 class Context;
 
