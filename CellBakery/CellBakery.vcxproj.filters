@@ -86,26 +86,29 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\Graphics\cells.frag">
+    <None Include="Shaders\cells.geom">
       <Filter>Шейдеры\Graphics\cells</Filter>
     </None>
-    <None Include="Shaders\Graphics\cells.geom">
+    <None Include="Shaders\cells.vert">
       <Filter>Шейдеры\Graphics\cells</Filter>
     </None>
-    <None Include="Shaders\Graphics\cells.vert">
+    <None Include="Shaders\cells.frag">
       <Filter>Шейдеры\Graphics\cells</Filter>
     </None>
-    <None Include="Shaders\Graphics\petri.frag">
-      <Filter>Шейдеры\Graphics\petri</Filter>
-    </None>
-    <None Include="Shaders\Graphics\petri.vert">
-      <Filter>Шейдеры\Graphics\petri</Filter>
-    </None>
-    <None Include="Shaders\Graphics\cellsPostProcessing.frag">
+    <None Include="Shaders\cellsPostProcessing.frag">
       <Filter>Шейдеры\Graphics\post</Filter>
     </None>
-    <None Include="Shaders\Graphics\cellsPostProcessing.vert">
+    <None Include="Shaders\cellsPostProcessing.vert">
       <Filter>Шейдеры\Graphics\post</Filter>
+    </None>
+    <None Include="Shaders\petri.frag">
+      <Filter>Шейдеры\Graphics\petri</Filter>
+    </None>
+    <None Include="Shaders\petri.vert">
+      <Filter>Шейдеры\Graphics\petri</Filter>
+    </None>
+    <None Include="Shaders\structs.glsl">
+      <Filter>Шейдеры\Graphics</Filter>
     </None>
   </ItemGroup>
 </Project>
