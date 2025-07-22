@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-
 class Context {
 public:
 	inline int run();
@@ -8,6 +7,7 @@ public:
 	Context(GLFWwindow *w) : window(w), CellsSSBO(0), GridSSBO(1), RandSSBO(2), cellsPostProcessingSSBO(3) {};
 
 private:
+	World world;
 
 	shad::Shader cellsShader;
 	shad::Shader petriShader;

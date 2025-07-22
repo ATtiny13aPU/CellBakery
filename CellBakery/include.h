@@ -21,12 +21,9 @@
 #include <OSL/include.h>
 #include <SHAD/include.h>
 
-#include <filesystem>
-
-
-
 class Context;
 
+#include "world.h"
 #include "context.h"
 #include "starting.h"
 #include "control.h"

@@ -35,6 +35,9 @@
     <Filter Include="Шейдеры\Graphics\post">
       <UniqueIdentifier>{35593ae7-5915-4d44-82c7-2601270e900f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\Симуляция">
+      <UniqueIdentifier>{ebbd46c4-ca44-4252-9634-ede56793202c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -61,6 +64,9 @@
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\ImGui\imgui_widgets.cpp">
       <Filter>Библиотеки\Imgui</Filter>
     </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>Исходные файлы\Симуляция</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include.h">
@@ -83,6 +89,9 @@
     </ClInclude>
     <ClInclude Include="context.h">
       <Filter>Исходные файлы\Графика</Filter>
+    </ClInclude>
+    <ClInclude Include="World.h">
+      <Filter>Исходные файлы\Симуляция</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

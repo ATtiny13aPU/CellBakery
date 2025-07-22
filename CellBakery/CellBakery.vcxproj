@@ -290,6 +290,7 @@
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="OpenGL\glad.c" />
+    <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="compute.h" />
@@ -299,6 +300,7 @@
     <ClInclude Include="gui.h" />
     <ClInclude Include="include.h" />
     <ClInclude Include="starting.h" />
+    <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\cells.frag" />
