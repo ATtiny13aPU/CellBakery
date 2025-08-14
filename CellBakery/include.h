@@ -23,10 +23,10 @@
 
 class Context;
 
-#include "world.h"
+#include "WorldAdapter.h"
 #include "context.h"
 #include "run.h"
 #include "control.h"
-#include "compute.h"
+#include "sync.h"
 #include "graphics.h"
 #include "gui.h"

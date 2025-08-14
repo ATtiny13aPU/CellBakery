@@ -31,9 +31,9 @@ int main() {
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-	//ImGui::StyleColorsDark();
+	ImGui::StyleColorsDark();
 	//ImGui::StyleColorsClassic();
-	ImGui::StyleColorsLight();
+	//ImGui::StyleColorsLight();
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);

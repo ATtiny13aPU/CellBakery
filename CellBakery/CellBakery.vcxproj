@@ -293,7 +293,7 @@
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="compute.h" />
+    <ClInclude Include="sync.h" />
     <ClInclude Include="context.h" />
     <ClInclude Include="control.h" />
     <ClInclude Include="graphics.h" />
@@ -301,6 +301,7 @@
     <ClInclude Include="include.h" />
     <ClInclude Include="run.h" />
     <ClInclude Include="World.h" />
+    <ClInclude Include="WorldAdapter.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\cells.frag" />

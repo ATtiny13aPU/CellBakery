@@ -1,46 +1,29 @@
 ﻿#pragma once
 
-#include <OSL/include.h>
 
-using namespace osl;
+typedef uint32_t id;
 
+class Cell;
+
+// Константы для обозначения состояния клеток
+inline const id nullID = static_cast<id>(-1);  // Нет следующей клетки
+inline const id deadID = static_cast<id>(-2);  // Клетка "мёртвая"
+
+// Класс имплементации мира
 class World {
 public:
-	struct WorldSettings;
-	void run(const WorldSettings ws);
-
-	struct RenderData;
-	struct RenderCellData;
-	inline const RenderData* capture() {
-		return render_data_snapshots.capture();
+	World() {
+		RAND.init("3523dgfsdg", 256u);
 	}
 
-	void stop() {
-		isRunning = false;
-	}
+	// Основной цикл симуляции
+	void run(std::atomic_bool &, osl::MultiThreadContainer<WorldAdapter::RenderData> &);
+
+	std::map<std::string, osl::fastMovingAverageW<120>> bench;
 private:
-	bool isRunning;
-	osl::Random rand;
-	osl::MultiThreadContainer<RenderData> render_data_snapshots;
-};
+	osl::Random RAND;
+	void update_cells();
 
-
-struct World::WorldSettings {
-	// максимальное число клеток, предполагается динамическое управление памятью
-	size_t cells_limit;
-	// условый размер мира, убивает клетки за пределом
-	vec2 world_size;
-	// число субшагов на шаг
-	size_t sub_steps;
-};
-
-struct World::RenderData {
-	std::vector<RenderCellData> cells;
-	std::map<std::string, double> bench;
-};
-
-struct World::RenderCellData {
-	osl::fvec4 position;	// позиция + скорость в мировых координатах
-	osl::fvec4 color;		// RGB + effect
-	osl::fvec4 debug;		// Зарезервировано
+	osl::UpdateRateLimiter ups_limiter;
+	osl::PoolContainer<Cell> cells_pc;
 };
