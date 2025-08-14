@@ -43,8 +43,8 @@ int Context::run() {
 		cellsShader.setUniform("WinSize");
 
 		forceShader.setUniform("ViewWorld");
-		cellsShader.setUniform("ViewWindow");
-		forceShader.setUniform("WinSize");
+		forceShader.setUniform("ViewWindow");
+		forceShader.setUniform("Scale");
 	}
 
 

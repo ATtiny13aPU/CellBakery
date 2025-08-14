@@ -23,11 +23,10 @@ void main() {
     g_color = v_color[0];
     float r = v_radius[0];
 
-	//pos += v_vel[0] * TimeLerp / 20.;
+	pos += v_vel[0] * TimeLerp / 20.;
 
     // Преобразование мировой позиции в экранную
 	vec2 mst = ViewWorld.zw - ViewWorld.xy;
-    //vec2 win_uv = (pos - ViewWorld.xy) / mst * 2. - 1.;
 	vec2 win_uv = mix(ViewWindow.xy, ViewWindow.zw, pos) * 2. - 1.;
     vec2 win_r = 1. / mst;
 
