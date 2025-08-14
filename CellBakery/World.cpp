@@ -1,14 +1,5 @@
-﻿#include "WorldAdapter.h"
-#include "World.h"
+﻿#include "World.h"
 
-// Враппер функция для запуска мира
-void WorldAdapter::run(const WorldSettings &ws) {
-	World world;
-	isRunning = true;
-	isSafeToClose = false;
-	world.run(isRunning, world_data_snapshots);
-	isSafeToClose = true;
-}
 
 class Cell {
 public:
@@ -63,8 +54,8 @@ void World::update_cells() {
 	}
 }
 
-void World::run(std::atomic_bool &isRunning, osl::MultiThreadContainer<WorldAdapter::RenderData> &rd_mtc) {
-	const uint32_t num_cells = 100000;
+void World::run(const WorldAdapter::WorldSettings &ws, std::atomic_bool &isRunning, osl::MultiThreadContainer<WorldAdapter::RenderData> &rd_mtc) {
+	const uint32_t cells_limit = ws.cells_limit;
 
 	ups_limiter.set(5.);
 
@@ -72,20 +63,20 @@ void World::run(std::atomic_bool &isRunning, osl::MultiThreadContainer<WorldAdap
 	auto &cells = cells_pc.storage;
 	// инициализация первого шага (временный код)
 	{
-		lines.reserve(num_cells + 1);
-		cells.reserve(num_cells);
+		lines.reserve(cells_limit + 1);
+		cells.reserve(cells_limit);
 
-		for (id i = 0; i < num_cells; i++) {
+		for (id i = 0; i < cells_limit; i++) {
 			// создаём новую клетку
 			auto &c = cells[cells_pc.get_new()];
-			c.pos = vec2(RAND.pf(), RAND.pf()) * sqrt(num_cells) * (2. / sqrt(10.));
+			c.pos = vec2(RAND.pf(), RAND.pf()) * ws.world_size;
 			// начальная инициализация, возможно нужно переработать цикл чтобы она не требовалась
 			lines.push_back(std::pair<vec2, id>(c.pos, lines.size()));
 			c.color = fvec4(osl::HSV2RGB(vec3(RAND.pf(), 1. - std::pow(RAND.pf(), 4.), 1. - 0.7 * std::pow(RAND.pf(), 2.))), 1.f);
 		}
 
 		// инициализация физических параметров клеток
-		for (id i = 0; i < num_cells; i++) {
+		for (id i = 0; i < cells_limit; i++) {
 			auto &c = cells[i];
 			c.force = vec2(0.);		// начальная сила = 0
 			c.velocity = vec2(0.);	// начальная скорость = 0
@@ -164,8 +155,8 @@ void World::run(std::atomic_bool &isRunning, osl::MultiThreadContainer<WorldAdap
 		lines.pop_back();
 
 		bench["GaP_2"].push(dtm.get(), 1.);
-		bench["GaP_cc"].push(double(check_counter) / num_cells, 1.);
-		bench["avr_collision"].push(double(collis_counter) / num_cells, 1.);
+		bench["GaP_cc"].push(double(check_counter) / cells_limit, 1.);
+		bench["avr_collision"].push(double(collis_counter) / cells_limit, 1.);
 
 
 		update_cells();
@@ -174,7 +165,7 @@ void World::run(std::atomic_bool &isRunning, osl::MultiThreadContainer<WorldAdap
 		// Обновление графических данных
 		{
 			auto &cells_wb = rd_mtc.get_current_write()->cells;
-			cells_wb.resize(num_cells);
+			cells_wb.resize(cells_limit);
 			for (auto wb_it = cells_wb.begin(); wb_it != cells_wb.end(); wb_it++) {
 				auto &wb = (*wb_it);
 				const auto &cell = cells[std::distance(cells_wb.begin(), wb_it)];

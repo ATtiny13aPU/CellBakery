@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include "WorldAdapter.h"
 
 typedef uint32_t id;
 
@@ -17,7 +17,7 @@ public:
 	}
 
 	// Основной цикл симуляции
-	void run(std::atomic_bool &, osl::MultiThreadContainer<WorldAdapter::RenderData> &);
+	void run(const WorldAdapter::WorldSettings &, std::atomic_bool &, osl::MultiThreadContainer<WorldAdapter::RenderData> &);
 
 	std::map<std::string, osl::fastMovingAverageW<120>> bench;
 private:
@@ -27,3 +27,12 @@ private:
 	osl::UpdateRateLimiter ups_limiter;
 	osl::PoolContainer<Cell> cells_pc;
 };
+
+// Враппер функция для запуска мира
+void WorldAdapter::run(const WorldSettings &ws) {
+	World world;
+	isRunning = true;
+	isSafeToClose = false;
+	world.run(ws, isRunning, world_data_snapshots);
+	isSafeToClose = true;
+}

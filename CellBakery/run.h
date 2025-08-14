@@ -50,7 +50,7 @@ int Context::run() {
 
 	WorldAdapter::WorldSettings ws;
 	ws.cells_limit = 100000;
-	ws.world_size = vec2(std::sqrt(ws.cells_limit));
+	ws.world_size = vec2(sqrt(ws.cells_limit) * (2. / sqrt(10.)));
 
 	camera.set(ws.world_size / 2., ws.world_size);
 	// Запуск симуляции в отдельном потоке
