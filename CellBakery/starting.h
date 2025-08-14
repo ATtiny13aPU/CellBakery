@@ -1,47 +1,7 @@
 ﻿#pragma once
 
 
-// функция загружает файлы с указанных путей с проверкой на BOM и пытается скомпилировать шейдер
-bool loadShaderFromFiles(shad::Shader &shader, std::string vert_path, std::string frag_path, std::string geom_path = "") {
-	std::string sourseV, sourseF, sourseG;
-	if (!osl::loadShaderFile(vert_path, sourseV)) {
-		std::cout << u8"Файл вершинного шейдера \"" << sourseV << u8"\" не был загружен\n";
-		std::cout << u8"Графический шейдер \"" << shader.name << u8"\" не был загружен\n";
-		return false;
-	}
-	if (!osl::loadShaderFile(frag_path, sourseF)) {
-		std::cout << u8"Файл фрагментного шейдера \"" << sourseF << u8"\" не был загружен\n";
-		std::cout << u8"Графический шейдер \"" << shader.name << u8"\" не был загружен\n";
-		return false;
-	}
 
-	if (!geom_path.empty()) // геометрический шейдер не обязателен, игнорируем если путь к нему не указан
-		if (!osl::loadShaderFile(geom_path, sourseG)) {
-			std::cout << u8"Файл геометрического шейдера \"" << sourseG << u8"\" не был загружен\n";
-			std::cout << u8"Графический шейдер \"" << shader.name << u8"\" не был загружен\n";
-			return false;
-		}
-
-	if (!sourseV.empty() && !sourseF.empty() && (!sourseG.empty() || geom_path.empty())) {
-		if (geom_path.empty()) {
-			if (shader.compile(sourseV.c_str(), sourseF.c_str())) {
-				std::cout << u8"Графический шейдер \"" << shader.name << u8"\" не скомпилирован\n";
-				return false;
-			}
-		}
-		else {
-			if (shader.compile(sourseV.c_str(), sourseF.c_str(), sourseG.c_str())) {
-				std::cout << u8"Графический шейдер \"" << shader.name << u8"\" не скомпилирован\n";
-				return false;
-			}
-		}
-	}
-	else {
-		std::cout << u8"Графический шейдер \"" << shader.name << u8"\" не был загружен\n";
-		return false;
-	}
-	return true;
-}
 
 int Context::run() {
 
@@ -54,6 +14,11 @@ int Context::run() {
 		loadShaderFromFiles(cellsShader, "Shaders/cells.vert", "Shaders/cells.frag", "Shaders/cells.geom");
 	}
 
+	World world;
+	World::WorldSettings ws;
+	ws.world_size = vec2(100.);
+	ws.cells_limit = 50000;
+	world.run(ws);
 
 	// Цикл графики
 	glfwSwapInterval(Vsync);

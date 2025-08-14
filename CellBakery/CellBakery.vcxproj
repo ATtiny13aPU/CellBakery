@@ -132,7 +132,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -150,7 +150,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -167,7 +167,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -185,7 +185,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -204,7 +204,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -226,7 +226,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -247,7 +247,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -269,7 +269,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
