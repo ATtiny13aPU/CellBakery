@@ -299,18 +299,19 @@
     <ClInclude Include="graphics.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="include.h" />
-    <ClInclude Include="starting.h" />
+    <ClInclude Include="run.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\cells.frag" />
     <None Include="Shaders\cells.geom" />
     <None Include="Shaders\cells.vert" />
-    <None Include="Shaders\cellsPostProcessing.frag" />
-    <None Include="Shaders\cellsPostProcessing.vert" />
+    <None Include="Shaders\force.frag" />
+    <None Include="Shaders\force.geom" />
+    <None Include="Shaders\force.vert" />
+    <None Include="Shaders\lib.glsl" />
     <None Include="Shaders\petri.frag" />
     <None Include="Shaders\petri.vert" />
-    <None Include="Shaders\structs.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

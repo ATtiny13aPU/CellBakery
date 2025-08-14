@@ -32,11 +32,11 @@
     <Filter Include="Шейдеры\Graphics\petri">
       <UniqueIdentifier>{bf52f0ec-f8f7-45f3-a143-de926f8277c1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Шейдеры\Graphics\post">
-      <UniqueIdentifier>{35593ae7-5915-4d44-82c7-2601270e900f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Исходные файлы\Симуляция">
       <UniqueIdentifier>{ebbd46c4-ca44-4252-9634-ede56793202c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Шейдеры\Graphics\force">
+      <UniqueIdentifier>{35593ae7-5915-4d44-82c7-2601270e900f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -72,9 +72,6 @@
     <ClInclude Include="include.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="starting.h">
-      <Filter>Исходные файлы\Графика</Filter>
-    </ClInclude>
     <ClInclude Include="graphics.h">
       <Filter>Исходные файлы\Графика</Filter>
     </ClInclude>
@@ -93,6 +90,9 @@
     <ClInclude Include="World.h">
       <Filter>Исходные файлы\Симуляция</Filter>
     </ClInclude>
+    <ClInclude Include="run.h">
+      <Filter>Исходные файлы\Графика</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\cells.geom">
@@ -104,19 +104,22 @@
     <None Include="Shaders\cells.frag">
       <Filter>Шейдеры\Graphics\cells</Filter>
     </None>
-    <None Include="Shaders\cellsPostProcessing.frag">
-      <Filter>Шейдеры\Graphics\post</Filter>
-    </None>
-    <None Include="Shaders\cellsPostProcessing.vert">
-      <Filter>Шейдеры\Graphics\post</Filter>
-    </None>
     <None Include="Shaders\petri.frag">
       <Filter>Шейдеры\Graphics\petri</Filter>
     </None>
     <None Include="Shaders\petri.vert">
       <Filter>Шейдеры\Graphics\petri</Filter>
     </None>
-    <None Include="Shaders\structs.glsl">
+    <None Include="Shaders\force.frag">
+      <Filter>Шейдеры\Graphics\force</Filter>
+    </None>
+    <None Include="Shaders\force.geom">
+      <Filter>Шейдеры\Graphics\force</Filter>
+    </None>
+    <None Include="Shaders\force.vert">
+      <Filter>Шейдеры\Graphics\force</Filter>
+    </None>
+    <None Include="Shaders\lib.glsl">
       <Filter>Шейдеры\Graphics</Filter>
     </None>
   </ItemGroup>

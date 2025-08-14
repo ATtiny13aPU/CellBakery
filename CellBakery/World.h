@@ -6,8 +6,6 @@ using namespace osl;
 
 class World {
 public:
-	World() {};
-
 	struct WorldSettings;
 	void run(const WorldSettings ws);
 
@@ -16,8 +14,13 @@ public:
 	inline const RenderData* capture() {
 		return render_data_snapshots.capture();
 	}
+
+	void stop() {
+		isRunning = false;
+	}
 private:
-	osl::Random RAND;
+	bool isRunning;
+	osl::Random rand;
 	osl::MultiThreadContainer<RenderData> render_data_snapshots;
 };
 

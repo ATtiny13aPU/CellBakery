@@ -64,9 +64,14 @@ int main() {
 
 	// не сохранять состояние меню imgui в файл
 	ImGui::GetIO().IniFilename = nullptr;
-
-	Context c(window);
-	int r = c.run();
+	int r = -1;
+	try {
+		Context c(window);
+		r = c.run();
+	}
+	catch (const fs::filesystem_error& e) {
+		std::cerr << u8"Context error: " << e.what() << std::endl;
+	}
 
 	glfwDestroyWindow(window);
 	glfwTerminate();

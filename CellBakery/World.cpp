@@ -10,9 +10,13 @@ inline const id deadID = static_cast<id>(-2);  // Клетка "мёртвая"
 
 
 void World::run(const WorldSettings ws) {
-	
-	
+	isRunning = true;
+	osl::UpdateRateLimiter ups_limiter(20.);
 
-	
 
+	while (isRunning) {
+
+
+		ups_limiter.sync();
+	}
 }

@@ -1,179 +1,57 @@
 #version 430 core
+#include "lib.glsl"
 
 layout(points) in;
-layout(triangle_strip, max_vertices = 8) out;
+layout(triangle_strip, max_vertices = 4) out;
 
-const int deadID = 0x7FFFFFFE;
-
-in int id[];
-
-uniform float onePixelRadius;
 uniform vec4 ViewWorld;
-uniform ivec2 WinSize;
-uniform float fTime;
+uniform vec2 WinSize;
+uniform float TimeLerp;
 
-uniform int GM;
+in vec3 v_color[];
+in vec2 v_vel[];
+in float v_radius[];
 
 out vec2 dp;
-flat out int c_id;
-
-struct Cell {
-	// Общие данные
-	int type_id;
-	ivec2 ipos;
-	vec2 pos;
-	float radius;
-	float angle;
-	float rotate_vel;
-	vec3 color_rgb;
-	vec3 color_hsv;
-
-	// Данные для симуляции
-	int chunk_id; // мемоизация для ipos.x + ipos.y * Dm
-	int linked_list;
-	int is_first;
-	float weight;
-	vec2 velocity;
-	ivec2 force;
-	// Данные для визуализации
-	vec2 visual_force;
-};
-
-readonly buffer ssbo_cells {
-    Cell cells[];
-};
+out vec3 g_color;
 
 
-mat2 rot(float a) { //матрица поворота по заданному углу
-	float s = sin(a);
-	float c = cos(a);
-	return mat2(c, -s, s, c);
-}
-
-float lengthRect(vec2 tl, vec2 br, vec2 uv) {
-	vec2 d = max(tl - uv, uv - br);
-	return length(max(vec2(0.0), d)) + min(0.0, max(d.x, d.y));
-}
-
-struct CellType {
-int
-	Phago,		// Фагоцит 0
-	Flagello,	// Жгутоцит 1
-	Photo,		// Фотоцит 2
-	Devoro,		// Девороцит 3
-	Lipo,		// Липоцит 4
-	Keratino,	// Кератиноцит 5
-	Buoyo,		// Буецит 6
-	Glueo,		// Клейкоцит 7
-	Viro,		// Вироцит 8
-	Nitro,		// Нитроцит 9
-	Stereo,		// Стереоцит 10
-	Senseo,		// Сенсеоцит 11
-	Myo,		// Миоцит 12
-	Neuro,		// Нейроцит 13
-	Secro,		// Секроцит 14
-	Stemo,		// Стволоцит 15
-	Gamete,		// Гамета 16
-	Cilio;		// Цилиоцит 17
-};
-
-const float t2kr[18] = float[](1., 1., 1., 1.3, 1., 1., 1., 1.3, 1.2, 1.15, 1.15, 1.15, 1., 1., 1., 1., 1., 1.1);
 
 void main() {
-	int cid = id[0];
-	
-	vec2 pos = cells[cid].pos + cells[cid].ipos;
-	float r = cells[cid].radius;
+    vec2 pos = gl_in[0].gl_Position.xy;
+    g_color = v_color[0];
+    float r = v_radius[0];
 
-	// отсекаем вне экрана
-	if (cells[cid].linked_list != deadID && lengthRect(ViewWorld.xy, ViewWorld.zw, pos) < cells[cid].radius) {
-		vec2 WinK = (pos - ViewWorld.xy) / (ViewWorld.zw - ViewWorld.xy) * 2. - 1.;
-		vec2 WinR = (cells[cid].radius + onePixelRadius * 2) / (ViewWorld.zw - ViewWorld.xy);
+	pos += v_vel[0] * TimeLerp / 20.;
 
-		gl_Position.zw = vec2(0., 1.);
-		
-		//type_id = cells[cid].type_id;
-		c_id = cid;
+    // Преобразование мировой позиции в экранную
+    vec2 win_uv = (pos - ViewWorld.xy) / (ViewWorld.zw - ViewWorld.xy) * 2.0 - 1.0;
+    vec2 win_r = r / (ViewWorld.zw - ViewWorld.xy);
 
-		//c_meta = cells[cid].color_rgb;
-		//c_pos = vec4(pos, r, cells[cid].angle);
+	if (between(pos, ViewWorld.xy - 2., ViewWorld.zw + 2.) == 0.)
+		return;
 
-		int t = cells[cid].type_id;
-		r *= t2kr[t];
+    gl_Position.zw = vec2(0.0, 1.0);
 
-		WinR *= t2kr[t];
+    // Четырехугольник
+    vec2 p1 = win_uv - win_r, p2 = win_uv + win_r;
 
-		// 4-угольник
-		if(t != 1) {
-			vec2 p1 = WinK - WinR, p2 = WinK + WinR;
+    // 1: bottom-left
+    dp = vec2(-1);
+    gl_Position.xy = p1;
+    EmitVertex();
+    // 2: bottom-right
+    dp = vec2(1, -1);
+    gl_Position.xy = vec2(p2.x, p1.y);
+    EmitVertex();
+    // 3: top-left
+    dp = vec2(-1, 1);
+    gl_Position.xy = vec2(p1.x, p2.y);
+    EmitVertex();
+    // 4: top-right
+    dp = vec2(1);
+    gl_Position.xy = p2;
+    EmitVertex();
 
-			r = 1.;// + sqrt(sqrOnePixelRadius) / r;
-			// 1:bottom-left
-		//	dp = vec2(-r);
-			dp = vec2(-r);
-			gl_Position.xy = p1;
-			EmitVertex();
-			// 2:bottom-right
-		//	dp = vec2(r, -r);
-			dp = vec2(r, -r);
-			gl_Position.xy = vec2(p2.x, p1.y);
-			EmitVertex();
-			// 3:top-left
-		//	dp = vec2(-r, r);
-			dp = vec2(-r, r);
-			gl_Position.xy = vec2(p1.x, p2.y);
-			EmitVertex();
-			// 4:top-right
-		//	dp = vec2(+r);
-			dp = vec2(+r);
-			gl_Position.xy = p2;
-			EmitVertex();
-			
-///			vec2 p1 = WinK - WinR, p2 = WinK + WinR;
-///
-///			// 1:bottom
-///			dp = vec2(0., -r);
-///			gl_Position.xy = vec2(WinK.x, p1.y);
-///			EmitVertex();
-///			// 2:right
-///			dp = vec2(r, 0.);
-///			gl_Position.xy = vec2(p2.x, WinK.y);
-///			EmitVertex();
-///			// 4:left
-///			dp = vec2(-r, 0.);
-///			gl_Position.xy = vec2(p1.x, WinK.y);
-///			EmitVertex();
-///			// 3:top
-///			dp = vec2(0., r);
-///			gl_Position.xy = vec2(WinK.x, p2.y);
-///			EmitVertex();
-
-		} else {
-			float kWR = WinR.x / WinR.y;
-			WinR.x /= kWR;
-
-			mat2x2 mr = rot((cells[cid].angle - 0.625) * 3.14159265358 * 2.);
-			WinR *= mr;
-			vec2 vr = vec2(r) * mr;
-
-			// 1:bottom-left
-			dp = vec2(-vr);
-			gl_Position.xy = WinK - vec2(WinR.x * kWR, WinR.y);
-			EmitVertex();
-			// 2:bottom-right
-			dp = vec2(vr.y, -vr.x);
-			gl_Position.xy = WinK + vec2(WinR.y * kWR, -WinR.x);
-			EmitVertex();
-			// 3:top-left
-			dp = vec2(-vr.y, vr.x);
-			gl_Position.xy = WinK + vec2(-WinR.y * kWR, WinR.x);
-			EmitVertex();
-			// 4:top-right
-			dp = vec2(vr * 2.);
-			gl_Position.xy = WinK + vec2(WinR.x * kWR, WinR.y) * 2.;
-			EmitVertex();
-		}
-		EndPrimitive();
-
-	}
+    EndPrimitive();
 }
