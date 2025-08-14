@@ -5,6 +5,7 @@ layout(points) in;
 layout(triangle_strip, max_vertices = 4) out;
 
 uniform vec4 ViewWorld;
+uniform vec4 ViewWindow;
 uniform vec2 WinSize;
 uniform float TimeLerp;
 
@@ -22,14 +23,16 @@ void main() {
     g_color = v_color[0];
     float r = v_radius[0];
 
-	pos += v_vel[0] * TimeLerp / 20.;
+	//pos += v_vel[0] * TimeLerp / 20.;
 
     // Преобразование мировой позиции в экранную
-    vec2 win_uv = (pos - ViewWorld.xy) / (ViewWorld.zw - ViewWorld.xy) * 2.0 - 1.0;
-    vec2 win_r = r / (ViewWorld.zw - ViewWorld.xy);
+	vec2 mst = ViewWorld.zw - ViewWorld.xy;
+    //vec2 win_uv = (pos - ViewWorld.xy) / mst * 2. - 1.;
+	vec2 win_uv = mix(ViewWindow.xy, ViewWindow.zw, pos) * 2. - 1.;
+    vec2 win_r = 1. / mst;
 
-	if (between(pos, ViewWorld.xy - 2., ViewWorld.zw + 2.) == 0.)
-		return;
+	//if (between(pos, ViewWorld.xy - 2., ViewWorld.zw + 2.) == 0.)
+	//	return;
 
     gl_Position.zw = vec2(0.0, 1.0);
 

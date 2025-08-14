@@ -39,9 +39,11 @@ int Context::run() {
 
 		cellsShader.setUniform("TimeLerp");
 		cellsShader.setUniform("ViewWorld");
+		cellsShader.setUniform("ViewWindow");
 		cellsShader.setUniform("WinSize");
 
 		forceShader.setUniform("ViewWorld");
+		cellsShader.setUniform("ViewWindow");
 		forceShader.setUniform("WinSize");
 	}
 
@@ -49,6 +51,8 @@ int Context::run() {
 	WorldAdapter::WorldSettings ws;
 	ws.cells_limit = 100000;
 	ws.world_size = vec2(std::sqrt(ws.cells_limit));
+
+	camera.set(ws.world_size / 2., ws.world_size);
 	// Запуск симуляции в отдельном потоке
 	std::thread simulationThread(&WorldAdapter::run, &world, std::ref(ws));
 	

@@ -78,7 +78,7 @@ void World::run(std::atomic_bool &isRunning, osl::MultiThreadContainer<WorldAdap
 		for (id i = 0; i < num_cells; i++) {
 			// создаём новую клетку
 			auto &c = cells[cells_pc.get_new()];
-			c.pos = vec2(RAND.pf(), RAND.pf()) * sqrt(num_cells);
+			c.pos = vec2(std::pow(RAND.pf(), 3.), std::pow(RAND.pf(), 3.)) * sqrt(num_cells);
 			// начальная инициализация, возможно нужно переработать цикл чтобы она не требовалась
 			lines.push_back(std::pair<vec2, id>(c.pos, lines.size()));
 			c.color = fvec4(osl::HSV2RGB(vec3(RAND.pf(), 1. - std::pow(RAND.pf(), 4.), 1. - 0.7 * std::pow(RAND.pf(), 2.))), 1.f);
@@ -87,7 +87,7 @@ void World::run(std::atomic_bool &isRunning, osl::MultiThreadContainer<WorldAdap
 		// инициализация физических параметров клеток
 		for (id i = 0; i < num_cells; i++) {
 			auto &c = cells[i];
-			c.pos = vec2(RAND.pf(), RAND.pf()) * (100. * 3.);
+			//c.pos = vec2(std::pow(RAND.pf(), 3.), std::pow(RAND.pf(), 3.)) * sqrt(num_cells);
 			c.force = vec2(0.);		// начальная сила = 0
 			c.velocity = vec2(0.);	// начальная скорость = 0
 			c.impulse = vec2(0.);	// начальный импульс = 0
@@ -101,7 +101,8 @@ void World::run(std::atomic_bool &isRunning, osl::MultiThreadContainer<WorldAdap
 	ups.get();
 
 
-	while (isRunning) {
+	//while (isRunning) 
+	{
 		// Обновление симуляции
 
 		// Сброс суммы сил
