@@ -54,7 +54,7 @@ void World::update_cells() {
 	}
 }
 
-void World::run(const WorldAdapter::WorldSettings &ws, std::atomic_bool &isRunning, osl::MultiThreadContainer<WorldAdapter::RenderData> &rd_mtc) {
+void World::run(const WorldAdapter::WorldSettings &ws) {
 	const uint32_t cells_limit = ws.cells_limit;
 
 	ups_limiter.set(5.);
@@ -69,10 +69,10 @@ void World::run(const WorldAdapter::WorldSettings &ws, std::atomic_bool &isRunni
 		for (id i = 0; i < cells_limit; i++) {
 			// создаём новую клетку
 			auto &c = cells[cells_pc.get_new()];
-			c.pos = vec2(RAND.pf(), RAND.pf()) * ws.world_size;
+			c.pos = vec2(rand.pf(), rand.pf()) * ws.world_size;
 			// начальная инициализация, возможно нужно переработать цикл чтобы она не требовалась
 			lines.push_back(std::pair<vec2, id>(c.pos, lines.size()));
-			c.color = fvec4(osl::HSV2RGB(vec3(RAND.pf(), 1. - std::pow(RAND.pf(), 4.), 1. - 0.7 * std::pow(RAND.pf(), 2.))), 1.f);
+			c.color = fvec4(osl::HSV2RGB(vec3(rand.pf(), 1. - std::pow(rand.pf(), 4.), 1. - 0.7 * std::pow(rand.pf(), 2.))), 1.f);
 		}
 
 		// инициализация физических параметров клеток
@@ -91,7 +91,7 @@ void World::run(const WorldAdapter::WorldSettings &ws, std::atomic_bool &isRunni
 	ups.get();
 
 
-	while (isRunning) {
+	while (wa.isRunning) {
 		// Обновление симуляции
 
 		// Сброс суммы сил
@@ -164,7 +164,7 @@ void World::run(const WorldAdapter::WorldSettings &ws, std::atomic_bool &isRunni
 
 		// Обновление графических данных
 		{
-			auto &cells_wb = rd_mtc.get_current_write()->cells;
+			auto &cells_wb = wa.world_data_snapshots.get_current_write()->cells;
 			cells_wb.resize(cells_limit);
 			for (auto wb_it = cells_wb.begin(); wb_it != cells_wb.end(); wb_it++) {
 				auto &wb = (*wb_it);
@@ -176,7 +176,7 @@ void World::run(const WorldAdapter::WorldSettings &ws, std::atomic_bool &isRunni
 			}
 
 			{
-				auto &b = rd_mtc.get_current_write()->bench;
+				auto &b = wa.world_data_snapshots.get_current_write()->bench;
 
 				b["avr_c"] = bench["avr_collision"].get();
 				b["gap1"] = bench["GaP_1"].get();
@@ -186,7 +186,7 @@ void World::run(const WorldAdapter::WorldSettings &ws, std::atomic_bool &isRunni
 				b["mspu"] = bench["mspu"].push(ups.get(), 1.);
 			}
 		}
-		rd_mtc.swap();
+		wa.world_data_snapshots.swap();
 
 		ups_limiter.sync();
 	}

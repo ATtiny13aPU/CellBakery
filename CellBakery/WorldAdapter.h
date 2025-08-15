@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <OSL/include.h>
+#include <variant>
 
 using namespace osl;
 
@@ -20,7 +21,8 @@ public:
 		return world_data_snapshots.capture();
 	}
 
-private:	
+private:
+	friend class World;
 	void wait_to_close() const {
 		while (!isSafeToClose)
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -28,7 +30,7 @@ private:
 
 	std::atomic_bool isRunning;
 	std::atomic_bool isSafeToClose;
-	osl::MultiThreadContainer<RenderData> world_data_snapshots;
+	osl::MTTripleBuffer<RenderData> world_data_snapshots;
 };
 
 

@@ -30,8 +30,8 @@ void main() {
 	vec2 win_uv = mix(ViewWindow.xy, ViewWindow.zw, pos) * 2. - 1.;
     vec2 win_r = 1. / mst;
 
-	//if (between(pos, ViewWorld.xy - 2., ViewWorld.zw + 2.) == 0.)
-	//	return;
+	if (between(pos, ViewWorld.xy - 2., ViewWorld.zw + 2.) == 0.)
+		return;
 
     gl_Position.zw = vec2(0.0, 1.0);
 

@@ -30,12 +30,12 @@ inline void Context::graphics() {
 		glDrawArrays(GL_POINTS, 0, cellsMesh.size);
 	}
 	// Отрисовка сил
-	{
+	if (scale_force_draw > 0.1f) {
 		glLineWidth(1.8f);
 		glUseProgram(forceShader.glID);
 		glUniform4fv(forceShader.getUniform("ViewWorld"), 1, &worldView[0]);
 		glUniform4fv(forceShader.getUniform("ViewWindow"), 1, &windowView[0]);
-		glUniform1f(forceShader.getUniform("Scale"), float(1.f / 20.f));
+		glUniform1f(forceShader.getUniform("Scale"), float(scale_force_draw / 20.f));
 
 		glDrawArrays(GL_POINTS, 0, cellsMesh.size);
 	}

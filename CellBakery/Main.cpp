@@ -69,7 +69,7 @@ int main() {
 		Context c(window);
 		r = c.run();
 	}
-	catch (const fs::filesystem_error& e) {
+	catch (const std::exception &e) {
 		std::cerr << u8"Context error: " << e.what() << std::endl;
 	}
 

@@ -33,4 +33,8 @@ private:
 	GLint Vsync = 1, VsyncNow = Vsync;
 
 	GLFWwindow *window;
+
+	// GUI
+	float ups_world_set = 5.f;
+	float scale_force_draw = 5.f;
 };

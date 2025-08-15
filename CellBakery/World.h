@@ -12,16 +12,18 @@ inline const id deadID = static_cast<id>(-2);  // Клетка "мёртвая"
 // Класс имплементации мира
 class World {
 public:
-	World() {
-		RAND.init("3523dgfsdg", 256u);
+	World(WorldAdapter &wa) : wa(wa) {
+		rand.init("3523dgfsdg", 256u);
 	}
 
 	// Основной цикл симуляции
-	void run(const WorldAdapter::WorldSettings &, std::atomic_bool &, osl::MultiThreadContainer<WorldAdapter::RenderData> &);
+	void run(const WorldAdapter::WorldSettings &);
 
 	std::map<std::string, osl::fastMovingAverageW<120>> bench;
 private:
-	osl::Random RAND;
+	WorldAdapter &wa;
+
+	osl::Random rand;
 	void update_cells();
 
 	osl::UpdateRateLimiter ups_limiter;
@@ -30,9 +32,9 @@ private:
 
 // Враппер функция для запуска мира
 void WorldAdapter::run(const WorldSettings &ws) {
-	World world;
+	World world(*this);
 	isRunning = true;
 	isSafeToClose = false;
-	world.run(ws, isRunning, world_data_snapshots);
+	world.run(ws);
 	isSafeToClose = true;
 }
