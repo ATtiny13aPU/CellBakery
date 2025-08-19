@@ -37,4 +37,6 @@ private:
 	// GUI
 	float ups_world_set = 5.f;
 	float scale_force_draw = 5.f;
+
+	WorldKeyValueCommands wkv_commands;
 };

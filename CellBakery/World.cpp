@@ -1,5 +1,5 @@
 ﻿#include "World.h"
-
+#include <iostream>
 
 class Cell {
 public:
@@ -56,7 +56,7 @@ void World::update_cells() {
 
 void World::run(const WorldAdapter::WorldSettings &ws) {
 	const uint32_t cells_limit = ws.cells_limit;
-
+	WorldKeyValueCommands wkv_commands;
 	ups_limiter.set(5.);
 
 	std::vector<std::pair<vec2, id>> lines;
@@ -117,7 +117,7 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 		// Для простой обработки краевого случая итераторами
 		lines.push_back(std::pair<vec2, id>(vec2(std::numeric_limits<double>::infinity()), nullID));
 		lines.push_back(std::pair<vec2, id>(vec2(std::numeric_limits<double>::infinity()), nullID));
-
+		
 
 		// Этап поиска коллизий
 		auto c3_it = lines.cbegin();
@@ -158,9 +158,36 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 		bench["GaP_cc"].push(double(check_counter) / cells_limit, 1.);
 		bench["avr_collision"].push(double(collis_counter) / cells_limit, 1.);
 
-
 		update_cells();
 		bench["update_cells"].push(dtm.get(), 1.);
+		// Обработка очереди событий
+		{
+			auto &q = *wa.wkv_queue_ptr.get();
+			while (q.pop(wkv_commands)) {
+				for (const auto &c : wkv_commands) {
+
+
+					// Получение ключа
+					std::string_view key = c.get_key();
+
+					// Получение значения через std::visit
+					std::visit([&](const auto& value) {
+						if constexpr (std::is_same_v<std::decay_t<decltype(value)>, uint64_t>) {
+							std::cout << "Key: " << key << ", Value (uint64_t): " << value << '\n';
+						}
+						else if constexpr (std::is_same_v<std::decay_t<decltype(value)>, double>) {
+							
+							
+							if (c.get_key() == std::string_view("ups"))
+								ups_limiter.set(std::get<double>(c.get_value()));
+
+							std::cout << "Key: " << key << ", Value (double): " << value << '\n';
+						}
+					}, c.get_value());
+				}
+			}
+		}
+
 
 		// Обновление графических данных
 		{

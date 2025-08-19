@@ -25,7 +25,13 @@ inline void Context::gui() {
 			
 			ImGui::PushItemWidth(150);
 
-			ImGui::SliderFloat("##ups_world_set", &ups_world_set, 1.f, 100.f, "%.1f");
+			if (ImGui::SliderFloat("##ups_world_set", &ups_world_set, 1.f, 100.f, "%.1f")) {
+				WorldKeyValueCommand c;
+				c["ups"] = ups_world_set;
+
+				wkv_commands.push_back(c);
+
+			}
 			ImGui::SliderFloat("##scale_force_draw", &scale_force_draw, 0.f, 20.f, "%.1f");
 			
 
@@ -36,5 +42,9 @@ inline void Context::gui() {
 		// Запускаем рендер меню
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	}
+
+	if (!wkv_commands.empty()) {
+		world.pushWKVCommands(wkv_commands);
 	}
 }
