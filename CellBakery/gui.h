@@ -23,9 +23,9 @@ inline void Context::gui() {
 			ImGui::Begin(u8"##settings_window", &open, windowFlags);
 
 			
-			ImGui::PushItemWidth(150);
+			ImGui::PushItemWidth(500);
 
-			if (ImGui::SliderFloat("##ups_world_set", &ups_world_set, 1.f, 100.f, "%.1f")) {
+			if (ImGui::SliderFloat("##ups_world_set", &ups_world_set, 1.f, 1000.f, "%.1f")) {
 				WorldKeyValueCommand c;
 				c["ups"] = ups_world_set;
 
