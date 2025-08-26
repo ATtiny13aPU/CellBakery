@@ -129,11 +129,11 @@ private:
 
 struct WorldAdapter::WorldSettings {
 	// максимальное число клеток, предполагается динамическое управление памятью
-	size_t cells_limit;
+	uint32_t cells_limit;
 	// условый размер мира, убивает клетки за пределом
 	vec2 world_size;
 	// число субшагов на шаг
-	size_t sub_steps;
+	uint32_t sub_steps;
 };
 
 struct WorldAdapter::RenderData {

@@ -55,7 +55,7 @@ void World::update_cells() {
 }
 
 void World::run(const WorldAdapter::WorldSettings &ws) {
-	const uint32_t cells_limit = ws.cells_limit;
+	const auto cells_limit = static_cast<uint32_t>(ws.cells_limit);
 	WorldKeyValueCommands wkv_commands;
 	ups_limiter.set(5.);
 
@@ -71,7 +71,7 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 			auto &c = cells[cells_pc.get_new()];
 			c.pos = vec2(rand.pf(), rand.pf()) * ws.world_size;
 			// начальная инициализация, возможно нужно переработать цикл чтобы она не требовалась
-			lines.push_back(std::pair<vec2, id>(c.pos, lines.size()));
+			lines.emplace_back(c.pos, lines.size());
 			c.color = fvec4(osl::HSV2RGB(vec3(rand.pf(), 1. - std::pow(rand.pf(), 4.), 1. - 0.7 * std::pow(rand.pf(), 2.))), 1.f);
 		}
 
@@ -115,40 +115,40 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 		bench["GaP_1"].push(dtm.get(), 1.);
 
 		// Для простой обработки краевого случая итераторами
-		lines.push_back(std::pair<vec2, id>(vec2(std::numeric_limits<double>::infinity()), nullID));
-		lines.push_back(std::pair<vec2, id>(vec2(std::numeric_limits<double>::infinity()), nullID));
+		lines.emplace_back(vec2(std::numeric_limits<double>::infinity()), nullID);
+		lines.emplace_back(vec2(std::numeric_limits<double>::infinity()), nullID);
 		
 
 		// Этап поиска коллизий
 		auto c3_it = lines.cbegin();
 		// проход по линиям (простые коллизии)
 		for (auto c1_it = lines.cbegin(); c1_it != (lines.cend() - 1u); ++c1_it) {
-			const auto c1 = (*c1_it);
+			const auto&[c1_pos, c1] = *c1_it;
 
 			// на 2R дальше по x и до ближайшего по Y вверх
-			const vec2 stop = vec2(c1.first[0] + 2., std::ceil(c1.first[1]));
+			const auto stop = vec2(c1_pos[0] + 2., std::ceil(c1_pos[1]));
 			{
-				const vec2 stop = vec2(c1.first[0] - 2., std::ceil(c1.first[1]));
+				const auto sub_stop = vec2(c1_pos[0] - 2., std::ceil(c1_pos[1]));
 				// если итератор на той же линии
-				while (c3_it->first[1] < stop[1])
+				while (c3_it->first[1] < sub_stop[1])
 					++c3_it;
 				// если итератор не переходит на следующую линию но опаздывает по x
-				while (std::floor(c3_it->first[1]) == std::floor(std::next(c3_it)->first[1]) && c3_it->first[0] < stop[0])
+				while (std::floor(c3_it->first[1]) == std::floor(std::next(c3_it)->first[1]) && c3_it->first[0] < sub_stop[0])
 					++c3_it;
 			}
 			// по текущей линии
 			for (auto c2_it = std::next(c1_it); c2_it->first[0] < stop[0] && c2_it->first[1] < stop[1]; ++c2_it) {
 				check_counter++;
-				const vec2 dp = c1.first - c2_it->first;
+				const vec2 dp = c1_pos - c2_it->first;
 				if (osl::dot(dp, dp) < 1.)
-					process_collision(cells[c1.second], cells[c2_it->second], dp), collis_counter++;
+					process_collision(cells[c1], cells[c2_it->second], dp), collis_counter++;
 			}
 			// по линии над
 			for (auto c2_it = c3_it; c2_it->first[0] < stop[0] && c2_it->first[1] < stop[1] + 1.; ++c2_it) {
 				check_counter++;
-				const vec2 dp = c1.first - c2_it->first;
+				const vec2 dp = c1_pos - c2_it->first;
 				if (osl::dot(dp, dp) < 1.)
-					process_collision(cells[c1.second], cells[c2_it->second], dp), collis_counter++;
+					process_collision(cells[c1], cells[c2_it->second], dp), collis_counter++;
 			}
 		}
 		lines.pop_back();
@@ -215,6 +215,6 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 		}
 		wa.world_data_snapshots.swap();
 
-		ups_limiter.sync();
+		ups_limiter.sync(true);
 	}
 }
