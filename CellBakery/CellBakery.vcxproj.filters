@@ -38,9 +38,6 @@
     <Filter Include="Шейдеры\Graphics\force">
       <UniqueIdentifier>{35593ae7-5915-4d44-82c7-2601270e900f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Фасады">
-      <UniqueIdentifier>{16991e4e-be9b-42e3-8103-1811d7c3c3e5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Библиотеки\OSL">
       <UniqueIdentifier>{40463903-03a9-4e32-a5ee-40ede6ee6560}</UniqueIdentifier>
     </Filter>
