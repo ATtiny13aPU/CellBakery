@@ -2,19 +2,18 @@ Debug/
 Debug Console/
 Release/
 Release Console/
-x64/Debug/
-x64/Debug Console/
-x64/Release/
-x64/Release Console/
+x64/
 
 
 CellBakeryAlternative/Debug/
 CellBakeryAlternative/Debug Console/
 CellBakeryAlternative/Release/
 CellBakeryAlternative/Release Console/
-CellBakeryAlternative/x64/Debug/
-CellBakeryAlternative/x64/Debug Console/
-CellBakeryAlternative/x64/Release/
-CellBakeryAlternative/x64/Release Console/
+CellBakeryAlternative/x64/
+
+CellBakeryAlternative/OpenGL/
+
+*.ttf
+*.c
 
 .vs/
