@@ -1,4 +1,9 @@
-﻿#pragma once
+﻿module;
+
+#include "monolith_std_osl_header.h";
+#include "monolith_ogl_imgui_header.h";
+
+module Context;
 
 
 inline void Context::graphics() {

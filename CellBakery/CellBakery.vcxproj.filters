@@ -38,14 +38,17 @@
     <Filter Include="Шейдеры\Graphics\force">
       <UniqueIdentifier>{35593ae7-5915-4d44-82c7-2601270e900f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Фасады">
+      <UniqueIdentifier>{16991e4e-be9b-42e3-8103-1811d7c3c3e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Библиотеки\OSL">
+      <UniqueIdentifier>{40463903-03a9-4e32-a5ee-40ede6ee6560}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Библиотеки\SHAD">
+      <UniqueIdentifier>{f806d213-e7da-49a0-9645-fd12526bbe21}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="OpenGL\glad.c">
-      <Filter>Библиотеки\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\ImGui\imgui.cpp">
       <Filter>Библиотеки\Imgui</Filter>
     </ClCompile>
@@ -64,38 +67,63 @@
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\ImGui\imgui_widgets.cpp">
       <Filter>Библиотеки\Imgui</Filter>
     </ClCompile>
-    <ClCompile Include="World.cpp">
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\window\window.ixx">
+      <Filter>Библиотеки\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\error\error.ixx">
+      <Filter>Библиотеки\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\event\event.ixx">
+      <Filter>Библиотеки\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\helper\helper.ixx">
+      <Filter>Библиотеки\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\joystick\joystick.ixx">
+      <Filter>Библиотеки\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\monitor\monitor.ixx">
+      <Filter>Библиотеки\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\native\native.ixx">
+      <Filter>Библиотеки\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\version\version.ixx">
+      <Filter>Библиотеки\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\glfwppm.ixx">
+      <Filter>Библиотеки\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\src\glad.c">
+      <Filter>Библиотеки\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="World\World.ixx">
       <Filter>Исходные файлы\Симуляция</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include.h">
+    <ClCompile Include="World\World.cpp">
+      <Filter>Исходные файлы\Симуляция</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
       <Filter>Исходные файлы</Filter>
-    </ClInclude>
-    <ClInclude Include="graphics.h">
+    </ClCompile>
+    <ClCompile Include="Context\graphics.cpp">
       <Filter>Исходные файлы\Графика</Filter>
-    </ClInclude>
-    <ClInclude Include="gui.h">
+    </ClCompile>
+    <ClCompile Include="Context\gui.cpp">
       <Filter>Исходные файлы\Графика</Filter>
-    </ClInclude>
-    <ClInclude Include="control.h">
+    </ClCompile>
+    <ClCompile Include="Context\run.cpp">
       <Filter>Исходные файлы\Графика</Filter>
-    </ClInclude>
-    <ClInclude Include="context.h">
+    </ClCompile>
+    <ClCompile Include="Context\sync.cpp">
       <Filter>Исходные файлы\Графика</Filter>
-    </ClInclude>
-    <ClInclude Include="run.h">
+    </ClCompile>
+    <ClCompile Include="Context\Context.ixx">
       <Filter>Исходные файлы\Графика</Filter>
-    </ClInclude>
-    <ClInclude Include="WorldAdapter.h">
-      <Filter>Исходные файлы\Симуляция</Filter>
-    </ClInclude>
-    <ClInclude Include="World.h">
-      <Filter>Исходные файлы\Симуляция</Filter>
-    </ClInclude>
-    <ClInclude Include="sync.h">
+    </ClCompile>
+    <ClCompile Include="Context\control.cpp">
       <Filter>Исходные файлы\Графика</Filter>
-    </ClInclude>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\cells.geom">
@@ -125,5 +153,13 @@
     <None Include="Shaders\lib.glsl">
       <Filter>Шейдеры\Graphics</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="monolith_std_osl_header.h">
+      <Filter>Библиотеки\OSL</Filter>
+    </ClInclude>
+    <ClInclude Include="monolith_ogl_imgui_header.h">
+      <Filter>Библиотеки\SHAD</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

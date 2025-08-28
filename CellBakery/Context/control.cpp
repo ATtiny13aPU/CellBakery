@@ -1,20 +1,23 @@
-﻿#pragma once
+﻿module;
 
+#include "monolith_std_osl_header.h";
+#include "monolith_ogl_imgui_header.h";
+
+module Context;
 
 inline void Context::control() {
 	// Работа с glfw3
 	{
 		if (VsyncNow != Vsync) {
-			glfwSwapInterval(Vsync);
+			glfw::swapInterval(Vsync);
 			VsyncNow = Vsync;
 		}
 
 		// Получаем эвенты
-		glfwPollEvents();
+		glfw::pollEvents();
 
 		// Настраиваем камеру под разрешение окна
-		int new_xsize_display, new_ysize_display;
-		glfwGetFramebufferSize(window, &new_xsize_display, &new_ysize_display);
+		auto[new_xsize_display, new_ysize_display] = window.getFramebufferSize();
 		if (uint32_t(new_xsize_display) != winSize[0] || uint32_t(new_ysize_display) != winSize[1]) {
 			winSize = osl::fvec2(new_xsize_display, new_ysize_display);
 			glViewport(0, 0, winSize[0], winSize[1]);
@@ -23,12 +26,13 @@ inline void Context::control() {
 	}
 
 	if (!ImGui::GetIO().WantCaptureMouse) {
-		const auto &mp = ImGui::GetIO().MousePos;
-		const auto &dmp = ImGui::GetIO().MouseDelta;
+		const auto& mp = ImGui::GetIO().MousePos;
+		const auto& dmp = ImGui::GetIO().MouseDelta;
 		vec2 nmp = vec2(mp[0], mp[1]) / vec2(winSize);
 		nmp[1] = 1. - nmp[1];
 		vec2 ndmp = vec2(dmp[0], -dmp[1]) / vec2(winSize);
-		if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) != GLFW_PRESS)
+		
+		if (!window.getMouseButton(glfw::MouseButton::Left))
 			ndmp = vec2(0.);
 
 		frac scroll = ImGui::GetIO().MouseWheel;

@@ -1,17 +1,18 @@
-﻿#pragma once
+﻿module;
 
+#include "monolith_std_osl_header.h";
+#include "monolith_ogl_imgui_header.h";
 
-
+module Context;
 
 int Context::run() {
-	glfwSwapInterval(Vsync); // Включение вертикальной синхронизации
-
 	// Включение прозрачности
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	// Сглаживание
-	glfwWindowHint(GLFW_SAMPLES, 16);
-	glEnable(GL_MULTISAMPLE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	
+	
+	// Сглаживание (только вот как...)
+	//glfwWindowHint(GLFW_SAMPLES, 16);
+	//glEnable(GL_MULTISAMPLE);
 
 	// Настройка CustomMesh для клеток
 	cellsMesh.setAttribFloat({ 4, 4, 4 });
@@ -54,14 +55,14 @@ int Context::run() {
 
 	camera.set(ws.world_size / 2., ws.world_size);
 	// Запуск симуляции в отдельном потоке
-	std::thread simulationThread(&WorldAdapter::run, &world, std::ref(ws));
-	
-	
+	std::jthread simulationThread(&WorldAdapter::run, &world, std::ref(ws));
+
+
 
 	// Цикл графики
-	glfwSwapInterval(Vsync);
+	glfw::swapInterval(Vsync);
 
-	while (!glfwWindowShouldClose(window)) {
+	while (!window.shouldClose()) {
 
 		control();
 
@@ -71,12 +72,12 @@ int Context::run() {
 
 		gui();
 
-		glfwSwapBuffers(window);
+		window.swapBuffers();
+		glfw::pollEvents();
 	}
 
 	// Остановка симуляции и ожидание завершения потока симуляции
 	world.stop();
-	simulationThread.join();
 
 	return 0;
 }

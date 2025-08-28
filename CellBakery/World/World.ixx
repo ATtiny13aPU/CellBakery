@@ -1,11 +1,10 @@
-﻿#pragma once
+﻿module;
 
-#include <OSL/include.h>
-#include <variant>
+#include "monolith_std_osl_header.h"
 
-using namespace osl;
+export module World;
 
-template <size_t N = 32>
+export template <size_t N = 32>
 class WorldKeyValueCommand {
 private:
 	std::array<char, N> key_array{};
@@ -88,22 +87,25 @@ public:
 	}
 };
 
-typedef osl::LF_MPSC_RingBufferQueue<WorldKeyValueCommand<32>, 8192> WorldKeyValueCommandQueue; // чутьб не умэр пока писал... Xp
-typedef std::vector<WorldKeyValueCommand<32>> WorldKeyValueCommands;
+// чутьб не умэр пока писал... Xp
+export using WorldKeyValueCommandQueue = osl::LF_MPSC_RingBufferQueue<WorldKeyValueCommand<32>, 8192>;
+export using WorldKeyValueCommands = std::vector<WorldKeyValueCommand<32>>;
 
-class WorldAdapter {
+export class WorldAdapter {
 public:
 
 	WorldAdapter() : wkv_queue_ptr(std::make_unique<WorldKeyValueCommandQueue>()) {}
 	struct WorldSettings;
-	void run(const WorldSettings &ws);
+	void run(const WorldSettings& ws);
 
 	void stop() {
-		isRunning = false;
+		while (!isRunning.load())
+			std::this_thread::yield();
+		isRunning.store(false);
 		wait_to_close();
 	}
 
-	size_t pushWKVCommands(WorldKeyValueCommands &commands) {
+	size_t pushWKVCommands(WorldKeyValueCommands& commands) {
 		return wkv_queue_ptr->push(commands);
 	}
 
@@ -127,7 +129,7 @@ private:
 };
 
 
-struct WorldAdapter::WorldSettings {
+export struct WorldAdapter::WorldSettings {
 	// максимальное число клеток, предполагается динамическое управление памятью
 	uint32_t cells_limit;
 	// условый размер мира, убивает клетки за пределом
@@ -136,13 +138,63 @@ struct WorldAdapter::WorldSettings {
 	uint32_t sub_steps;
 };
 
-struct WorldAdapter::RenderData {
+export struct WorldAdapter::RenderData {
 	std::vector<RenderCellData> cells;
 	std::map<std::string, double> bench;
 };
 
-struct WorldAdapter::RenderCellData {
+export struct WorldAdapter::RenderCellData {
 	osl::fvec4 position;	// позиция + скорость в мировых координатах
 	osl::fvec4 color;		// RGB + effect
 	osl::fvec4 debug;		// Зарезервировано
 };
+
+
+using id = uint32_t;
+
+class Cell {
+public:
+	fvec4 color;
+	vec2 pos;       // позиция (метры)
+	vec2 force;     // сила (ньютоны)
+	vec2 impulse;   // импульс (кг·м/с)
+	vec2 velocity;  // скорость (м/с)
+	frac weight;    // масса (кг)
+	frac angle;
+	frac rotate_vel;
+	frac radius;    // радиус (0.5 м по умолчанию)
+};
+
+// Константы для обозначения состояния клеток
+inline const id nullID = static_cast<id>(-1);  // Нет следующей клетки
+inline const id deadID = static_cast<id>(-2);  // Клетка "мёртвая"
+
+// Класс имплементации мира
+class World {
+public:
+	explicit World(WorldAdapter& wa) : wa(wa) {
+		rand.init("3523dgfsdg", 256u);
+	}
+
+	// Основной цикл симуляции
+	void run(const WorldAdapter::WorldSettings&);
+
+	std::map<std::string, osl::fastMovingAverageW<120>, std::less<>> bench;
+private:
+	WorldAdapter& wa;
+
+	osl::Random rand;
+	void update_cells();
+
+	osl::UpdateRateLimiter ups_limiter;
+	osl::PoolContainer<Cell> cells_pc;
+};
+
+// Враппер функция для запуска мира
+void WorldAdapter::run(const WorldSettings& ws) {
+	World world(*this);
+	isRunning = true;
+	isSafeToClose = false;
+	world.run(ws);
+	isSafeToClose = true;
+}

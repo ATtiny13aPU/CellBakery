@@ -1,18 +1,7 @@
-﻿#include "World.h"
-#include <iostream>
+﻿module;
+#include "monolith_std_osl_header.h"
 
-class Cell {
-public:
-	osl::fvec4 color;
-	vec2 pos;       // позиция (метры)
-	vec2 force;     // сила (ньютоны)
-	vec2 impulse;   // импульс (кг·м/с)
-	vec2 velocity;  // скорость (м/с)
-	frac weight;    // масса (кг)
-	frac angle;
-	frac rotate_vel;
-	frac radius;    // радиус (0.5 м по умолчанию)
-};
+module World;
 
 inline void process_collision(Cell &a, Cell &b, const vec2 &dp) {
 	if (dp == vec2(0.))
@@ -90,8 +79,7 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 	osl::DeltaTimeMark ups;
 	ups.get();
 
-
-	while (wa.isRunning) {
+	while (wa.isRunning.load()) {
 		// Обновление симуляции
 
 		// Сброс суммы сил
@@ -165,11 +153,11 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 			auto &q = *wa.wkv_queue_ptr.get();
 			while (q.pop(wkv_commands)) {
 				for (const auto &c : wkv_commands) {
-
-
+	
+	
 					// Получение ключа
 					std::string_view key = c.get_key();
-
+	
 					// Получение значения через std::visit
 					std::visit([&](const auto& value) {
 						if constexpr (std::is_same_v<std::decay_t<decltype(value)>, uint64_t>) {
@@ -180,7 +168,7 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 							
 							if (c.get_key() == std::string_view("ups"))
 								ups_limiter.set(std::get<double>(c.get_value()));
-
+	
 							std::cout << "Key: " << key << ", Value (double): " << value << '\n';
 						}
 					}, c.get_value());

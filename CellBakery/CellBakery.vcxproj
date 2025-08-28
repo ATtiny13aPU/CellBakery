@@ -131,9 +131,14 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\KNP\Source\GitHub\CellBakery\CellBakery;C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
+      <TranslateIncludes>false</TranslateIncludes>
+      <EnableModules>true</EnableModules>
+      <AdditionalModuleDependencies>C:\Microsoft Visual Studio\GlobalModuls\GLFW;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -149,9 +154,14 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\KNP\Source\GitHub\CellBakery\CellBakery;C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
+      <TranslateIncludes>false</TranslateIncludes>
+      <EnableModules>true</EnableModules>
+      <AdditionalModuleDependencies>C:\Microsoft Visual Studio\GlobalModuls\GLFW;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -166,9 +176,14 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\KNP\Source\GitHub\CellBakery\CellBakery;C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
+      <TranslateIncludes>false</TranslateIncludes>
+      <EnableModules>true</EnableModules>
+      <AdditionalModuleDependencies>C:\Microsoft Visual Studio\GlobalModuls\GLFW;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -184,9 +199,14 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\KNP\Source\GitHub\CellBakery\CellBakery;C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460d\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
+      <TranslateIncludes>false</TranslateIncludes>
+      <EnableModules>true</EnableModules>
+      <AdditionalModuleDependencies>C:\Microsoft Visual Studio\GlobalModuls\GLFW;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -203,9 +223,14 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\KNP\Source\GitHub\CellBakery\CellBakery;C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
+      <TranslateIncludes>false</TranslateIncludes>
+      <EnableModules>true</EnableModules>
+      <AdditionalModuleDependencies>C:\Microsoft Visual Studio\GlobalModuls\GLFW;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -225,9 +250,14 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\KNP\Source\GitHub\CellBakery\CellBakery;C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN32\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
+      <TranslateIncludes>false</TranslateIncludes>
+      <EnableModules>true</EnableModules>
+      <AdditionalModuleDependencies>C:\Microsoft Visual Studio\GlobalModuls\GLFW;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -246,9 +276,14 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\KNP\Source\GitHub\CellBakery\CellBakery;C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
+      <TranslateIncludes>false</TranslateIncludes>
+      <EnableModules>true</EnableModules>
+      <AdditionalModuleDependencies>C:\Microsoft Visual Studio\GlobalModuls\GLFW;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -268,9 +303,14 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\KNP\Source\GitHub\CellBakery\CellBakery;C:\Microsoft Visual Studio\GlobalLibs\ImGui;C:\Microsoft Visual Studio\MyGlobalLibs;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glfw-3.3.8.bin.WIN64\include;C:\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLFW_INCLUDE_NONE;_LEGACY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
+      <TranslateIncludes>false</TranslateIncludes>
+      <EnableModules>true</EnableModules>
+      <AdditionalModuleDependencies>C:\Microsoft Visual Studio\GlobalModuls\GLFW;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -288,20 +328,25 @@
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\ImGui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\ImGui\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalLibs\OpenGL460\glad\src\glad.c" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\error\error.ixx" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\event\event.ixx" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\glfwppm.ixx" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\helper\helper.ixx" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\joystick\joystick.ixx" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\monitor\monitor.ixx" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\native\native.ixx" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\version\version.ixx" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\window\window.ixx" />
+    <ClCompile Include="Context\Context.ixx" />
+    <ClCompile Include="Context\control.cpp" />
+    <ClCompile Include="Context\graphics.cpp" />
+    <ClCompile Include="Context\gui.cpp" />
+    <ClCompile Include="Context\run.cpp" />
+    <ClCompile Include="Context\sync.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="OpenGL\glad.c" />
-    <ClCompile Include="World.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="sync.h" />
-    <ClInclude Include="context.h" />
-    <ClInclude Include="control.h" />
-    <ClInclude Include="graphics.h" />
-    <ClInclude Include="gui.h" />
-    <ClInclude Include="include.h" />
-    <ClInclude Include="run.h" />
-    <ClInclude Include="World.h" />
-    <ClInclude Include="WorldAdapter.h" />
+    <ClCompile Include="World\World.cpp" />
+    <ClCompile Include="World\World.ixx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\cells.frag" />
@@ -313,6 +358,10 @@
     <None Include="Shaders\lib.glsl" />
     <None Include="Shaders\petri.frag" />
     <None Include="Shaders\petri.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="monolith_ogl_imgui_header.h" />
+    <ClInclude Include="monolith_std_osl_header.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
