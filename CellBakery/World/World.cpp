@@ -93,12 +93,17 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 		dtm.get();
 		for (auto &c : lines)
 			c.first = cells[c.second].pos;
+
 		// Сортировка событий (лексикографическая по целой части Y, затем по X, затем по id)
 		std::sort(lines.begin(), lines.end(), [](const std::pair<vec2, id>& a, const std::pair<vec2, id>& b) {
-			const auto floor_y_a = std::floor(a.first[1]);
-			const auto floor_y_b = std::floor(b.first[1]);
-			return std::tie(floor_y_a, a.first[0], a.second) < std::tie(floor_y_b, b.first[0], b.second);
+			struct compare_struct_t { // tie заменён на структуру, чтобы облегчить работу компилятору
+				const double x, y; const id i;
+				auto operator<=>(const compare_struct_t&) const = default;
+			};
+			return compare_struct_t{ std::floor(a.first[1]), a.first[0], a.second } <
+				compare_struct_t{ std::floor(b.first[1]), b.first[0], b.second };
 		});
+
 		bench["GaP_1"].push(dtm.get(), 1.);
 
 		// Для простой обработки краевого случая итераторами
@@ -152,25 +157,19 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 			auto &q = *wa.wkv_queue_ptr.get();
 			while (q.pop(wkv_commands)) {
 				for (const auto &c : wkv_commands) {
-	
-	
 					// Получение ключа
 					std::string_view key = c.get_key();
-	
-					// Получение значения через std::visit
-					std::visit([&](const auto& value) {
-						if constexpr (std::is_same_v<std::decay_t<decltype(value)>, uint64_t>) {
-							std::cout << "Key: " << key << ", Value (uint64_t): " << value << '\n';
-						}
-						else if constexpr (std::is_same_v<std::decay_t<decltype(value)>, double>) {
-							
-							
-							if (c.get_key() == std::string_view("ups"))
-								ups_limiter.set(std::get<double>(c.get_value()));
-	
-							std::cout << "Key: " << key << ", Value (double): " << value << '\n';
-						}
-					}, c.get_value());
+					const auto &value = c.get_value();
+
+					if (const uint64_t* v = std::get_if<uint64_t>(&value)) {
+						std::cout << "Key: " << key << ", Value (uint64_t): " << *v << '\n';
+					}
+					else if (const double* v = std::get_if<double>(&value)) {
+						if (key == std::string_view("ups"))
+							ups_limiter.set(*v);
+
+						std::cout << "Key: " << key << ", Value (double): " << *v << '\n';
+					}
 				}
 			}
 		}

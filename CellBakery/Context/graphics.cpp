@@ -1,5 +1,5 @@
 ﻿module;
-#include "monolith_ogl_imgui_header.h";
+#include "monolith_ogl_imgui_header.h"
 module Context;
 import osl;
 using namespace osl::types;
@@ -25,7 +25,7 @@ void Context::graphics() {
 	// Отрисовка клеток
 	{
 		cellsShader.use();
-		glUniform1f(cellsShader.getUniform("TimeLerp"), time_lerp - 1.);
+		glUniform1f(cellsShader.getUniform("TimeLerp"), time_lerp - 1.f);
 		glUniform4fv(cellsShader.getUniform("ViewWorld"), 1, &worldView[0]);
 		glUniform4fv(cellsShader.getUniform("ViewWindow"), 1, &windowView[0]);
 		glUniform2fv(cellsShader.getUniform("WinSize"), 1, &winSize[0]);

@@ -6,6 +6,6 @@
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
 
-#include "imgui.h";
-#include "imgui_impl_glfw.h";
-#include "imgui_impl_opengl3.h";
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
