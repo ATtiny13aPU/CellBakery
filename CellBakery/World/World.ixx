@@ -1,8 +1,7 @@
-﻿module;
-
-#include "monolith_std_osl_header.h"
-
-export module World;
+﻿export module World;
+import std;
+import osl;
+using namespace osl::types;
 
 export template <size_t N = 32>
 class WorldKeyValueCommand {
@@ -144,13 +143,17 @@ export struct WorldAdapter::RenderData {
 };
 
 export struct WorldAdapter::RenderCellData {
-	osl::fvec4 position;	// позиция + скорость в мировых координатах
-	osl::fvec4 color;		// RGB + effect
-	osl::fvec4 debug;		// Зарезервировано
+	fvec4 position;	// позиция + скорость в мировых координатах
+	fvec4 color;		// RGB + effect
+	fvec4 debug;		// Зарезервировано
 };
 
 
 using id = uint32_t;
+
+// Константы для обозначения состояния клеток
+inline const id nullID = static_cast<id>(-1);  // Нет следующей клетки
+inline const id deadID = static_cast<id>(-2);  // Клетка "мёртвая"
 
 class Cell {
 public:
@@ -164,10 +167,6 @@ public:
 	frac rotate_vel;
 	frac radius;    // радиус (0.5 м по умолчанию)
 };
-
-// Константы для обозначения состояния клеток
-inline const id nullID = static_cast<id>(-1);  // Нет следующей клетки
-inline const id deadID = static_cast<id>(-2);  // Клетка "мёртвая"
 
 // Класс имплементации мира
 class World {
@@ -183,7 +182,7 @@ public:
 private:
 	WorldAdapter& wa;
 
-	osl::Random rand;
+	osl::random rand;
 	void update_cells();
 
 	osl::UpdateRateLimiter ups_limiter;

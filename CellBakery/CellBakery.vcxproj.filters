@@ -121,6 +121,36 @@
     <ClCompile Include="Context\control.cpp">
       <Filter>Исходные файлы\Графика</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.aliases.ixx">
+      <Filter>Библиотеки\OSL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.container.ixx">
+      <Filter>Библиотеки\OSL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.ixx">
+      <Filter>Библиотеки\OSL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.legacy.ixx">
+      <Filter>Библиотеки\OSL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.math.ixx">
+      <Filter>Библиотеки\OSL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.matrix.ixx">
+      <Filter>Библиотеки\OSL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.random.ixx">
+      <Filter>Библиотеки\OSL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.threadsafe.ixx">
+      <Filter>Библиотеки\OSL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.vector.ixx">
+      <Filter>Библиотеки\OSL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\MyGlobalLibs\SHAD\SHAD.ixx">
+      <Filter>Библиотеки\SHAD</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\cells.geom">
@@ -152,9 +182,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="monolith_std_osl_header.h">
-      <Filter>Библиотеки\OSL</Filter>
-    </ClInclude>
     <ClInclude Include="monolith_ogl_imgui_header.h">
       <Filter>Библиотеки\SHAD</Filter>
     </ClInclude>

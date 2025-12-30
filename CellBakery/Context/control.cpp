@@ -1,11 +1,12 @@
 ﻿module;
-
-#include "monolith_std_osl_header.h";
 #include "monolith_ogl_imgui_header.h";
 
 module Context;
+import osl;
+using namespace osl::types;
+import shad.base;
 
-inline void Context::control() {
+void Context::control() {
 	// Работа с glfw3
 	{
 		if (VsyncNow != Vsync) {
@@ -18,6 +19,7 @@ inline void Context::control() {
 
 		// Настраиваем камеру под разрешение окна
 		auto[new_xsize_display, new_ysize_display] = window.getFramebufferSize();
+
 		if (uint32_t(new_xsize_display) != winSize[0] || uint32_t(new_ysize_display) != winSize[1]) {
 			winSize = osl::fvec2(new_xsize_display, new_ysize_display);
 			glViewport(0, 0, winSize[0], winSize[1]);

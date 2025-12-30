@@ -1,7 +1,6 @@
-﻿module;
-#include "monolith_std_osl_header.h"
-
-module World;
+﻿module World;
+import osl;
+using namespace osl::types;
 
 inline void process_collision(Cell &a, Cell &b, const vec2 &dp) {
 	if (dp == vec2(0.))
@@ -52,7 +51,7 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 	auto &cells = cells_pc.storage;
 	// инициализация первого шага (временный код)
 	{
-		lines.reserve(cells_limit + 1);
+		lines.reserve(cells_limit + 1u);
 		cells.reserve(cells_limit);
 
 		for (id i = 0; i < cells_limit; i++) {

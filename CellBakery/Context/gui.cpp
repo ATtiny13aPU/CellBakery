@@ -1,12 +1,11 @@
 ﻿module;
-
-#include "monolith_std_osl_header.h";
 #include "monolith_ogl_imgui_header.h";
-
 module Context;
+import osl;
+using namespace osl::types;
+import shad.base;
 
-
-inline void Context::gui() {
+void Context::gui() {
 
 	// Работа с ImGui
 	{

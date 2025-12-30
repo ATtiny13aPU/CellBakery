@@ -1,28 +1,35 @@
 ﻿module;
-
-#include "monolith_std_osl_header.h";
 #include "monolith_ogl_imgui_header.h";
-
 module Context;
+import osl;
+using namespace osl::types;
+import shad.base;
 
 int Context::run() {
 	// Включение прозрачности
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	
-	
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	// Сглаживание (только вот как...)
 	//glfwWindowHint(GLFW_SAMPLES, 16);
 	//glEnable(GL_MULTISAMPLE);
 
 	// Настройка CustomMesh для клеток
-	cellsMesh.setAttribFloat({ 4, 4, 4 });
-
+	{
+		std::array<shad::attribute_layout, 3> atr = {
+			shad::attribute_layout{.type = shad::attribute_type::gl_float_t, .count = 4},
+			shad::attribute_layout{.type = shad::attribute_type::gl_float_t, .count = 4},
+			shad::attribute_layout{.type = shad::attribute_type::gl_float_t, .count = 4}
+		};
+		cellsMesh.linkAttributes(0, atr);
+	}
 	// Настройка SimpleMesh для чашки Петри
 	{
-		std::vector<float> m = { -1., -1., -1., 1., 1., -1., 1., 1. };
-		petriMesh.loadFrom(&m[0], m.size());
+		std::vector<float> m = {-1., -1., -1., 1., 1., -1., 1., 1.};
+		petriMesh.vbo.data(m);
+		petriMesh.linkAttributes(0, shad::attribute_layout{.type = shad::attribute_type::gl_float_t, .count = 2});
 	}
-
+	
 
 	// Загрузка шейдеров
 	// Шейдеры графики

@@ -1,31 +1,35 @@
 ﻿module;
-
-#include "monolith_std_osl_header.h";
 #include "monolith_ogl_imgui_header.h";
 
 export module Context;
+import osl;
+using namespace osl::types;
+import shad.base;
 import vspefs.glfwppm;
 import World;
 
+import std;
+namespace fs = std::filesystem;
+
 class Context {
 public:
-	inline int run();
+	int run();
 
 	explicit Context(glfw::Window &w) : window(w), rand("seed", 256) {};
 
 private:
 	WorldAdapter world;
 
-	CameraController2D camera;
+	osl::CameraController2D camera;
 
 	shad::Shader cellsShader;
 	shad::Shader forceShader;
 	shad::Shader petriShader;
 
-	shad::CustomMesh cellsMesh;
+	shad::SimpleMesh cellsMesh;
 	shad::SimpleMesh petriMesh;
 
-	osl::fvec2 winSize;
+	fvec2 winSize;
 
 	uint64_t frame_counter = 0u;
 	uint64_t last_update_frame = 0u;
@@ -33,12 +37,12 @@ private:
 	frac32 delta_time_lerp = 0.;
 	osl::fastMovingAverageW<5> framePerUpdate;
 	
-	inline void control();
-	inline void sync();
-	inline void graphics();
-	inline void gui();
+	void control();
+	void sync();
+	void graphics();
+	void gui();
 
-	osl::Random rand;
+	osl::random rand;
 
 	GLint Vsync = 1;
 	GLint VsyncNow = Vsync;
@@ -98,7 +102,7 @@ export int main_too() {
 			ImGui::GetIO().Fonts->AddFontFromFileTTF(font.generic_string().c_str(), 18.f, nullptr, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
 		}
 		else {
-			std::cout << u8_to_str(u8"Imgui: файл шрифта не найден\n") << std::endl;
+			std::cout << u8"Imgui: файл шрифта не найден\n"_cpp17 << std::endl;
 		}
 	}
 	catch (const fs::filesystem_error& e) {

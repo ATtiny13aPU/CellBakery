@@ -1,11 +1,12 @@
 ﻿module;
-
-#include "monolith_std_osl_header.h";
 #include "monolith_ogl_imgui_header.h";
 
 module Context;
+import osl;
+using namespace osl::types;
+import shad.base;
 
-inline void Context::sync() {
+void Context::sync() {
 
 	// TODO: рефакторинг
 	const auto world_state = world.capture();
@@ -14,7 +15,7 @@ inline void Context::sync() {
 		const auto& cells = world_state->cells;
 		framePerUpdate.push(frame_counter - last_update_frame, 1.);
 		last_update_frame = frame_counter;
-		cellsMesh.loadFrom(cells.data(), cells.size());
+		cellsMesh.vbo.data(cells);
 		time_lerp -= 1.;
 		delta_time_lerp = (1. - time_lerp) / framePerUpdate.get();
 		if (!(delta_time_lerp > 0. && delta_time_lerp < 1.))
