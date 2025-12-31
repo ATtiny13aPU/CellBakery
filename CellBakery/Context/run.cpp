@@ -21,13 +21,13 @@ int Context::run() {
 			shad::attribute_layout{.type = shad::attribute_type::gl_float_t, .count = 4},
 			shad::attribute_layout{.type = shad::attribute_type::gl_float_t, .count = 4}
 		};
-		cellsMesh.linkAttributes(0, atr);
+		cellsMesh.link_attributes(0, atr);
 	}
 	// Настройка SimpleMesh для чашки Петри
 	{
 		std::vector<float> m = {-1., -1., -1., 1., 1., -1., 1., 1.};
-		petriMesh.vbo.data(m);
-		petriMesh.linkAttributes(0, shad::attribute_layout{.type = shad::attribute_type::gl_float_t, .count = 2});
+		petriMesh.vbo.emplace(m);
+		petriMesh.link_attributes(0, shad::attribute_layout{.type = shad::attribute_type::gl_float_t, .count = 2});
 	}
 	
 
@@ -35,24 +35,24 @@ int Context::run() {
 	// Шейдеры графики
 	{
 		cellsShader.name = "cellsShader";
-		loadShaderFromFiles(cellsShader, "Shaders/cells.vert", "Shaders/cells.frag", "Shaders/cells.geom");
+		load_shader_from_files(cellsShader, "Shaders/cells.vert", "Shaders/cells.frag", "Shaders/cells.geom");
 
 		forceShader.name = "forceShader";
-		loadShaderFromFiles(forceShader, "Shaders/force.vert", "Shaders/force.frag", "Shaders/force.geom");
+		load_shader_from_files(forceShader, "Shaders/force.vert", "Shaders/force.frag", "Shaders/force.geom");
 
 		petriShader.name = "petriShader";
-		loadShaderFromFiles(petriShader, "Shaders/petri.vert", "Shaders/petri.frag");
+		load_shader_from_files(petriShader, "Shaders/petri.vert", "Shaders/petri.frag");
 
-		petriShader.setUniform("ViewWorld");
+		petriShader.location("ViewWorld");
 
-		cellsShader.setUniform("TimeLerp");
-		cellsShader.setUniform("ViewWorld");
-		cellsShader.setUniform("ViewWindow");
-		cellsShader.setUniform("WinSize");
+		cellsShader.location("TimeLerp");
+		cellsShader.location("ViewWorld");
+		cellsShader.location("ViewWindow");
+		cellsShader.location("WinSize");
 
-		forceShader.setUniform("ViewWorld");
-		forceShader.setUniform("ViewWindow");
-		forceShader.setUniform("Scale");
+		forceShader.location("ViewWorld");
+		forceShader.location("ViewWindow");
+		forceShader.location("Scale");
 	}
 
 

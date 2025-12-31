@@ -22,9 +22,9 @@ private:
 
 	osl::CameraController2D camera;
 
-	shad::Shader cellsShader;
-	shad::Shader forceShader;
-	shad::Shader petriShader;
+	shad::shader cellsShader;
+	shad::shader forceShader;
+	shad::shader petriShader;
 
 	shad::SimpleMesh cellsMesh;
 	shad::SimpleMesh petriMesh;

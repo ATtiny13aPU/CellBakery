@@ -2,7 +2,7 @@
 import osl;
 using namespace osl::types;
 
-inline void process_collision(Cell &a, Cell &b, const vec2 &dp) {
+static inline void process_collision(Cell &a, Cell &b, const vec2 &dp) {
 	if (dp == vec2(0.))
 		return;
 
@@ -51,15 +51,15 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 	auto &cells = cells_pc.storage;
 	// инициализация первого шага (временный код)
 	{
-		lines.reserve(cells_limit + 1u);
-		cells.reserve(cells_limit);
+		lines.reserve(static_cast<size_t>(cells_limit) + 1u);
+		cells.reserve(static_cast<size_t>(cells_limit));
 
 		for (id i = 0; i < cells_limit; i++) {
 			// создаём новую клетку
 			auto &c = cells[cells_pc.get_new()];
 			c.pos = vec2(rand.pf(), rand.pf()) * ws.world_size;
 			// начальная инициализация, возможно нужно переработать цикл чтобы она не требовалась
-			lines.emplace_back(c.pos, lines.size());
+			lines.emplace_back(c.pos, static_cast<id>(lines.size()));
 			c.color = fvec4(osl::HSV2RGB(vec3(rand.pf(), 1. - std::pow(rand.pf(), 4.), 1. - 0.7 * std::pow(rand.pf(), 2.))), 1.f);
 		}
 

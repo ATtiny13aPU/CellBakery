@@ -15,7 +15,7 @@ void Context::sync() {
 		const auto& cells = world_state->cells;
 		framePerUpdate.push(frame_counter - last_update_frame, 1.);
 		last_update_frame = frame_counter;
-		cellsMesh.vbo.data(cells);
+		cellsMesh.vbo.emplace(cells);
 		time_lerp -= 1.;
 		delta_time_lerp = (1. - time_lerp) / framePerUpdate.get();
 		if (!(delta_time_lerp > 0. && delta_time_lerp < 1.))
