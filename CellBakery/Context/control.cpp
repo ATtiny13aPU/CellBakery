@@ -4,7 +4,7 @@
 module Context;
 import osl;
 using namespace osl::types;
-import shad.base;
+import shad;
 
 void Context::control() {
 	// Работа с glfw3
@@ -24,6 +24,16 @@ void Context::control() {
 			winSize = osl::fvec2(new_xsize_display, new_ysize_display);
 			glViewport(0, 0, winSize[0], winSize[1]);
 			camera.ratio(winSize[0] / winSize[1]);
+
+			// Фреймбуфер
+			{
+				if (frame_texture_id)
+					glDeleteTextures(1, &frame_texture_id);
+				glCreateTextures(GL_TEXTURE_2D, 1, &frame_texture_id);
+				glTextureStorage2D(frame_texture_id, 1, GL_RGBA32UI, winSize[0], winSize[1]);
+				//frame_texture = std::make_unique<shad::texture2d>(shad::texture2d());
+				//frame_texture->create(winSize[0], winSize[1], shad::texture_format::rgba32ui);
+			}
 		}
 	}
 

@@ -347,7 +347,11 @@
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.random.ixx" />
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.threadsafe.ixx" />
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.vector.ixx" />
-    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\MyGlobalLibs\SHAD\SHAD.ixx" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\MyGlobalLibs\SHAD\shad.buffer.ixx" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\MyGlobalLibs\SHAD\shad.ixx" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\MyGlobalLibs\SHAD\shad.mesh.ixx" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\MyGlobalLibs\SHAD\shad.shader.ixx" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\MyGlobalLibs\SHAD\shad.texture.ixx" />
     <ClCompile Include="Context\Context.ixx" />
     <ClCompile Include="Context\control.cpp" />
     <ClCompile Include="Context\graphics.cpp" />

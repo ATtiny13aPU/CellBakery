@@ -3,7 +3,7 @@
 module Context;
 import osl;
 using namespace osl::types;
-import shad.base;
+import shad;
 
 void Context::gui() {
 
@@ -25,9 +25,9 @@ void Context::gui() {
 			ImGui::Begin("##settings_window", &open, windowFlags);
 
 
-			ImGui::PushItemWidth(500);
+			ImGui::PushItemWidth(400);
 
-			if (ImGui::SliderFloat("##ups_world_set", &ups_world_set, 1.f, 1000.f, "%.1f")) {
+			if (ImGui::SliderFloat("##ups_world_set", &ups_world_set, 4.f, 1000.f, "%.1f")) {
 				WorldKeyValueCommand c;
 				c["ups"] = ups_world_set;
 
@@ -36,8 +36,15 @@ void Context::gui() {
 			}
 			ImGui::SliderFloat("##scale_force_draw", &scale_force_draw, 0.f, 20.f, "%.1f");
 
-
 			ImGui::PopItemWidth();
+			bool check = Vsync;
+			if (ImGui::Checkbox("vsync", &check)) {
+				Vsync = check;
+				glfw::swapInterval(Vsync);
+			}
+			ImGui::SameLine();
+			ImGui::Text(" %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
 			ImGui::End();
 		}
 

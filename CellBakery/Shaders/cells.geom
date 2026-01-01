@@ -14,13 +14,13 @@ in vec2 v_vel[];
 in float v_radius[];
 
 out vec2 dp;
-out vec3 g_color;
+out flat uint id;
 
 
 
 void main() {
 	vec2 pos = gl_in[0].gl_Position.xy;
-	g_color = v_color[0];
+	id = gl_PrimitiveIDIn;
 	float r = v_radius[0];
 
 	pos += v_vel[0] * TimeLerp / 20.;

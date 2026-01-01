@@ -4,7 +4,7 @@
 export module Context;
 import osl;
 using namespace osl::types;
-import shad.base;
+import shad;
 import vspefs.glfwppm;
 import World;
 
@@ -27,7 +27,10 @@ private:
 	shad::shader petriShader;
 
 	shad::SimpleMesh cellsMesh;
-	shad::SimpleMesh petriMesh;
+	shad::SimpleMesh screenMesh;
+
+	//std::unique_ptr<shad::texture2d> frame_texture;
+	GLuint frame_texture_id = 0;
 
 	fvec2 winSize;
 
@@ -50,8 +53,8 @@ private:
 	glfw::Window &window;
 
 	// GUI
-	float ups_world_set = 5.f;
-	float scale_force_draw = 5.f;
+	float ups_world_set = 10.f;
+	float scale_force_draw = 0.f;
 
 	WorldKeyValueCommands wkv_commands;
 };
@@ -64,17 +67,20 @@ export int main_too() {
 
 	auto glfwInit = glfw::init();
 
-	glfw::WindowHints{
-		.contextVersionMajor = 4, .contextVersionMinor = 6,
-		.openglProfile = glfw::OpenGlProfile::Core
-	}.apply();
-
+	{
+		glfw::WindowHints wh{
+			.contextVersionMajor = 4, .contextVersionMinor = 6,
+			.openglProfile = glfw::OpenGlProfile::Core
+		};
+	//	wh.samples = 16;
+		wh.apply();
+		//	glEnable(GL_MULTISAMPLE);
+	}
 	glfw::Window window{ 640, 480, "CellBakery" };
 	glfw::makeContextCurrent(window);
 
-	if (!gladLoadGL()) {
+	if (!gladLoadGL())
 		return 1;
-	}
 
 	// загрузка и настройка imgui
 	IMGUI_CHECKVERSION();

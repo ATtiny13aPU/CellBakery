@@ -9,8 +9,8 @@ out float v_radius;
 out vec2 v_vel;
 
 void main() {
-    gl_Position = vec4(position.xy, 0.0, 1.0);
-    v_color = color.rgb;
-    v_radius = color.a;
+	gl_Position = vec4(position.xy, 0.0, 1.0);
+	v_color = color.rgb;
+	v_radius = color.a;
 	v_vel = position.zw;
 }

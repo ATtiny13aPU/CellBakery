@@ -4,7 +4,7 @@
 module Context;
 import osl;
 using namespace osl::types;
-import shad.base;
+import shad;
 
 void Context::sync() {
 

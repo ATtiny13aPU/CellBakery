@@ -3,16 +3,12 @@
 module Context;
 import osl;
 using namespace osl::types;
-import shad.base;
+import shad;
 
 int Context::run() {
 	// Включение прозрачности
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	// Сглаживание (только вот как...)
-	//glfwWindowHint(GLFW_SAMPLES, 16);
-	//glEnable(GL_MULTISAMPLE);
 
 	// Настройка CustomMesh для клеток
 	{
@@ -23,13 +19,13 @@ int Context::run() {
 		};
 		cellsMesh.link_attributes(0, atr);
 	}
-	// Настройка SimpleMesh для чашки Петри
+	// Настройка экранного меша
 	{
-		std::vector<float> m = {-1., -1., -1., 1., 1., -1., 1., 1.};
-		petriMesh.vbo.emplace(m);
-		petriMesh.link_attributes(0, shad::attribute_layout{.type = shad::attribute_type::gl_float_t, .count = 2});
+		std::vector<float> m = { -1., -1., -1., 1., 1., -1., 1., 1. };
+		screenMesh.vbo.emplace(m);
+		screenMesh.link_attributes(0, shad::attribute_layout{ .type = shad::attribute_type::gl_float_t, .count = 2 });
 	}
-	
+
 
 	// Загрузка шейдеров
 	// Шейдеры графики
@@ -55,7 +51,15 @@ int Context::run() {
 		forceShader.location("Scale");
 	}
 
-
+	// Связываем VBO как SSBO для случайного доступа к графическим данным из под пост-процессора
+	{
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, cellsMesh.vbo.id());
+		shad::link_uniform_block(petriShader.id(), "cells", 0);
+		///GLuint resource_index = glGetProgramResourceIndex(petriShader.id(), GL_SHADER_STORAGE_BLOCK, "cells");
+		///if (resource_index != GL_INVALID_INDEX) {
+		///	glShaderStorageBlockBinding(petriShader.id(), resource_index, 0);
+		///}
+	}
 	WorldAdapter::WorldSettings ws;
 	ws.cells_limit = 100000;
 	ws.world_size = vec2(sqrt(ws.cells_limit) * (2. / sqrt(10.)));

@@ -148,7 +148,19 @@
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.vector.ixx">
       <Filter>Библиотеки\OSL</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\MyGlobalLibs\SHAD\SHAD.ixx">
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\MyGlobalLibs\SHAD\shad.ixx">
+      <Filter>Библиотеки\SHAD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\MyGlobalLibs\SHAD\shad.texture.ixx">
+      <Filter>Библиотеки\SHAD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\MyGlobalLibs\SHAD\shad.mesh.ixx">
+      <Filter>Библиотеки\SHAD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\MyGlobalLibs\SHAD\shad.shader.ixx">
+      <Filter>Библиотеки\SHAD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\MyGlobalLibs\SHAD\shad.buffer.ixx">
       <Filter>Библиотеки\SHAD</Filter>
     </ClCompile>
   </ItemGroup>
