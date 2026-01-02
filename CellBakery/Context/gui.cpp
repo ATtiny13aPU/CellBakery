@@ -35,6 +35,8 @@ void Context::gui() {
 
 			}
 			ImGui::SliderFloat("##scale_force_draw", &scale_force_draw, 0.f, 20.f, "%.1f");
+			ImGui::SliderFloat("##msaa", &MSAA, 1.f, 16.f, "%.0f");
+
 
 			ImGui::PopItemWidth();
 			bool check = Vsync;
@@ -44,7 +46,9 @@ void Context::gui() {
 			}
 			ImGui::SameLine();
 			ImGui::Text(" %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
+			ImGui::Checkbox("no update", &no_update_flag);
+			ImGui::SameLine();
+			ImGui::Checkbox("MSAA quasi start", &MSAA_quasi_start);
 			ImGui::End();
 		}
 

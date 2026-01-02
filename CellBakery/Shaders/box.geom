@@ -14,13 +14,13 @@ in vec2 v_vel[];
 in float v_radius[];
 
 out vec2 dp;
-out flat uint id;
+out vec3 color;
 
 
 
 void main() {
 	vec2 pos = gl_in[0].gl_Position.xy;
-	id = gl_PrimitiveIDIn;
+	color = v_color[0] * 0.3;
 	float r = v_radius[0];
 
 	pos += v_vel[0] * (TimeLerp / 20.);
@@ -28,8 +28,7 @@ void main() {
 	// Преобразование мировой позиции в экранную
 	vec2 mst = ViewWorld.zw - ViewWorld.xy;
 	vec2 win_uv = mix(ViewWindow.xy, ViewWindow.zw, pos) * 2. - 1.;
-	// К диаметру добавляется 2 пикселя экранного пространства для MSAA (окружность тоже будет нарисована на 1 пиксель шире)
-	vec2 win_r = 1. / mst + 2. / WinSize;
+	vec2 win_r = 1. / mst + 1. / WinSize;
 
 	if (between(pos, ViewWorld.xy - 2., ViewWorld.zw + 2.) == 0.)
 		return;

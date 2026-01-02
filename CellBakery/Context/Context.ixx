@@ -23,6 +23,7 @@ private:
 	osl::CameraController2D camera;
 
 	shad::shader cellsShader;
+	shad::shader boxShader;
 	shad::shader forceShader;
 	shad::shader petriShader;
 
@@ -55,6 +56,9 @@ private:
 	// GUI
 	float ups_world_set = 10.f;
 	float scale_force_draw = 0.f;
+	float MSAA = 1;
+	bool MSAA_quasi_start = false;
+	bool no_update_flag = false;
 
 	WorldKeyValueCommands wkv_commands;
 };
@@ -72,7 +76,7 @@ export int main_too() {
 			.contextVersionMajor = 4, .contextVersionMinor = 6,
 			.openglProfile = glfw::OpenGlProfile::Core
 		};
-	//	wh.samples = 16;
+		//	wh.samples = 16;
 		wh.apply();
 		//	glEnable(GL_MULTISAMPLE);
 	}

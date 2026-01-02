@@ -363,6 +363,9 @@
     <ClCompile Include="World\World.ixx" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shaders\box.frag" />
+    <None Include="Shaders\box.geom" />
+    <None Include="Shaders\box.vert" />
     <None Include="Shaders\cells.frag" />
     <None Include="Shaders\cells.geom" />
     <None Include="Shaders\cells.vert" />

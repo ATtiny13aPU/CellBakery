@@ -45,11 +45,28 @@ void Context::graphics() {
 
 	// Отрисовка чашки Петри (Пост-эффект отрисовка)
 	{
-		petriShader.use();
+		petriShader.use(); 
+		petriShader.uniform("TimeLerp", time_lerp - 1.f);
 		petriShader.uniform("ViewWorld", worldView);
+		petriShader.uniform("WinSize", winSize);
+		petriShader.uniform("MSAA", MSAA);
+		petriShader.uniform("MSAA_quasi_start", float(MSAA_quasi_start));
 
 		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 		screenMesh.draw(shad::draw_primitive::gl_triangle_strip);
+	}
+
+	// Отрисовка коробок
+	if (0) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		boxShader.use();
+		boxShader.uniform("TimeLerp", time_lerp - 1.f);
+		boxShader.uniform("ViewWorld", worldView);
+		boxShader.uniform("ViewWindow", windowView);
+		boxShader.uniform("WinSize", winSize);
+
+		cellsMesh.draw(shad::draw_primitive::gl_points);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
 	// Отрисовка сил

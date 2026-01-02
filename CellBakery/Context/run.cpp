@@ -33,18 +33,30 @@ int Context::run() {
 		cellsShader.name = "cellsShader";
 		load_shader_from_files(cellsShader, "Shaders/cells.vert", "Shaders/cells.frag", "Shaders/cells.geom");
 
+		boxShader.name = "boxShader";
+		load_shader_from_files(boxShader, "Shaders/box.vert", "Shaders/box.frag", "Shaders/box.geom");
+
 		forceShader.name = "forceShader";
 		load_shader_from_files(forceShader, "Shaders/force.vert", "Shaders/force.frag", "Shaders/force.geom");
 
 		petriShader.name = "petriShader";
 		load_shader_from_files(petriShader, "Shaders/petri.vert", "Shaders/petri.frag");
 
+		petriShader.location("TimeLerp");
 		petriShader.location("ViewWorld");
+		petriShader.location("WinSize");
+		petriShader.location("MSAA");
+		petriShader.location("MSAA_quasi_start");
 
 		cellsShader.location("TimeLerp");
 		cellsShader.location("ViewWorld");
 		cellsShader.location("ViewWindow");
 		cellsShader.location("WinSize");
+
+		boxShader.location("TimeLerp");
+		boxShader.location("ViewWorld");
+		boxShader.location("ViewWindow");
+		boxShader.location("WinSize");
 
 		forceShader.location("ViewWorld");
 		forceShader.location("ViewWindow");

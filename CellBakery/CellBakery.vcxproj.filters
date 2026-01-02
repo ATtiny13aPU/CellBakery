@@ -29,20 +29,26 @@
     <Filter Include="Шейдеры\Graphics\cells">
       <UniqueIdentifier>{776a5b44-3a0f-454d-b9e4-1c01c5c8b302}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Шейдеры\Graphics\petri">
-      <UniqueIdentifier>{bf52f0ec-f8f7-45f3-a143-de926f8277c1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Исходные файлы\Симуляция">
       <UniqueIdentifier>{ebbd46c4-ca44-4252-9634-ede56793202c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Шейдеры\Graphics\force">
-      <UniqueIdentifier>{35593ae7-5915-4d44-82c7-2601270e900f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Библиотеки\OSL">
       <UniqueIdentifier>{40463903-03a9-4e32-a5ee-40ede6ee6560}</UniqueIdentifier>
     </Filter>
     <Filter Include="Библиотеки\SHAD">
       <UniqueIdentifier>{f806d213-e7da-49a0-9645-fd12526bbe21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Шейдеры\Debug">
+      <UniqueIdentifier>{dcdbf66c-3483-4626-9d35-9f57f777f452}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Шейдеры\Graphics\petri">
+      <UniqueIdentifier>{bf52f0ec-f8f7-45f3-a143-de926f8277c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Шейдеры\Debug\force">
+      <UniqueIdentifier>{35593ae7-5915-4d44-82c7-2601270e900f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Шейдеры\Debug\box">
+      <UniqueIdentifier>{c89307c7-c7bd-4a95-bd3b-cd033fcf9631}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -181,16 +187,25 @@
       <Filter>Шейдеры\Graphics\petri</Filter>
     </None>
     <None Include="Shaders\force.frag">
-      <Filter>Шейдеры\Graphics\force</Filter>
+      <Filter>Шейдеры\Debug\force</Filter>
     </None>
     <None Include="Shaders\force.geom">
-      <Filter>Шейдеры\Graphics\force</Filter>
+      <Filter>Шейдеры\Debug\force</Filter>
     </None>
     <None Include="Shaders\force.vert">
-      <Filter>Шейдеры\Graphics\force</Filter>
+      <Filter>Шейдеры\Debug\force</Filter>
     </None>
     <None Include="Shaders\lib.glsl">
       <Filter>Шейдеры\Graphics</Filter>
+    </None>
+    <None Include="Shaders\box.vert">
+      <Filter>Шейдеры\Debug\box</Filter>
+    </None>
+    <None Include="Shaders\box.frag">
+      <Filter>Шейдеры\Debug\box</Filter>
+    </None>
+    <None Include="Shaders\box.geom">
+      <Filter>Шейдеры\Debug\box</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
