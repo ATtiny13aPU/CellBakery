@@ -29,6 +29,20 @@ uniform float TimeLerp;
 uniform float MSAA;
 uniform float MSAA_quasi_start;
 
+float gradient(vec2 p, vec2 a, vec2 b) {
+	vec2 ap = p - a;
+	vec2 ab = b - a;
+
+	float t = dot(ap, ab) / dot(ab, ab);
+
+	return t;
+}
+
+float linear_smoothstep(float k) {
+	// Наклоняем k, чтобы он стал касательной к smoothstep в точке 0.75
+	return mix(k * 1.125, smoothstep(0.0, 1.0, k), step(0.75, k));
+}
+
 vec2 quasi_random(float i) {
 	const float a1 = 0.7548776662;
 	const float a2 = 0.5698402909;
@@ -57,32 +71,52 @@ vec3 render_background(const vec2 w_uv) {
 	return pixel;
 }
 
-
-// Функция отрисовывает геометрию клеток
-vec4 render_cells(const uvec4 pixel_meta, const cell_data_t cell_1, const cell_data_t cell_2, const vec2 w_uv) {
+// Функция ответственная за внешний вид клетки
+vec4 render_cell(const cell_data_t cell, const float r, const vec2 w_uv) {
 	vec4 pixel = vec4(0.);
 
-	
+	pixel = mix(vec4(cell.color.rgb * 0.5, 0.8), vec4(cell.color.rgb, 0.5), step(0.2, r) * step(r, 0.9));
+	return pixel;
+}
+
+// Функция отрисовывает геометрию клеток (вычисляет аргументы для вызова render_cell)
+vec4 render_cells(const uvec4 pixel_meta, cell_data_t cell_1, cell_data_t cell_2, const vec2 w_uv) {
 	cell_data_t cell;
+
 	float r;
 	if (pixel_meta.y == null_id) {
-		r = distance(cell_1.position.xy, w_uv) / cell_1.color.a * 2.;
+
+		r = distance(cell_1.position.xy, w_uv) / cell_1.meta.w * 2.;
 		cell = cell_1;
 	} else {
-		float r1 = distance(cell_1.position.xy, w_uv) / cell_1.color.a * 2.;
-		float r2 = distance(cell_2.position.xy, w_uv) / cell_2.color.a * 2.;
+		float r1 = distance(cell_1.position.xy, w_uv) / cell_1.meta.w * 2.;
+		float r2 = distance(cell_2.position.xy, w_uv) / cell_2.meta.w * 2.;
+
+		// Сортировка клеток по расстоянию
 		if (r1 < r2) {
 			cell = cell_1;
 		} else {
 			r = r2; r2 = r1; r1 = r;
 			cell = cell_2;
 		}
-		r = mix(0., max(r1, r1 / r2), step(0.2, r1));
+
+		// Расстояние между клетками для регулирования коррекции эффекта сплющивания клеток
+		float r3 = distance(cell_1.position.xy, cell_2.position.xy) / (cell_1.color.w + cell_2.color.w);
+
+		// Корректор эффекта сплющивания
+		float factor = gradient(w_uv, cell_1.position.xy, cell_2.position.xy);
+		factor = clamp(factor, 0., 0.5) * 2.;
+		float k = clamp(r3 * 16., 0., 1.); // больше множитель -> нужен меньший радиус для включения коррекции
+		factor = mix(factor, 1., mix(k, linear_smoothstep(k), step(0.5, k)));
+
+		// Сам эффект сплющивания
+		r = mix(0., max(r1, mix(r1, r1 / r2, factor)), step(0.2, r1));
 	}
 	if (r > 1.)
-		return pixel;
-	pixel = mix(vec4(cell.color.rgb * 0.5, 0.8), vec4(cell.color.rgb, 0.5), step(0.2, r) * step(r, 0.9));
-	return pixel;
+		return vec4(0.);
+	// r хранит сейчас расстояние до ближайшей клетки
+	// cell хранит остальные данные ближайшей клетки
+	return render_cell(cell, r, w_uv);
 }
 
 

@@ -70,6 +70,7 @@ void Context::graphics() {
 	}
 
 	// Отрисовка сил
+	if (1) // Шейдер не работает более, потому что поле meta занят
 	if (scale_force_draw > 0.1f) {
 		forceShader.use();
 		glLineWidth(1.8f);

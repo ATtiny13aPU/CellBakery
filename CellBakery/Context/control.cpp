@@ -19,22 +19,22 @@ void Context::control() {
 
 		// Настраиваем камеру под разрешение окна
 		auto[new_xsize_display, new_ysize_display] = window.getFramebufferSize();
+		if (new_xsize_display != 0 && new_ysize_display != 0)
+			if (uint32_t(new_xsize_display) != winSize[0] || uint32_t(new_ysize_display) != winSize[1]) {
+				winSize = osl::fvec2(new_xsize_display, new_ysize_display);
+				glViewport(0, 0, winSize[0], winSize[1]);
+				camera.ratio(winSize[0] / winSize[1]);
 
-		if (uint32_t(new_xsize_display) != winSize[0] || uint32_t(new_ysize_display) != winSize[1]) {
-			winSize = osl::fvec2(new_xsize_display, new_ysize_display);
-			glViewport(0, 0, winSize[0], winSize[1]);
-			camera.ratio(winSize[0] / winSize[1]);
-
-			// Фреймбуфер
-			{
-				if (frame_texture_id)
-					glDeleteTextures(1, &frame_texture_id);
-				glCreateTextures(GL_TEXTURE_2D, 1, &frame_texture_id);
-				glTextureStorage2D(frame_texture_id, 1, GL_RGBA32UI, winSize[0], winSize[1]);
-				//frame_texture = std::make_unique<shad::texture2d>(shad::texture2d());
-				//frame_texture->create(winSize[0], winSize[1], shad::texture_format::rgba32ui);
+				// Фреймбуфер
+				{
+					if (frame_texture_id)
+						glDeleteTextures(1, &frame_texture_id);
+					glCreateTextures(GL_TEXTURE_2D, 1, &frame_texture_id);
+					glTextureStorage2D(frame_texture_id, 1, GL_RGBA32UI, winSize[0], winSize[1]);
+					//frame_texture = std::make_unique<shad::texture2d>(shad::texture2d());
+					//frame_texture->create(winSize[0], winSize[1], shad::texture_format::rgba32ui);
+				}
 			}
-		}
 	}
 
 	if (!ImGui::GetIO().WantCaptureMouse) {

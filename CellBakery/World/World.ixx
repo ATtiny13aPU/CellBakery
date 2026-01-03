@@ -145,7 +145,7 @@ export struct WorldAdapter::RenderData {
 export struct WorldAdapter::RenderCellData {
 	fvec4 position;	// позиция + скорость в мировых координатах
 	fvec4 color;		// RGB + effect
-	fvec4 debug;		// Зарезервировано
+	fvec4 meta;		// Зарезервировано
 };
 
 

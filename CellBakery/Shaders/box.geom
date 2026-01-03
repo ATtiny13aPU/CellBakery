@@ -28,7 +28,7 @@ void main() {
 	// Преобразование мировой позиции в экранную
 	vec2 mst = ViewWorld.zw - ViewWorld.xy;
 	vec2 win_uv = mix(ViewWindow.xy, ViewWindow.zw, pos) * 2. - 1.;
-	vec2 win_r = 1. / mst + 1. / WinSize;
+	vec2 win_r = v_radius[0] / mst + 2. / WinSize;
 
 	if (between(pos, ViewWorld.xy - 2., ViewWorld.zw + 2.) == 0.)
 		return;

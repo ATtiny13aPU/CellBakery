@@ -4,6 +4,7 @@
 layout(rgba32ui, binding = 0) coherent uniform uimage2D frame_buffer;
 
 in vec2 dp;
+in vec2 k;
 in flat uint id;
 const uint null_id = uint(-1);
 
@@ -11,6 +12,9 @@ void main() {
 	float qd = dot(dp, dp);
 	beginInvocationInterlockARB();
 	if (qd < 1.) {
+		vec2 truth_dp = dp / k; // коррекция радиуса из-за того, что у нас бокс чуть больше окружности
+		qd = dot(truth_dp, truth_dp);
+
 		uvec4 pixel = imageLoad(frame_buffer, ivec2(gl_FragCoord.xy));
 		uint my_distance = uint(qd * 2147483648.);
 		/*

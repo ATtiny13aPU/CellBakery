@@ -14,6 +14,7 @@ in vec2 v_vel[];
 in float v_radius[];
 
 out vec2 dp;
+out vec2 k;
 out flat uint id;
 
 
@@ -25,14 +26,16 @@ void main() {
 
 	pos += v_vel[0] * (TimeLerp / 20.);
 
+	if (between(pos, ViewWorld.xy - 2., ViewWorld.zw + 2.) == 0.)
+		return; // грубое быстрое отсечение всей клетки вне экрана
+
 	// Преобразование мировой позиции в экранную
 	vec2 mst = ViewWorld.zw - ViewWorld.xy;
 	vec2 win_uv = mix(ViewWindow.xy, ViewWindow.zw, pos) * 2. - 1.;
-	// К диаметру добавляется 2 пикселя экранного пространства для MSAA (окружность тоже будет нарисована на 1 пиксель шире)
-	vec2 win_r = 1. / mst + 2. / WinSize;
-
-	if (between(pos, ViewWorld.xy - 2., ViewWorld.zw + 2.) == 0.)
-		return;
+	vec2 win_r = v_radius[0] / mst;
+	// К радиусу добавляется 2 пикселя экранного пространства для MSAA (окружность тоже будет нарисована на 2 пикселя шире)
+	k = 1. + (2. / WinSize) / win_r;
+	win_r *= k;
 
 	gl_Position.zw = vec2(0.0, 1.0);
 

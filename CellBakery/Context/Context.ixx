@@ -56,7 +56,7 @@ private:
 	// GUI
 	float ups_world_set = 10.f;
 	float scale_force_draw = 0.f;
-	float MSAA = 1;
+	float MSAA = 4.;
 	bool MSAA_quasi_start = false;
 	bool no_update_flag = false;
 

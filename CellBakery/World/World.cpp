@@ -2,19 +2,45 @@
 import osl;
 using namespace osl::types;
 
-static inline void process_collision(Cell &a, Cell &b, const vec2 &dp) {
+
+//#pragma optimize("", off)
+//__declspec(noinline)
+void process_collision(Cell &a, Cell &b, const vec2 &dp, const frac& sum_r) {
 	if (dp == vec2(0.))
 		return;
+	/*
+		Сейчас два тела взаимодействую друг с другом, т.е. сумма их радиусов меньше расстояния между центрами.
+		Нужно вычислить силу отталкивания и применить её к обеим клеткам.
+		Применяется классческая модель пружины, но с ограничением на максимальную силу и экспоненциальным ростом силы.
 
+		Демпфирование реализовано как динамический коэффициент жёсткости, зависящий от скорости сближения клеток.
+	*/
+
+	// 1. Вычисляем относительную скорость: v_rel = v_a - v_b
+	const vec2 rel_v = a.velocity - b.velocity;
+
+	// 2. Вычисляем нормализованный вектор направления (от b к a)
+	// r — это нормализованное расстояние, мы используем его для получения нормали n
 	const frac sqr_r = osl::dot(dp, dp);
-	const frac r = sqrt(sqr_r);	// расстояние между центрами клеток
-	const vec2 nfv = dp / r;	// нормализованный вектор силы
-	constexpr frac k = 4.;		// коэффициент жёсткости
+	const frac dist = sqrt(sqr_r);
+	const vec2 n = dp / dist;
+
+	// 3. Проекция относительной скорости на нормаль (скалярная скорость сближения)
+	// Если v_approach < 0, клетки движутся навстречу друг другу
+	// Если v_approach > 0, клетки разлетаются
+	const frac v_approach = osl::dot(rel_v, n);
+
+	const frac k = 4. + std::clamp(v_approach * 0.2, -0.2, +2.);	// коэффициент жёсткости (при 4 выстраиваются соты)
+
+	const frac r = dist / sum_r;			// расстояние между центрами клеток, нормализованное на сумму радиусов
+	const vec2 nfv = dp / r;				// нормализованный вектор силы
 	const frac f = (1. / k) / r - (1. / k);	// сила в ньютонах (скаляр)
 	const vec2 fv = nfv * std::min(2., f * 16.) * 4.;	// сила в ньютонах (вектор)
+
 	a.force += fv;
 	b.force -= fv;
 }
+//#pragma optimize("", on)
 
 void World::update_cells() {
 	const frac substeps = 20.;
@@ -27,6 +53,9 @@ void World::update_cells() {
 
 		// Динамическое трение вязкости
 		cell.force -= viscosity * cell.velocity;
+
+		// Стягивание к центру для отладки
+		cell.force = osl::mix(cell.force, vec2(100.) - cell.pos, 0.01);
 
 		// Вычисление ускорения: a = F / m
 		vec2 acceleration = cell.force / cell.weight;
@@ -45,7 +74,7 @@ void World::update_cells() {
 void World::run(const WorldAdapter::WorldSettings &ws) {
 	const auto cells_limit = static_cast<uint32_t>(ws.cells_limit);
 	WorldKeyValueCommands wkv_commands;
-	ups_limiter.set(5.);
+	ups_limiter.set(20.);
 
 	std::vector<std::pair<vec2, id>> lines;
 	auto &cells = cells_pc.storage;
@@ -69,17 +98,18 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 			c.force = vec2(0.);		// начальная сила = 0
 			c.velocity = vec2(0.);	// начальная скорость = 0
 			c.impulse = vec2(0.);	// начальный импульс = 0
-			c.weight = 1.;			// масса = 1 кг
-			c.radius = 0.5;			// радиус = 0.5 м (диаметр = 1 м)
+			c.radius = 0.2 + rand.pd() * 0.3;		// радиус в м
+			c.weight = c.radius * c.radius * 4.;	// масса в кг
 		}
 	}
 
 	osl::DeltaTimeMark dtm;
 	osl::DeltaTimeMark ups;
 	ups.get();
-
+	uint32_t world_step_counter = (-1);
 	while (wa.isRunning.load()) {
 		// Обновление симуляции
+		world_step_counter++;
 
 		// Сброс суммы сил
 		for (const auto cid : cells_pc.enabled)
@@ -112,15 +142,17 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 		
 
 		// Этап поиска коллизий
+		const double max_diameter = 1.; // Максимально возможная сумма двух радиусов
+
 		auto c3_it = lines.cbegin();
 		// проход по линиям (простые коллизии)
 		for (auto c1_it = lines.cbegin(); c1_it != (lines.cend() - 1u); ++c1_it) {
 			const auto&[c1_pos, c1] = *c1_it;
 
 			// на 2R дальше по x и до ближайшего по Y вверх
-			const auto stop = vec2(c1_pos[0] + 2., std::ceil(c1_pos[1]));
+			const auto stop = vec2(c1_pos[0] + max_diameter, std::ceil(c1_pos[1]));
 			{
-				const auto sub_stop = vec2(c1_pos[0] - 2., std::ceil(c1_pos[1]));
+				const auto sub_stop = vec2(c1_pos[0] - max_diameter, std::ceil(c1_pos[1]));
 				// если итератор на той же линии
 				while (c3_it->first[1] < sub_stop[1])
 					++c3_it;
@@ -132,15 +164,17 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 			for (auto c2_it = std::next(c1_it); c2_it->first[0] < stop[0] && c2_it->first[1] < stop[1]; ++c2_it) {
 				check_counter++;
 				const vec2 dp = c1_pos - c2_it->first;
-				if (osl::dot(dp, dp) < 1.)
-					process_collision(cells[c1], cells[c2_it->second], dp), collis_counter++;
+				const double sum_r = cells[c1].radius + cells[c2_it->second].radius;
+				if (osl::dot(dp, dp) < sum_r * sum_r)
+					process_collision(cells[c1], cells[c2_it->second], dp, sum_r), collis_counter++;
 			}
 			// по линии над
 			for (auto c2_it = c3_it; c2_it->first[0] < stop[0] && c2_it->first[1] < stop[1] + 1.; ++c2_it) {
 				check_counter++;
 				const vec2 dp = c1_pos - c2_it->first;
-				if (osl::dot(dp, dp) < 1.)
-					process_collision(cells[c1], cells[c2_it->second], dp), collis_counter++;
+				const double sum_r = cells[c1].radius + cells[c2_it->second].radius;
+				if (osl::dot(dp, dp) < sum_r * sum_r)
+					process_collision(cells[c1], cells[c2_it->second], dp, sum_r), collis_counter++;
 			}
 		}
 		lines.pop_back();
@@ -179,12 +213,18 @@ void World::run(const WorldAdapter::WorldSettings &ws) {
 		{
 			auto &cells_wb = wa.world_data_snapshots.get_current_write()->cells;
 			cells_wb.resize(cells_limit);
+			float time_cycle = (world_step_counter % 20) / 20.; // временно для отладки
+
 			for (auto wb_it = cells_wb.begin(); wb_it != cells_wb.end(); wb_it++) {
 				auto &wb = (*wb_it);
 				const auto &cell = cells[std::distance(cells_wb.begin(), wb_it)];
 				wb.position = fvec4(fvec2(cell.pos), fvec2(cell.velocity));
-				wb.color = cell.color;
-				wb.debug = fvec4(fvec2(cell.force), 0., 0.);
+				if (cell.force == vec2(0.))
+					wb.color = cell.color * -0.1f;
+				else
+					wb.color = cell.color;
+				wb.meta = fvec4(fvec2(cell.force)//fvec2(sinf(cell.angle), cosf(cell.angle))
+					, time_cycle, cell.radius * 2.);
 
 			}
 

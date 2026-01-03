@@ -34,7 +34,7 @@ int Context::run() {
 		load_shader_from_files(cellsShader, "Shaders/cells.vert", "Shaders/cells.frag", "Shaders/cells.geom");
 
 		boxShader.name = "boxShader";
-		load_shader_from_files(boxShader, "Shaders/box.vert", "Shaders/box.frag", "Shaders/box.geom");
+		load_shader_from_files(boxShader, "Shaders/cells.vert", "Shaders/box.frag", "Shaders/box.geom");
 
 		forceShader.name = "forceShader";
 		load_shader_from_files(forceShader, "Shaders/force.vert", "Shaders/force.frag", "Shaders/force.geom");
