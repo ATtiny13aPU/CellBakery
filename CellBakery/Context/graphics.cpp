@@ -11,11 +11,11 @@ void Context::graphics() {
 	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//glClear(GL_COLOR_BUFFER_BIT);
 
-	fvec4 worldView = camera.getDirectView();
-	fvec4 windowView = camera.getInverseView();
+	fvec4 worldView = camera.direct_view();
+	fvec4 windowView = camera.inverse_view();
 
 	
-	// Привязка и отчистка текстуры
+	// Привязка и отчистка текстуры и привязка VBO к SSBO
 	{
 		glBindImageTexture(0, frame_texture_id, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32UI);
 		static std::array<uint32_t, 4> color_reset = { -1, -1, -1, -1 };
@@ -26,19 +26,15 @@ void Context::graphics() {
 			GL_UNSIGNED_INT,  // type (тип данных в массиве clear_color)
 			color_reset.data()
 		);
-		//glBindImageTexture(0, frame_texture->id(), 0, GL_FALSE, 0, static_cast<GLenum>(shad::access_order::gl_read_write), GL_RGBA32UI);
-		////frame_texture->bind_as_image(0, 0, shad::access_order::gl_read_write);
-		//static std::array<uint32_t, 4> color_reset = { -1, -1, -1, -1 };
-		//frame_texture->clear_color(color_reset.data(), shad::pixel_format::rgba, shad::pixel_type::ubyte_t);
 	}
 
 	// Отрисовка клеток
-	{
+	if (gui_s.show_cells) {
 		cellsShader.use();
 		cellsShader.uniform("TimeLerp", time_lerp - 1.f);
 		cellsShader.uniform("ViewWorld", worldView);
 		cellsShader.uniform("ViewWindow", windowView);
-		cellsShader.uniform("WinSize", winSize);
+		cellsShader.uniform("WinSize", win_size);
 
 		cellsMesh.draw(shad::draw_primitive::gl_points);
 	}
@@ -48,36 +44,78 @@ void Context::graphics() {
 		petriShader.use(); 
 		petriShader.uniform("TimeLerp", time_lerp - 1.f);
 		petriShader.uniform("ViewWorld", worldView);
-		petriShader.uniform("WinSize", winSize);
-		petriShader.uniform("MSAA", MSAA);
-		petriShader.uniform("MSAA_quasi_start", float(MSAA_quasi_start));
+		petriShader.uniform("WinSize", win_size);
+		petriShader.uniform("MSAA", gui_s.MSAA);
+		petriShader.uniform("MSAA_quasi_start", float(gui_s.MSAA_quasi_start));
 
 		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 		screenMesh.draw(shad::draw_primitive::gl_triangle_strip);
 	}
 
+	// Запрос захвата пикселя экрана для упрощения поиска коллизии курсора с клетками
+	if (pbo.active) {
+		// если позиция мыши внутри окна
+		if (camera.mouse_screen_pos() > vec2(0) && camera.mouse_screen_pos() < vec2(1)) {
+			// Если предыдущий запрос еще не обработан, лучше не спамить новыми
+			ivec2 mp = ivec2(camera.mouse_screen_pos() * win_size);
+			if (!pbo.pending) {
+				// Если предыдущий запрос еще не обработан, лучше не спамить новыми
+				glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo.id);
+				// Асинхронное чтение из текстуры в PBO
+				glGetTextureSubImage(frame_texture_id, 0, mp[0], mp[1], 0, 1, 1, 1,
+					GL_RGBA_INTEGER, GL_UNSIGNED_INT, 16, nullptr);
+				glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
+
+				pbo.sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+				pbo.pending = true;
+			}
+		}
+	}
+
 	// Отрисовка коробок
-	if (0) {
+	if (gui_s.show_boxes && (gui_s.scale_force_draw > 0.01 || gui_s.scale_vel_draw > 0.01)) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		boxShader.use();
 		boxShader.uniform("TimeLerp", time_lerp - 1.f);
 		boxShader.uniform("ViewWorld", worldView);
 		boxShader.uniform("ViewWindow", windowView);
-		boxShader.uniform("WinSize", winSize);
+		boxShader.uniform("WinSize", win_size);
 
 		cellsMesh.draw(shad::draw_primitive::gl_points);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
 	// Отрисовка сил
-	if (1) // Шейдер не работает более, потому что поле meta занят
-	if (scale_force_draw > 0.1f) {
+	if (gui_s.show_forces) {
 		forceShader.use();
 		glLineWidth(1.8f);
 		forceShader.uniform("ViewWorld", worldView);
 		forceShader.uniform("ViewWindow", windowView);
-		forceShader.uniform("Scale", static_cast<float>(scale_force_draw / 20.f));
+		forceShader.uniform("ScaleForce", static_cast<float>(gui_s.scale_force_draw / 20.f));
+		forceShader.uniform("ScaleVel", static_cast<float>(gui_s.scale_vel_draw / 20.f));
 
 		cellsMesh.draw(shad::draw_primitive::gl_points);
+	}
+
+
+	// Попытка забрать запрошенные данные в конце кадра
+	if (pbo.pending && pbo.sync) {
+		// Проверяем статус без блокировки потока (timeout = 0)
+		GLenum status = glClientWaitSync(pbo.sync, GL_SYNC_FLUSH_COMMANDS_BIT, 0);
+
+		if (status == GL_ALREADY_SIGNALED || status == GL_CONDITION_SATISFIED) {
+			// Теперь glMapNamedBufferRange не вернет nullptr, так как буфер создан через glBufferStorage
+			void* ptr = glMapNamedBufferRange(pbo.id, 0, 16, GL_MAP_READ_BIT);
+
+			if (ptr) {
+				pbo.last_sample = *static_cast<uvec4*>(ptr);
+				glUnmapNamedBuffer(pbo.id);
+			}
+
+			glDeleteSync(pbo.sync);
+			pbo.sync = nullptr;
+			pbo.pending = false;
+			pbo.active = false;
+		}
 	}
 }

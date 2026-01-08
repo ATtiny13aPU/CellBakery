@@ -15,12 +15,24 @@ class Context {
 public:
 	int run();
 
-	explicit Context(glfw::Window &w) : window(w), rand("seed", 256) {};
+	explicit Context(glfw::Window& w) : window(w), rand("seed", 256), gui_s{} {};
 
 private:
 	WorldAdapter world;
+	WorldKeyValueCommands wkv_push_commands;
+	WorldKeyValueCommands wkv_pull_commands;
 
-	osl::CameraController2D camera;
+	/*
+		Это хранилище для тройной буферизации кадров мира.
+		Нужно для того, чтобы избежать аллокаций в самом мире,
+		поскольку планируется выделять память сразу на видеокарте.
+
+		Запрещено читать содержимое этого массива напрямую,
+		нужно использовать только методы WorldAdapter для доступа к кадрам.
+	*/
+	std::array<std::vector<WorldAdapter::cell_render_data_t>, 3> world_snapshots_storage;
+
+	osl::camera_controller_2d camera;
 
 	shad::shader cellsShader;
 	shad::shader boxShader;
@@ -32,8 +44,15 @@ private:
 
 	//std::unique_ptr<shad::texture2d> frame_texture;
 	GLuint frame_texture_id = 0;
+	struct {
+		GLuint id;
+		GLsync sync = nullptr;
+		bool pending = false;
+		bool active = false;
+		uvec4 last_sample = uvec4(-1);
+	} pbo;
 
-	fvec2 winSize;
+	fvec2 win_size;
 
 	uint64_t frame_counter = 0u;
 	uint64_t last_update_frame = 0u;
@@ -48,19 +67,65 @@ private:
 
 	osl::random rand;
 
+	glfw::Window &window;
+
 	GLint Vsync = 1;
 	GLint VsyncNow = Vsync;
 
-	glfw::Window &window;
-
 	// GUI
-	float ups_world_set = 10.f;
-	float scale_force_draw = 0.f;
-	float MSAA = 4.;
-	bool MSAA_quasi_start = false;
-	bool no_update_flag = false;
+	struct GuiState {
+		GuiState() {
+			init_template();
+		}
 
-	WorldKeyValueCommands wkv_commands;
+		// Симуляция
+		float ups_world_set = 10.f;
+		bool no_update_flag = false;
+		bool pause_simulation = false;
+
+		// Графика
+		float MSAA = 4.f;
+		bool MSAA_quasi_start = false;
+		GLint Vsync = 1;
+
+		// Визуализация объектов
+		float scale_force_draw = 0.f;
+		float scale_vel_draw = 0.f;
+		bool show_cells = true;
+		bool show_forces = true;
+		bool show_boxes = false;
+
+		// Создание клеток
+		bool is_placing_cell = false;
+		cell_t template_cell;
+
+		// Вспомогательная структура для UI-состояний
+		struct {
+			int current_type_idx = 0;
+			float radius = 0.5f;
+			float weight = 1.0f;
+			bool is_dragging_speed = false; // Флаг для визуализации "натяжения" скорости 
+			// Здесь можно хранить данные, которые нужны только в момент отрисовки
+		} ui;
+
+		void init_template() {
+			template_cell.radius = 0.5;
+			template_cell.color = fvec4(1.0f, 0.5f, 0.2f, 1.0f);
+			template_cell.velocity = vec2(0.0);
+			template_cell.weight = 1.0;
+
+			// Синхронизируем UI мост
+			ui.radius = static_cast<float>(template_cell.radius);
+			ui.weight = static_cast<float>(template_cell.weight);
+			ui.current_type_idx = static_cast<int>(template_cell.type);
+		}
+	} gui_s;
+
+
+	void gui_graphics_m();
+	void gui_world_control_m();
+	void gui_focus_cell_info_m();
+	void gui_creation_m();
 };
 
 

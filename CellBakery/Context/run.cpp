@@ -19,6 +19,7 @@ int Context::run() {
 		};
 		cellsMesh.link_attributes(0, atr);
 	}
+
 	// Настройка экранного меша
 	{
 		std::vector<float> m = { -1., -1., -1., 1., 1., -1., 1., 1. };
@@ -26,9 +27,7 @@ int Context::run() {
 		screenMesh.link_attributes(0, shad::attribute_layout{ .type = shad::attribute_type::gl_float_t, .count = 2 });
 	}
 
-
 	// Загрузка шейдеров
-	// Шейдеры графики
 	{
 		cellsShader.name = "cellsShader";
 		load_shader_from_files(cellsShader, "Shaders/cells.vert", "Shaders/cells.frag", "Shaders/cells.geom");
@@ -47,6 +46,7 @@ int Context::run() {
 		petriShader.location("WinSize");
 		petriShader.location("MSAA");
 		petriShader.location("MSAA_quasi_start");
+		shad::link_uniform_block(petriShader.id(), "cells", 0);
 
 		cellsShader.location("TimeLerp");
 		cellsShader.location("ViewWorld");
@@ -60,33 +60,53 @@ int Context::run() {
 
 		forceShader.location("ViewWorld");
 		forceShader.location("ViewWindow");
-		forceShader.location("Scale");
+		forceShader.location("ScaleForce");
+		forceShader.location("ScaleVel");
 	}
 
-	// Связываем VBO как SSBO для случайного доступа к графическим данным из под пост-процессора
+	// Ручная настройка PBO для получения одного экранного пикселя
 	{
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, cellsMesh.vbo.id());
-		shad::link_uniform_block(petriShader.id(), "cells", 0);
-		///GLuint resource_index = glGetProgramResourceIndex(petriShader.id(), GL_SHADER_STORAGE_BLOCK, "cells");
-		///if (resource_index != GL_INVALID_INDEX) {
-		///	glShaderStorageBlockBinding(petriShader.id(), resource_index, 0);
-		///}
+		glGenBuffers(1, &pbo.id);
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo.id);
+		glBufferStorage(GL_PIXEL_PACK_BUFFER, 16, nullptr, GL_MAP_READ_BIT | GL_DYNAMIC_STORAGE_BIT);
+		glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 	}
+
+
+	/*
+		Создание и запуск мира. Сейчас это происходит сразу при запуске Context,
+		но планируется более сложное поведение
+		включая возможность создания нескольких миров
+		а так же автоматизированное создание миров логикой скриптов
+	*/
 	WorldAdapter::WorldSettings ws;
-	ws.cells_limit = 100000;
+	ws.cells_limit = 100000; // Это не жёсткий лимит, а лишь рекомендация.
 	ws.world_size = vec2(sqrt(ws.cells_limit) * (2. / sqrt(10.)));
 
+	// Направляем камеру на "центр" мира
 	camera.set(ws.world_size / 2., ws.world_size);
 	// Запуск симуляции в отдельном потоке
 	std::jthread simulationThread(&WorldAdapter::run, &world, std::ref(ws));
-
-
 
 	// Цикл графики
 	glfw::swapInterval(Vsync);
 
 	while (!window.shouldClose()) {
+		/*
+		control();
+			принимаем эвенты от OpenGL контекста, обновляем состояние мыши и прочий пользовательский ввод
+			обрабатываем состояние смены разрешения окна и запрос на изменение размера экранной текстуры
 
+		sync();
+			принимаем эвенты мира и проверяем состояние world_snapshots на наличие новых кадров симуляции
+			в случае наличия таковых вызывает функцию загрузки данных на видеокарту
+
+		graphics();
+			содержит основные вызовы графики в цикле
+
+		gui();
+			содержит взаимодействие с ImGui
+		*/
 		control();
 
 		sync();
@@ -94,6 +114,13 @@ int Context::run() {
 		graphics();
 
 		gui();
+
+
+		// отправка накопленных команд в мир, генерируемых из GUI и автоматизированные запросы
+		if (!wkv_push_commands.empty()) {
+			world.push_wkv_commands(wkv_push_commands);
+			wkv_push_commands.clear();
+		}
 
 		window.swapBuffers();
 		glfw::pollEvents();

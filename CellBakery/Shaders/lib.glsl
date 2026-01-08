@@ -1,9 +1,9 @@
-
+п»ї
 
 // Checks if `x` is in range [a, b].
 float between(float x, float a, float b) {
-	/// step(a, b) тоже самое, что и a <= b, 1 - step(a, b) тоже самое, что a > b
-	/// тогда получается x >= a && b >= x, или же b >= x >= a что и есть [a, b]
+	/// step(a, b) С‚РѕР¶Рµ СЃР°РјРѕРµ, С‡С‚Рѕ Рё a <= b, 1 - step(a, b) С‚РѕР¶Рµ СЃР°РјРѕРµ, С‡С‚Рѕ a > b
+	/// С‚РѕРіРґР° РїРѕР»СѓС‡Р°РµС‚СЃСЏ x >= a && b >= x, РёР»Рё Р¶Рµ b >= x >= a С‡С‚Рѕ Рё РµСЃС‚СЊ [a, b]
 	return step(0., step(a, x) * step(x, b));
 }
 
