@@ -8,18 +8,21 @@ import shad;
 import std;
 
 void Context::sync() {
-
 	// TODO: рефакторинг
 	if (!gui_s.no_update_flag) {
+		// предварительное создание события окончания использования текущего vbo
+		// world_snapshots_storage[current_vbo_index].fence_release();
+		world.last_capture()->frame_index = frame_counter - 1u;
+
 		// получение нового кадра из мира и перерисчёт параметров интерполяции
 		if (const auto world_state = world.capture()) {
 			// обновление графики
-			const auto& cells = world_state->cells;
 			framePerUpdate.push(frame_counter - last_update_frame, 1.);
 			last_update_frame = frame_counter;
-			cellsMesh.vbo.emplace(cells);
+			current_vbo_index = world_state->vbo_index;
+			current_vbo_gl_id = world_snapshots_storage[current_vbo_index].id();
 			// Связываем VBO как SSBO для случайного доступа к графическим данным из под пост-процессора
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, cellsMesh.vbo.id());
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, current_vbo_gl_id);
 
 			time_lerp -= 1.;
 			delta_time_lerp = (1. - time_lerp) / framePerUpdate.get();
@@ -49,11 +52,15 @@ void Context::sync() {
 				if (key == std::string_view("reallock_tb")) {
 					auto &storge = *world.critical_capture();
 
-					for (auto&& [frame, storage] : std::ranges::views::zip(storge, world_snapshots_storage)) {
+					uint32_t index_counter = 0;
+					// Применение нового размера к каждому из трёх буферов
+					for (auto&& [frame, vbo] : std::ranges::views::zip(storge, world_snapshots_storage)) {
+						frame->vbo_index = index_counter++;
+						frame->frame_index_ptr = frame_counter_mapped_ptr;
 						// Изменение размера хранилища тройной буферизации
-						storage.resize(*v);
+						vbo.allocate(*v * sizeof(WorldAdapter::cell_render_data_t));
 						// Привязка хранилища к std::span
-						frame.get()->cells_vram_storge = std::span<WorldAdapter::cell_render_data_t>{ storage.data(), storage.size() };
+						frame.get()->cells_vram_storge = vbo.as_span<WorldAdapter::cell_render_data_t>();
 					}
 					std::cout << "Key: " << key << ", Value (size_t): " << *v << '\n';
 				}

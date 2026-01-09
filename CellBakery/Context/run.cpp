@@ -10,7 +10,7 @@ int Context::run() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	// Настройка CustomMesh для клеток
+	// Настройка всех атрибутов мешей
 	{
 		std::array<shad::attribute_layout, 3> atr = {
 			shad::attribute_layout{.type = shad::attribute_type::gl_float_t, .count = 4},
@@ -18,13 +18,22 @@ int Context::run() {
 			shad::attribute_layout{.type = shad::attribute_type::gl_float_t, .count = 4}
 		};
 		cellsMesh.link_attributes(0, atr);
+
+		screenMesh.link_attributes(0, shad::attribute_layout{ .type = shad::attribute_type::gl_float_t, .count = 2 });
 	}
 
-	// Настройка экранного меша
+	// Настройка всех vbo
 	{
 		std::vector<float> m = { -1., -1., -1., 1., 1., -1., 1., 1. };
 		screenMesh.vbo.emplace(m);
-		screenMesh.link_attributes(0, shad::attribute_layout{ .type = shad::attribute_type::gl_float_t, .count = 2 });
+
+		for (auto& vbo : world_snapshots_storage)
+			vbo.setup(shad::usage_order::by_default, shad::storage_flags::gl_map_coherent_write);
+
+		frame_id_immutable_buffer.setup(shad::usage_order::by_default, shad::storage_flags::gl_map_coherent_read);
+		frame_id_immutable_buffer.allocate(sizeof(uint32_t) * 4u);
+		std::span<uint32_t> s = frame_id_immutable_buffer.as_span<uint32_t>();
+		frame_counter_mapped_ptr = s.data();
 	}
 
 	// Загрузка шейдеров
@@ -80,7 +89,7 @@ int Context::run() {
 		а так же автоматизированное создание миров логикой скриптов
 	*/
 	WorldAdapter::WorldSettings ws;
-	ws.cells_limit = 100000; // Это не жёсткий лимит, а лишь рекомендация.
+	ws.cells_limit = 10000; // Это не жёсткий лимит, а лишь рекомендация.
 	ws.world_size = vec2(sqrt(ws.cells_limit) * (2. / sqrt(10.)));
 
 	// Направляем камеру на "центр" мира
@@ -92,6 +101,9 @@ int Context::run() {
 	glfw::swapInterval(Vsync);
 
 	while (!window.shouldClose()) {
+		frame_counter++;
+		frame_counter_proxy = uvec4(frame_counter);
+
 		/*
 		control();
 			принимаем эвенты от OpenGL контекста, обновляем состояние мыши и прочий пользовательский ввод

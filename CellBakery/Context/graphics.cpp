@@ -6,7 +6,6 @@ using namespace osl::types;
 import shad;
 
 void Context::graphics() {
-	frame_counter++;
 	// Очистка экрана
 	//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	//glClear(GL_COLOR_BUFFER_BIT);
@@ -14,13 +13,14 @@ void Context::graphics() {
 	fvec4 worldView = camera.direct_view();
 	fvec4 windowView = camera.inverse_view();
 
-	
+	auto& cell_vbo = world_snapshots_storage[current_vbo_index];
+
 	// Привязка и отчистка текстуры и привязка VBO к SSBO
 	{
 		glBindImageTexture(0, frame_texture_id, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32UI);
 		static std::array<uint32_t, 4> color_reset = { -1, -1, -1, -1 };
 		glClearTexImage(
-			frame_texture_id,       // ID текстуры (в вашем случае 17)
+			frame_texture_id, // ID текстуры (в вашем случае 17)
 			0,                // level (мип-уровень)
 			GL_RGBA_INTEGER,  // format (ОБЯЗАТЕЛЬНО с суффиксом _INTEGER)
 			GL_UNSIGNED_INT,  // type (тип данных в массиве clear_color)
@@ -36,7 +36,7 @@ void Context::graphics() {
 		cellsShader.uniform("ViewWindow", windowView);
 		cellsShader.uniform("WinSize", win_size);
 
-		cellsMesh.draw(shad::draw_primitive::gl_points);
+		cellsMesh.draw(cell_vbo, shad::draw_primitive::gl_points);
 	}
 
 	// Отрисовка чашки Петри (Пост-эффект отрисовка)
@@ -73,7 +73,7 @@ void Context::graphics() {
 	}
 
 	// Отрисовка коробок
-	if (gui_s.show_boxes && (gui_s.scale_force_draw > 0.01 || gui_s.scale_vel_draw > 0.01)) {
+	if (gui_s.show_boxes) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		boxShader.use();
 		boxShader.uniform("TimeLerp", time_lerp - 1.f);
@@ -81,12 +81,12 @@ void Context::graphics() {
 		boxShader.uniform("ViewWindow", windowView);
 		boxShader.uniform("WinSize", win_size);
 
-		cellsMesh.draw(shad::draw_primitive::gl_points);
+		cellsMesh.draw(cell_vbo, shad::draw_primitive::gl_points);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
 	// Отрисовка сил
-	if (gui_s.show_forces) {
+	if (gui_s.show_forces && (gui_s.scale_force_draw > 0.01 || gui_s.scale_vel_draw > 0.01)) {
 		forceShader.use();
 		glLineWidth(1.8f);
 		forceShader.uniform("ViewWorld", worldView);
@@ -94,8 +94,17 @@ void Context::graphics() {
 		forceShader.uniform("ScaleForce", static_cast<float>(gui_s.scale_force_draw / 20.f));
 		forceShader.uniform("ScaleVel", static_cast<float>(gui_s.scale_vel_draw / 20.f));
 
-		cellsMesh.draw(shad::draw_primitive::gl_points);
+		cellsMesh.draw(cell_vbo, shad::draw_primitive::gl_points);
 	}
+
+	// Первый барьер гарантирует, что операция с vbo завершена до этой
+	glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
+	// Обновление счётчика кадров в immutable буфере
+	glClearNamedBufferSubData(frame_id_immutable_buffer.id(), GL_R32UI,
+		0, sizeof(uint32_t) * 4,
+		GL_RED_INTEGER, GL_UNSIGNED_INT, &frame_counter_proxy);
+	// Второй барьер гарантирует, что операция с immutable буфером завершена сразу же
+	glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
 
 
 	// Попытка забрать запрошенные данные в конце кадра

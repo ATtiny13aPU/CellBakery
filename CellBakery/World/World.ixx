@@ -105,12 +105,12 @@ public:
 	}
 
 	// Захватить новый кадр из тройной буферизации
-	const world_render_data_t* capture() {
+	world_render_data_t* capture() {
 		return world_snapshots.capture();
 	}
 
 	// Получить последний доступный кадр из тройной буферизации
-	const world_render_data_t* last_capture() {
+	world_render_data_t* last_capture() {
 		return world_snapshots.get_current_read();
 	}
 
@@ -168,6 +168,13 @@ export struct WorldAdapter::world_render_data_t {
 	std::span<cell_render_data_t> cells_vram_storge; // отражение доступной памяти
 	std::span<cell_render_data_t> cells; // отражение использованной памяти
 	std::unordered_map<std::string, double> bench;
+
+	// ожидаемый индекс кадра при котором завершится работа с vbo на стороне GPU
+	uint32_t frame_index = 0;
+
+	// только для чтения
+	uint32_t vbo_index = 0; // index в хранилище std::array<shad::vbo, 3>
+	uint32_t* frame_index_ptr = nullptr; // указатель на актуальный глобальный счётчик кадров
 };
 
 export struct WorldAdapter::cell_render_data_t {

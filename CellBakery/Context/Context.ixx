@@ -30,7 +30,11 @@ private:
 		Запрещено читать содержимое этого массива напрямую,
 		нужно использовать только методы WorldAdapter для доступа к кадрам.
 	*/
-	std::array<std::vector<WorldAdapter::cell_render_data_t>, 3> world_snapshots_storage;
+	std::array<shad::vbo_im, 3> world_snapshots_storage;
+	uint32_t current_vbo_gl_id = 0u;
+	uint32_t current_vbo_index = 0u;
+
+	shad::base_buffer_t<GL_BUFFER, true> frame_id_immutable_buffer;
 
 	osl::camera_controller_2d camera;
 
@@ -39,8 +43,8 @@ private:
 	shad::shader forceShader;
 	shad::shader petriShader;
 
-	shad::SimpleMesh cellsMesh;
-	shad::SimpleMesh screenMesh;
+	shad::simple_mesh cellsMesh;
+	shad::simple_mesh screenMesh;
 
 	//std::unique_ptr<shad::texture2d> frame_texture;
 	GLuint frame_texture_id = 0;
@@ -56,6 +60,9 @@ private:
 
 	uint64_t frame_counter = 0u;
 	uint64_t last_update_frame = 0u;
+	uvec4 frame_counter_proxy = uvec4(0);
+	uint32_t* frame_counter_mapped_ptr = nullptr;
+
 	frac32 time_lerp = 0.;
 	frac32 delta_time_lerp = 0.;
 	osl::fastMovingAverageW<5> framePerUpdate;

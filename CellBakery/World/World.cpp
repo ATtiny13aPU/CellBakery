@@ -29,13 +29,16 @@ void process_collision(cell_t &a, cell_t &b, const vec2 &dp, const frac& sum_r) 
 	// Если v_approach > 0, клетки разлетаются
 	const frac v_approach = osl::dot(rel_v, n);
 
-	const frac k = 4 + std::clamp(v_approach * 0.2, -0.2, +2.);	// коэффициент жёсткости (при 4 выстраиваются соты)
+	// коэффициент жёсткости
+	// если k < -1, то это спадающая экспонента
+	// если k > 0, то это растущая экспонента
+	const frac k = -3. - std::clamp(v_approach * 0.2, -0.3, +3.);
 
-	const frac r = dist / sum_r;			// расстояние между центрами клеток, нормализованное на сумму радиусов
-	const vec2 nfv = dp / r;				// нормализованный вектор силы
-	const frac f = (1. / k) / r - (1. / k);	// сила в ньютонах (скаляр)
-	//const vec2 fv = nfv * std::min(2., f * 16.) * 4.;	// сила в ньютонах (вектор)
-	const vec2 fv = nfv * (1. - v_approach); // чисто порофлить
+	const frac r = dist / sum_r;					// расстояние между центрами клеток, нормализованное на сумму радиусов
+	const vec2 nfv = dp / r;						// нормализованный вектор силы
+	const frac f = k * (1. - r) / (k + r) * 32.;	// сила в ньютонах (скаляр)
+	const vec2 fv = nfv * f;						// сила в ньютонах (вектор)
+	//const vec2 fv = nfv * (1. - v_approach); // чисто порофлить
 	a.force += fv;
 	b.force -= fv;
 }
@@ -189,6 +192,15 @@ void World::sync() {
 				return;
 		}
 
+		// Ожидание завершения использования текущего буфера со стороны GPU
+		{
+			auto& ws = *wa.world_snapshots.get_current_write();
+			while ((*ws.frame_index_ptr) < ws.frame_index) {
+				std::this_thread::yield();
+				//std::print("Waiting for GPU to finish with frame index: {} \n", ws.frame_index);
+			}
+		}
+
 		// Загружаем данные в тройной буфер
 		{
 			float time_cycle = (world_step_counter % 20) / 20.; // временно для отладки
@@ -219,8 +231,9 @@ void World::sync() {
 			b["mspu"] = bench["mspu"].push(ups.get(), 1.);
 			b["sync"] = bench["sync"].get();
 		}
+
+		wa.world_snapshots.swap();
 	}
-	wa.world_snapshots.swap();
 }
 
 void World::run(const WorldAdapter::WorldSettings &ws) {
