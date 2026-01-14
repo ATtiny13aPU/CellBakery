@@ -103,7 +103,7 @@
     <ClCompile Include="World\World.ixx">
       <Filter>Исходные файлы\Симуляция</Filter>
     </ClCompile>
-    <ClCompile Include="World\World.cpp">
+    <ClCompile Include="World\w_run.cpp">
       <Filter>Исходные файлы\Симуляция</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
@@ -168,6 +168,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\MyGlobalLibs\SHAD\shad.buffer.ixx">
       <Filter>Библиотеки\SHAD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.experimental.ixx">
+      <Filter>Библиотеки\OSL</Filter>
+    </ClCompile>
+    <ClCompile Include="World\w_physics.cpp">
+      <Filter>Исходные файлы\Симуляция</Filter>
+    </ClCompile>
+    <ClCompile Include="World\w_cells.cpp">
+      <Filter>Исходные файлы\Симуляция</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

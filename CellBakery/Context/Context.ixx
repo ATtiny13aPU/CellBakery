@@ -19,8 +19,8 @@ public:
 
 private:
 	WorldAdapter world;
-	WorldKeyValueCommands wkv_push_commands;
-	WorldKeyValueCommands wkv_pull_commands;
+	map_commands_t wkv_push_commands;
+	map_commands_t wkv_pull_commands;
 
 	/*
 		Это хранилище для тройной буферизации кадров мира.
@@ -43,8 +43,8 @@ private:
 	shad::shader forceShader;
 	shad::shader petriShader;
 
-	shad::simple_mesh cellsMesh;
-	shad::simple_mesh screenMesh;
+	shad::vao cells_vao;
+	shad::simple_mesh screen_mesh;
 
 	//std::unique_ptr<shad::texture2d> frame_texture;
 	GLuint frame_texture_id = 0;
@@ -65,8 +65,10 @@ private:
 
 	frac32 time_lerp = 0.;
 	frac32 delta_time_lerp = 0.;
-	osl::fastMovingAverageW<5> framePerUpdate;
-	
+
+	osl::window::sliding_counter update_rate_counter{ 10000 };
+	osl::window::sliding_counter frame_rate_counter{ 10000 };
+
 	void control();
 	void sync();
 	void graphics();
@@ -86,12 +88,14 @@ private:
 		}
 
 		// Симуляция
-		float ups_world_set = 10.f;
+		float ups_world_set = 2.f;
 		bool no_update_flag = false;
 		bool pause_simulation = false;
+		bool expendet_ups = false;
+		double max_collision_list = 0.f;
 
 		// Графика
-		float MSAA = 4.f;
+		float MSAA = 16.f;
 		bool MSAA_quasi_start = false;
 		GLint Vsync = 1;
 
@@ -148,9 +152,7 @@ export int main_too() {
 			.contextVersionMajor = 4, .contextVersionMinor = 6,
 			.openglProfile = glfw::OpenGlProfile::Core
 		};
-		//	wh.samples = 16;
 		wh.apply();
-		//	glEnable(GL_MULTISAMPLE);
 	}
 	glfw::Window window{ 640, 480, "CellBakery" };
 	glfw::makeContextCurrent(window);
@@ -167,6 +169,7 @@ export int main_too() {
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 450 core");
+	// настройка шрифтов
 
 	// поиск шрифта
 	try {
@@ -190,6 +193,8 @@ export int main_too() {
 	catch (const fs::filesystem_error& e) {
 		std::cerr << "filesystem error: " << e.what() << std::endl;
 	}
+
+	ImGui::GetIO().Fonts->AddFontDefault();
 
 	// не сохранять состояние меню imgui в файл
 	ImGui::GetIO().IniFilename = nullptr;

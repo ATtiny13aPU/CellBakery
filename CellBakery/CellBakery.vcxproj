@@ -231,6 +231,10 @@
       <TranslateIncludes>false</TranslateIncludes>
       <EnableModules>true</EnableModules>
       <AdditionalModuleDependencies>C:\Microsoft Visual Studio\GlobalModuls\GLFW;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -258,6 +262,10 @@
       <TranslateIncludes>false</TranslateIncludes>
       <EnableModules>true</EnableModules>
       <AdditionalModuleDependencies>C:\Microsoft Visual Studio\GlobalModuls\GLFW;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -284,6 +292,10 @@
       <TranslateIncludes>false</TranslateIncludes>
       <EnableModules>true</EnableModules>
       <AdditionalModuleDependencies>C:\Microsoft Visual Studio\GlobalModuls\GLFW;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -311,6 +323,10 @@
       <TranslateIncludes>false</TranslateIncludes>
       <EnableModules>true</EnableModules>
       <AdditionalModuleDependencies>C:\Microsoft Visual Studio\GlobalModuls\GLFW;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -340,6 +356,7 @@
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\GLFW\window\window.ixx" />
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.aliases.ixx" />
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.container.ixx" />
+    <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.experimental.ixx" />
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.ixx" />
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.legacy.ixx" />
     <ClCompile Include="..\..\..\..\..\..\Microsoft Visual Studio\GlobalModuls\OSL\osl.math.ixx" />
@@ -359,8 +376,10 @@
     <ClCompile Include="Context\run.cpp" />
     <ClCompile Include="Context\sync.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="World\World.cpp" />
+    <ClCompile Include="World\w_cells.cpp" />
+    <ClCompile Include="World\w_run.cpp" />
     <ClCompile Include="World\World.ixx" />
+    <ClCompile Include="World\w_physics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\box.frag" />

@@ -1,19 +1,16 @@
 ﻿#version 430 core
 #extension GL_ARB_fragment_shader_interlock : enable
 
+const bool dark_theme = false;
+
 layout(rgba32ui, binding = 0) readonly uniform uimage2D frame_buffer;
+
 
 struct cell_data_t {
 	vec4 position;
 	vec4 color;
 	vec4 meta;
 };
-/*
-	gl_Position = vec4(position.xy, 0.0, 1.0);
-	v_color = color.rgb;
-	v_radius = color.a;
-	v_vel = position.zw;
-*/
 
 layout(std430, binding = 0) readonly buffer cells {
 	cell_data_t data[];
@@ -54,19 +51,45 @@ float grid1(vec2 uv) {
 	return abs(step(uv.x, 0.5) - step(uv.y, 0.5));
 }
 
+// Полезные функции для работы с цветом
+vec3 rgb2hsv(vec3 c) {
+	vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+	vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+	vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+	float d = q.x - min(q.w, q.y);
+	float e = 1.0e-10;
+	return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+vec3 hsv2rgb(vec3 c) {
+	vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+	vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+	return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+vec3 world_pixel;
+
 // Функция отрисовывает чашу и фон (освещение в будущем)
 vec3 render_background(const vec2 w_uv) {
 	vec3 pixel;
 
 
-	float ling = 0.3;
+	float ling = clamp(1. - dot(w_uv, w_uv) * dot(w_uv, w_uv) * 0.00004 * 0.00004, -10., 0.3);// 0.3;
 
-	ling *= sqrt(ling);
+	const vec3 base_component = vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3);
+	// светлый компонент
+	vec3 ling_color1 = clamp(mix(base_component, vec3(1.), ling * ling * 0.5), 0., 1.);
+	// тёмный компонент
+	vec3 ling_color2 = clamp(base_component * 0.5, 0., 1.);
 
-	vec3 ling_color1 = clamp(mix(vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3), vec3(1.), ling * ling * 0.5), 0., 1.);
-	vec3 ling_color2 = clamp(vec3(0.745 + ling / 2., 0.745 + ling / 5., 1. - ling * ling * 0.3) * 0.5, 0., 1.);
+	pixel = clamp(mix(ling_color2, ling_color1, min(1., (ling_color2.r - 0.05) / 0.55)), 0.02, 1.1);// * step(fract(w_uv.y * 0.5), 0.5) * 0.02 + 0.1;
 
-	pixel = ling_color1;// * step(fract(w_uv.y * 0.5), 0.5) * 0.02 + 0.1;
+	if (dark_theme) {
+		vec3 hsv = rgb2hsv(pixel);
+		hsv.x += 0.45;
+		return hsv2rgb(hsv + vec3(0., 0., -0.4));
+	}
 
 	return pixel;
 }
@@ -76,6 +99,16 @@ vec4 render_cell(const cell_data_t cell, const float r, const vec2 w_uv) {
 	vec4 pixel = vec4(0.);
 
 	pixel = mix(vec4(cell.color.rgb * 0.5, 0.8), vec4(cell.color.rgb, 0.5), step(0.2, r) * step(r, 0.9));
+
+	if (dark_theme) {
+		vec3 hsv = rgb2hsv(cell.color.rgb);
+		vec3 cell_color = hsv2rgb(vec3(hsv.x, 1. - hsv.y, 1. - hsv.z));
+        float l = min(1., world_pixel.r);
+		pixel = mix(
+        vec4(cell.color.rgb * (0.3 + step(0.2, r)) * max(1. - l, 0.2) + world_pixel * (0.2 + step(r, 0.2) * 0.8) - step(r, 0.2) * l, 0.8), 
+        vec4(cell.color.rgb * max(l, 0.7), 0.8 - l), 
+        step(0.2, r) * step(r, 0.9));
+	}
 	return pixel;
 }
 
@@ -129,11 +162,13 @@ void main() {
 	const uvec4 pixel_meta = imageLoad(frame_buffer, i_uv);
 
 	// Чаша и фон
-	pixel = vec4(render_background(world_uv), 1.);
+	world_pixel = render_background(world_uv);
 
 	// Если клеток нет, то и нечего рисовать
-	if (pixel_meta.x == null_id)
+	if (pixel_meta.x == null_id){
+		pixel = vec4(world_pixel.rgb, 1.);
 		return;
+	}
 	cell_data_t cell_1 = data[pixel_meta.x];
 	cell_1.position.xy += cell_1.position.zw * (TimeLerp / 20.);
 
@@ -145,11 +180,10 @@ void main() {
 
 	float start = (gl_FragCoord.x + gl_FragCoord.y * WinSize.x) * MSAA_quasi_start;
 	// Клетка с MSAA
-	vec4 cell_pixel = vec4(0.);
-	for (float x = 0; x < MSAA; x += 1.)
-		cell_pixel += render_cells(pixel_meta, cell_1, cell_2, world_uv + (quasi_random(x + start) - 0.5) * world_pixel_vector);
-	cell_pixel /= MSAA;
-
-	// Смешивание
-	pixel = vec4(mix(pixel.rgb, cell_pixel.rgb, cell_pixel.a), 1.);
+	for (float x = 0; x < MSAA; x += 1.) {
+		const vec4 cell_pixel = render_cells(pixel_meta, cell_1, cell_2, world_uv + (quasi_random(x + start) - 0.5) * world_pixel_vector);
+		// Смешивание
+		pixel += vec4(mix(world_pixel.rgb, cell_pixel.rgb, cell_pixel.a), 1.);
+	}
+	pixel /= MSAA;
 }

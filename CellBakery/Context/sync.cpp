@@ -8,29 +8,30 @@ import shad;
 import std;
 
 void Context::sync() {
-	// TODO: рефакторинг
 	if (!gui_s.no_update_flag) {
-		// предварительное создание события окончания использования текущего vbo
-		// world_snapshots_storage[current_vbo_index].fence_release();
 		world.last_capture()->frame_index = frame_counter - 1u;
-
-		// получение нового кадра из мира и перерисчёт параметров интерполяции
+		// Получение нового кадра из мира и перерисчёт параметров интерполяции
 		if (const auto world_state = world.capture()) {
-			// обновление графики
-			framePerUpdate.push(frame_counter - last_update_frame, 1.);
-			last_update_frame = frame_counter;
+			// Получение отношения числа кадров к числу обновлений буфера
+			update_rate_counter.push();
+			const double frame_per_update =
+				frame_rate_counter.count_rate(std::chrono::milliseconds(200)) /
+				update_rate_counter.count_rate(std::chrono::milliseconds(500));
+			// Вычисление нового дельта времени интерполяции
+			// delta_time_lerp вычисляется такая, чтобы за frame_per_update шагов значение time_lerp стремилось к 1.
+			time_lerp -= 1.;
+			delta_time_lerp = (1. - time_lerp) / frame_per_update;
+
+			// Обновление индекса текущего отрисовываемого VBO и привязка его к VAO
 			current_vbo_index = world_state->vbo_index;
 			current_vbo_gl_id = world_snapshots_storage[current_vbo_index].id();
-			// Связываем VBO как SSBO для случайного доступа к графическим данным из под пост-процессора
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, current_vbo_gl_id);
+			cells_vao.bind_buffer_range(current_vbo_gl_id, 0, 0);
 
-			time_lerp -= 1.;
-			delta_time_lerp = (1. - time_lerp) / framePerUpdate.get();
-			if (!(delta_time_lerp > 0. && delta_time_lerp < 1.))
-				delta_time_lerp = 0., time_lerp = 1.;
-		} else
-			// икремент времени интерполяции
-			time_lerp += delta_time_lerp;
+			// Обновляем связку VBO как SSBO для случайного доступа к графическим данным из под пост-процессора
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, current_vbo_gl_id);
+		}
+		// икремент времени интерполяции
+		time_lerp = std::max<frac32>(-0.3, std::min<frac32>(time_lerp + delta_time_lerp, 1.4));
 	}
 
 	/*
@@ -62,7 +63,7 @@ void Context::sync() {
 						// Привязка хранилища к std::span
 						frame.get()->cells_vram_storge = vbo.as_span<WorldAdapter::cell_render_data_t>();
 					}
-					std::cout << "Key: " << key << ", Value (size_t): " << *v << '\n';
+					std::println("G: queue [{}, {}](size_t)", key, *v);
 				}
 			}
 		}

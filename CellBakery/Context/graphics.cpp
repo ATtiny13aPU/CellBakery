@@ -36,7 +36,8 @@ void Context::graphics() {
 		cellsShader.uniform("ViewWindow", windowView);
 		cellsShader.uniform("WinSize", win_size);
 
-		cellsMesh.draw(cell_vbo, shad::draw_primitive::gl_points);
+		cells_vao.draw(shad::draw_primitive::gl_points, world.last_capture()->cells.size());
+		//cells_vao.draw(cell_vbo, shad::draw_primitive::gl_points);
 	}
 
 	// Отрисовка чашки Петри (Пост-эффект отрисовка)
@@ -49,7 +50,7 @@ void Context::graphics() {
 		petriShader.uniform("MSAA_quasi_start", float(gui_s.MSAA_quasi_start));
 
 		glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-		screenMesh.draw(shad::draw_primitive::gl_triangle_strip);
+		screen_mesh.draw(shad::draw_primitive::gl_triangle_strip);
 	}
 
 	// Запрос захвата пикселя экрана для упрощения поиска коллизии курсора с клетками
@@ -81,7 +82,7 @@ void Context::graphics() {
 		boxShader.uniform("ViewWindow", windowView);
 		boxShader.uniform("WinSize", win_size);
 
-		cellsMesh.draw(cell_vbo, shad::draw_primitive::gl_points);
+		//cells_vao.draw(cell_vbo, shad::draw_primitive::gl_points);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
@@ -94,7 +95,7 @@ void Context::graphics() {
 		forceShader.uniform("ScaleForce", static_cast<float>(gui_s.scale_force_draw / 20.f));
 		forceShader.uniform("ScaleVel", static_cast<float>(gui_s.scale_vel_draw / 20.f));
 
-		cellsMesh.draw(cell_vbo, shad::draw_primitive::gl_points);
+		//cells_vao.draw(cell_vbo, shad::draw_primitive::gl_points);
 	}
 
 	// Первый барьер гарантирует, что операция с vbo завершена до этой

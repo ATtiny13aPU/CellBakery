@@ -17,15 +17,15 @@ int Context::run() {
 			shad::attribute_layout{.type = shad::attribute_type::gl_float_t, .count = 4},
 			shad::attribute_layout{.type = shad::attribute_type::gl_float_t, .count = 4}
 		};
-		cellsMesh.link_attributes(0, atr);
+		cells_vao.link_attributes(0, atr);
 
-		screenMesh.link_attributes(0, shad::attribute_layout{ .type = shad::attribute_type::gl_float_t, .count = 2 });
+		screen_mesh.link_attributes(0, shad::attribute_layout{ .type = shad::attribute_type::gl_float_t, .count = 2 });
 	}
 
 	// Настройка всех vbo
 	{
 		std::vector<float> m = { -1., -1., -1., 1., 1., -1., 1., 1. };
-		screenMesh.vbo.emplace(m);
+		screen_mesh.vbo.emplace(m);
 
 		for (auto& vbo : world_snapshots_storage)
 			vbo.setup(shad::usage_order::by_default, shad::storage_flags::gl_map_coherent_write);
@@ -81,6 +81,8 @@ int Context::run() {
 		glBindBuffer(GL_PIXEL_PACK_BUFFER, 0);
 	}
 
+	wkv_push_commands.emplace_back("ups", gui_s.ups_world_set);
+	wkv_push_commands.emplace_back("sync_limit", 300);
 
 	/*
 		Создание и запуск мира. Сейчас это происходит сразу при запуске Context,
@@ -88,12 +90,12 @@ int Context::run() {
 		включая возможность создания нескольких миров
 		а так же автоматизированное создание миров логикой скриптов
 	*/
-	WorldAdapter::WorldSettings ws;
-	ws.cells_limit = 10000; // Это не жёсткий лимит, а лишь рекомендация.
+	WorldAdapter::world_settings_t ws;
+	ws.cells_limit = 100000; // Это не жёсткий лимит, а лишь рекомендация.
 	ws.world_size = vec2(sqrt(ws.cells_limit) * (2. / sqrt(10.)));
 
 	// Направляем камеру на "центр" мира
-	camera.set(ws.world_size / 2., ws.world_size);
+	camera.set(vec2(0.), ws.world_size * 1.2);
 	// Запуск симуляции в отдельном потоке
 	std::jthread simulationThread(&WorldAdapter::run, &world, std::ref(ws));
 
@@ -103,6 +105,7 @@ int Context::run() {
 	while (!window.shouldClose()) {
 		frame_counter++;
 		frame_counter_proxy = uvec4(frame_counter);
+		frame_rate_counter.push();
 
 		/*
 		control();

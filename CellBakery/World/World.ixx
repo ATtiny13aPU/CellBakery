@@ -4,7 +4,7 @@ import osl;
 using namespace osl::types;
 
 export template <std::size_t key_max_size = 32, std::size_t value_max_size = 256>
-class WorldKeyValueCommand {
+class map_command_t {
 private:
 	std::array<char, key_max_size> key_array{};
 	size_t key_size = 0;
@@ -20,9 +20,9 @@ private:
 	// Прокси-класс для поддержки синтаксиса command["key"] = value
 	class Proxy {
 	private:
-		WorldKeyValueCommand& cmd;
+		map_command_t& cmd;
 	public:
-		Proxy(WorldKeyValueCommand& c) : cmd(c) {}
+		Proxy(map_command_t& c) : cmd(c) {}
 		template <typename T>
 		void operator=(T&& v) {
 			cmd.value.store(std::forward<T>(v));
@@ -33,10 +33,10 @@ public:
 	// value можно сделать теперь публичным
 	trivial<value_max_size> value{};
 
-	WorldKeyValueCommand() = default;
+	map_command_t() = default;
 
 	template <typename T>
-	WorldKeyValueCommand(std::string_view key, T&& v) {
+	map_command_t(std::string_view key, T&& v) {
 		set_key(key);
 		value.store(std::forward<T>(v));
 	}
@@ -51,8 +51,8 @@ public:
 		return { key_array.data(), key_size };
 	}
 
-	WorldKeyValueCommand(const WorldKeyValueCommand& other) = default;
-	WorldKeyValueCommand& operator=(const WorldKeyValueCommand& other) = default;
+	map_command_t(const map_command_t& other) = default;
+	map_command_t& operator=(const map_command_t& other) = default;
 
 	Proxy operator[](std::string_view key) {
 		set_key(key);
@@ -60,21 +60,20 @@ public:
 	}
 };
 
-// чутьб не умэр пока писал... Xp
-export using WorldKeyValueCommandQueue = osl::LF_MPSC_RingBufferQueue<WorldKeyValueCommand<>, 8192>;
-export using WorldKeyValueCommands = std::vector<WorldKeyValueCommand<>>;
+export using map_command_queue_t = osl::lf_mpsc_ring<map_command_t<>, 8192>;
+export using map_commands_t = std::vector<map_command_t<>>;
 
 export class WorldAdapter {
 public:
 	WorldAdapter() : 
-		wkv_request_queue_ptr(std::make_unique<WorldKeyValueCommandQueue>()),
-		wkv_response_queue_ptr(std::make_unique<WorldKeyValueCommandQueue>()) {}
+		wkv_request_queue_ptr(std::make_unique<map_command_queue_t>()),
+		wkv_response_queue_ptr(std::make_unique<map_command_queue_t>()) {}
 
-	struct WorldSettings;
+	struct world_settings_t;
 	struct world_render_data_t;
 	struct cell_render_data_t;
 
-	void run(const WorldSettings& ws);
+	void run(const world_settings_t& ws);
 
 	void stop() {
 		// Ожидание старта, если ещё не запущен
@@ -95,12 +94,12 @@ public:
 	}
 
 	// Возвращает количество успешно помещённых команд
-	size_t push_wkv_commands(WorldKeyValueCommands& commands) {
+	size_t push_wkv_commands(map_commands_t& commands) {
 		return wkv_request_queue_ptr->push(commands);
 	}
 
 	// Возвращает true, если была извлечена хотя бы одна команда
-	bool pull_wkv_commands(WorldKeyValueCommands& commands) {
+	bool pull_wkv_commands(map_commands_t& commands) {
 		return wkv_response_queue_ptr.get()->pop(commands);
 	}
 
@@ -150,12 +149,12 @@ private:
 		Точно так же запрещается использовать world_snapshots как источник поведения очереди команд.
 	*/
 	osl::LF_SPSC_TripleBuffer<world_render_data_t> world_snapshots;
-	std::unique_ptr<WorldKeyValueCommandQueue> wkv_request_queue_ptr; // для запросов от хоста к миру
-	std::unique_ptr<WorldKeyValueCommandQueue> wkv_response_queue_ptr; // для запросов мира к хосту
+	std::unique_ptr<map_command_queue_t> wkv_request_queue_ptr; // для запросов от хоста к миру
+	std::unique_ptr<map_command_queue_t> wkv_response_queue_ptr; // для запросов мира к хосту
 };
 
 
-export struct WorldAdapter::WorldSettings {
+export struct WorldAdapter::world_settings_t {
 	// максимальное число клеток, предполагается динамическое управление памятью
 	uint32_t cells_limit;
 	// условый размер мира, убивает клетки за пределом
@@ -168,6 +167,9 @@ export struct WorldAdapter::world_render_data_t {
 	std::span<cell_render_data_t> cells_vram_storge; // отражение доступной памяти
 	std::span<cell_render_data_t> cells; // отражение использованной памяти
 	std::unordered_map<std::string, double> bench;
+
+	// время, затраченное на генерацию этого шага мира
+	double swap_delta_ms = 0.;
 
 	// ожидаемый индекс кадра при котором завершится работа с vbo на стороне GPU
 	uint32_t frame_index = 0;
@@ -184,11 +186,11 @@ export struct WorldAdapter::cell_render_data_t {
 };
 
 
-using id = uint32_t;
+using id_t = uint32_t;
 
 // Константы для обозначения состояния клеток
-inline const id nullID = static_cast<id>(-1);  // Нет следующей клетки
-inline const id deadID = static_cast<id>(-2);  // Клетка "мёртвая"
+inline constexpr id_t null_id_v = static_cast<id_t>(-1);  // Нет следующей клетки
+inline constexpr id_t dead_id_v = static_cast<id_t>(-2);  // Клетка "мёртвая"
 
 export const char* cell_type_names[] = {
 	u8"Фагоцит"_cpp17,		// Фагоцит 0
@@ -211,20 +213,26 @@ export const char* cell_type_names[] = {
 	u8"Цилиоцит"_cpp17		// Цилиоцит 17
 };
 
-export class cell_t {
+export struct alignas(16) cell_t {
 public:
-	fvec4 color;
-	vec2 pos;       // позиция (метры)
-	vec2 force;     // сила (ньютоны)
-	vec2 impulse;   // импульс (кг·м/с)
-	vec2 velocity;  // скорость (м/с)
-	frac weight;    // масса (кг)
+	alignas(16) vec2 force_predict;		// предварительное значение силы (ньютоны)
+	alignas(16) vec2 velocity_predict;	// предварительное значение скорости (м/с)
+	alignas(16) vec2 pos;				// позиция (метры)
+	alignas(16) vec2 force;				// сила (ньютоны)
+	alignas(16) vec2 impulse;			// импульс (кг·м/с)
+	alignas(16) vec2 velocity;			// скорость (м/с)
+	fvec4 color; // RGBA цвет
+	frac radius;						// радиус (0.5 м по умолчанию)
+	frac weight;						// масса (кг)
 	frac angle;
 	frac rotate_vel;
-	frac radius;    // радиус (0.5 м по умолчанию)
 
-	enum type_t : id {
-		phago,		// Фагоцит 0
+
+	frac forve_abs; // сумма сил взаимодействия (для отладки)
+
+	enum type_t : id_t {
+		none = null_id_v,
+		phago = 0,	// Фагоцит 0
 		flagello,	// Жгутоцит 1
 		photo,		// Фотоцит 2
 		devoro,		// Девороцит 3
@@ -245,6 +253,15 @@ public:
 	} type;
 };
 
+struct line_struct_t {
+	line_struct_t() = default;
+	frac x = std::numeric_limits<double>::infinity();
+	frac y = std::numeric_limits<double>::infinity();
+	alignas(8) id_t index = null_id_v;
+	frac y_floor = std::numeric_limits<double>::infinity();
+	auto operator<=>(const line_struct_t&) const = default;
+};
+
 // Класс имплементации мира
 class World {
 public:
@@ -253,7 +270,7 @@ public:
 	}
 
 	// Основной цикл симуляции
-	void run(const WorldAdapter::WorldSettings&);
+	void run(const WorldAdapter::world_settings_t&);
 
 	std::map<std::string, osl::fastMovingAverageW<20>, std::less<>> bench;
 private:
@@ -263,33 +280,48 @@ private:
 	osl::random rand;
 
 	void update_cells();
-	void physics_1();
-	void physics_2();
-	void sync();
+	void physics_1(); // Подготовка
+	void physics_2(); // Поиск коллизий
+	void physics_3(); // Обработка коллизий
+	void sync(bool is_main_sync);
+
+	id_t enable_new_cell(); // возвращает id живой неинициализированной клетки
+	void disable_cell(const id_t cid); // добавляет id мёрткой клетки в список на удаление
 
 	// Контейнер хранения данных состояния агентов
-	osl::PoolContainer<cell_t> cells_pc;
+	osl::pool_container_t<cell_t> cells_pc;
 	// Оптимизированный список позиций агентов для поиска коллизий
-	std::vector<std::pair<vec2, id>> lines;
+	std::vector<line_struct_t> lines;
+	// Список найденных пар коллизий
+	std::vector<std::pair<id_t, id_t>> detected_pair_collision_vec;
+
 	// Очереди команд ключ-значение
-	WorldKeyValueCommands wkv_push_commands; // команды от хоста к миру
-	WorldKeyValueCommands wkv_pull_commands; // команды от мира к хосту
+	map_commands_t wkv_push_commands; // команды от хоста к миру
+	map_commands_t wkv_pull_commands; // команды от мира к хосту
 
 	// Счётчик шагов мира
 	uint32_t world_step_counter = (-1);
 
 	// Таймеры
-	osl::DeltaTimeMark dtm;
-	osl::DeltaTimeMark ups;
-	osl::UpdateRateLimiter ups_limiter;
+	osl::delta_time_mark dtm;
+	osl::delta_time_mark ups;
+	osl::delta_time_mark swap_delta;
+	osl::update_rate_limiter ups_limiter;
+	osl::window::sliding_counter ups_counter{ 100000 };
+	osl::window::sliding_counter sync_counter{ 1000 };
+	int32_t skip_accum = 0;
+
+	// Счётчик производительности
+	uint32_t check_counter = 0u; // считаем общее число проверок потенциальных пар
+	uint32_t collision_counter = 0u; // считаем число действительных коолизий
 
 	// Состояние мира
-	bool is_paused = false;
+	bool is_paused = true;
 	uint32_t cells_limit = 0;
 };
 
 // Враппер функция для запуска мира
-void WorldAdapter::run(const WorldSettings& ws) {
+void WorldAdapter::run(const world_settings_t& ws) {
 	World world(*this);
 	is_running = true;
 	is_safe_to_close = false;

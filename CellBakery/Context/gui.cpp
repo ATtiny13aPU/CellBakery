@@ -55,10 +55,13 @@ void Context::gui() {
 		// Получаем последние валидные данные бенчмарка
 		const auto& bench = world.last_capture()->bench;
 		if (!bench.empty()) {
-			double current_ups = bench.contains("mspu") ? 1000.0 / bench.at("mspu") : 0.0;
+			ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+			//const double current_ups = bench.contains("mspu") ? 1000.0 / bench.at("mspu") : 0.0;
+			const double current_ups = bench.contains("total_ups") ? bench.at("total_ups") : 0.0;
 			ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f),
-				u8"FPS: %.1f (%.3f ms) | UPS: %.1f / %.1f"_cpp17,
+				u8"FPS: %.1f (%.1f ms) | UPS: %.1f / %.f"_cpp17,
 				ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate, current_ups, 1000. / bench.at("gap"));
+			ImGui::PopFont();
 		}
 	}
 	ImGui::End();
@@ -95,24 +98,27 @@ void Context::gui_graphics_m() {
 void Context::gui_world_control_m() {
 	ImGui::Text(u8"Состояние:"_cpp17);
 	ImGui::BeginGroup();
-	if (ImGui::Button(gui_s.no_update_flag ? u8"Запустить"_cpp17 : u8"Приостановить"_cpp17)) {
+	if (ImGui::Button(gui_s.no_update_flag ? u8"Запустить"_cpp17 : u8"Приостановить"_cpp17, ImVec2(150, 0))) {
 		gui_s.no_update_flag = !gui_s.no_update_flag;
+		if (gui_s.no_update_flag)
+			wkv_push_commands.emplace_back("ups", float(-1.));
+		else
+			wkv_push_commands.emplace_back("ups", gui_s.ups_world_set);
 	}
 
-	if (ImGui::Button(u8"Быстрое сохранение"_cpp17)) {
-		// TODO: реализовать пересоздание со случайным значением seed, либо пользовательским
+	if (ImGui::Button(u8"Пересоздать"_cpp17, ImVec2(150, 0))) {
+		wkv_push_commands.emplace_back("restart", uint64_t(0));
 	}
 	ImGui::EndGroup();
 
 	ImGui::SameLine();
 
 	ImGui::BeginGroup();
-	if (ImGui::Button(u8"Пересоздать"_cpp17)) {
-		// TODO: реализовать пересоздание со случайным значением seed, либо пользовательским
+
+	if (ImGui::Button(u8"Быстрое сохранение"_cpp17, ImVec2(180, 0))) {
 	}
 
-	if (ImGui::Button(u8"Быстрая загрузка"_cpp17)) {
-		// TODO: реализовать пересоздание со случайным значением seed, либо пользовательским
+	if (ImGui::Button(u8"Быстрая загрузка"_cpp17, ImVec2(180, 0))) {
 	}
 	ImGui::EndGroup();
 
@@ -125,23 +131,41 @@ void Context::gui_world_control_m() {
 		// Вывод временных интервалов (gap1 - подготовка, gap2 - вычисления)
 		ImGui::Text(u8" Сортировка и поиск\n %.2f + %.2f = %.2f мс"_cpp17,
 			bench.at("gap1"), bench.at("gap2"), bench.at("gap"));
+		
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip(u8"Отдельно время на подготовку перед алгоритмомо поиска коллизий\nи отдельно время на его работу. (сумма времени обработки физики)"_cpp17);
+
+		ImGui::BulletText(u8"Обработка коллизий: %.2f мс"_cpp17, bench.at("collision"));
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip(u8"Время вычисления суммы сил и ньютоновской физики."_cpp17);
+
+		ImGui::BulletText(u8"Синхр. графики: %.2f мс"_cpp17, bench.at("sync"));
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip(u8"Время на загрузку данных о клетках в видеопамять\nи время ожидания доступа к буферу видеопамяти."_cpp17);
 
 		// Дополнительные счетчики эффективности
 		ImGui::BulletText(u8"Проверок/клетка: %.2f"_cpp17, bench.at("gapcc"));
-		ImGui::BulletText(u8"Коллизий/клетка: %.2f"_cpp17, bench.at("avr_c"));
-
-		ImGui::BulletText(u8"Синхр. графики: %.2f"_cpp17, bench.at("sync"));
-
 		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip(u8"Среднее количество физических контактов на одну частицу"_cpp17);
+			ImGui::SetTooltip(u8"Сколько клетка в среднем делает проверок\nколлизии другими сущностями. (проверки ведутся парами)"_cpp17);
+
+		ImGui::BulletText(u8"Коллизий/клетка: %.2f"_cpp17, bench.at("avr_c") * 2.);
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip(u8"Сколько в среднем столкновений имеют клетки."_cpp17);
+
+		gui_s.max_collision_list = std::max<double>(gui_s.max_collision_list, bench.at("gapcc") * 100000.);
+		ImGui::BulletText(u8"Использование ОЗУ миром: %.1f Мб"_cpp17, bench.at("mem"));
 	}
 
 	ImGui::Text(u8"Целевой UPS:"_cpp17);
-	if (ImGui::SliderFloat("##ups_set", &gui_s.ups_world_set, 4.f, 1000.f, "%.1f")) {
-		WorldKeyValueCommand c;
-		c["ups"] = gui_s.ups_world_set;
-		wkv_push_commands.push_back(c);
+	if (ImGui::SliderFloat("##ups_set", &gui_s.ups_world_set, 
+		gui_s.expendet_ups ? 0.5f : 4.f, gui_s.expendet_ups ? 10000.f : 1000.f,
+		"%.1f", ImGuiSliderFlags_Logarithmic)) {
+		map_command_t c;
+		if (!gui_s.no_update_flag)
+			wkv_push_commands.emplace_back("ups", gui_s.ups_world_set);
 	}
+	ImGui::SameLine();
+	ImGui::Checkbox("##exp_ups", &gui_s.expendet_ups);
 }
 
 // Информация о выделенной клетке
